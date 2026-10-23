@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
@@ -12,6 +12,8 @@ import PlatformUsers from './pages/PlatformUsers.jsx';
 import DataTablePage from './pages/DataTablePage.jsx';
 import SubscriptionPlans from './pages/SubscriptionPlans.jsx';
 import SuspendedTenants from './pages/SuspendedTenants.jsx';
+import TenantBilling from './pages/TenantBilling.jsx';
+import Onboarding from './pages/Onboarding.jsx';
 
 import useSuspendedTenants from './pages/suspended/useSuspendedTenants.js';
 
@@ -132,29 +134,6 @@ export default function App() {
 
           {page === 'usage' && <UsageLimits toast={toast} />}
 
-          {page === 'pusers' && (
-            <PlatformUsers
-              range={range}
-              setRange={setRange}
-              toast={toast}
-            />
-          )}
-
-          {item &&
-            ![
-              'dashboard',
-              'companies',
-              'usage',
-              'plans',
-              'suspended',
-              'pusers',
-            ].includes(page) && (
-              <UnavailablePage
-                item={item}
-                onBack={() => go('dashboard')}
-              />
-            )}
-        </div>
       </div>
 
       <DetailPanel
@@ -166,3 +145,4 @@ export default function App() {
     </div>
   );
 }
+
