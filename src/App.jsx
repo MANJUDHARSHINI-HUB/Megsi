@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
+
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
 import { DetailPanel } from './components/Common.jsx';
 import UnavailablePage from './components/UnavailablePage.jsx';
+
 import Dashboard from './pages/Dashboard.jsx';
 import Companies from './pages/Companies.jsx';
 import UsageLimits from './pages/UsageLimits.jsx';
 import DataTablePage from './pages/DataTablePage.jsx';
+import SubscriptionPlans from './pages/SubscriptionPlans.jsx';
+import SuspendedTenants from './pages/SuspendedTenants.jsx';
+
+import useSuspendedTenants from './pages/suspended/useSuspendedTenants.js';
+
 import { useI18n } from './i18n/I18nContext.jsx';
 import { NAV } from './data/mockData.js';
 import { PRESETS } from './data/selectors.js';
@@ -16,6 +23,7 @@ const ITEMS = NAV.flatMap((g) => g.items);
 export default function App() {
   const { t, lang, fmtDate } = useI18n();
   const [page, setPage] = useState('dashboard');
+  const suspendedStore = useSuspendedTenants();
   const [collapsed, setCollapsed] = useState(false);
   const [range, setRange] = useState({ start: PRESETS[0].start, end: PRESETS[0].end }); // single source of truth for the date range
   const [detail, setDetail] = useState(null);
@@ -39,8 +47,14 @@ export default function App() {
           {page === 'dashboard' && <Dashboard range={range} setRange={setRange} openDetail={setDetail} go={go} toast={toast} />}
           {page.startsWith('table:') && <DataTablePage id={page.slice(6)} range={range} onBack={() => go('dashboard')} />}
           {page === 'companies' && <Companies toast={toast} />}
+          {page === 'plans' && <SubscriptionPlans toast={toast} />}
+          {page === 'suspended' && (
+  <SuspendedTenants store={suspendedStore} toast={toast} />
+)}
           {page === 'usage' && <UsageLimits toast={toast} />}
-          {item && page !== 'dashboard' && page !== 'companies' && page !== 'usage' && <UnavailablePage item={item} onBack={() => go('dashboard')} />}        </div>
+          {item && !['dashboard', 'companies', 'usage', 'plans', 'suspended'].includes(page) && (
+  <UnavailablePage item={item} onBack={() => go('dashboard')} />
+)}        </div>
       </div>
       <DetailPanel data={detail} onClose={() => setDetail(null)} />
       {msg && <div className="toast">{msg}</div>}
