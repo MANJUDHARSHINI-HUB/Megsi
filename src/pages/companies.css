@@ -1,0 +1,842 @@
+/* =========================================================
+   MEGSI COMPANIES PAGE
+   All styles are scoped to .cp to protect the Dashboard.
+   ========================================================= */
+
+.cp {
+  --cp-gap: 12px;
+  --cp-border: var(--bd, #E4ECF5);
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+.cp *,
+.cp *::before,
+.cp *::after {
+  box-sizing: border-box;
+}
+
+.cp button,
+.cp input,
+.cp select {
+  font-family: inherit;
+}
+
+.cp button {
+  cursor: pointer;
+}
+
+.cp button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ---------- Page heading ---------- */
+
+.cp .title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 0 2px 14px;
+  min-width: 0;
+}
+
+.cp .title-row > div {
+  min-width: 0;
+}
+
+.cp .title-row h1 {
+  font-size: 26px;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.cp .title-row p {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sec, #465477);
+}
+
+.cp .cp-add {
+  min-height: 38px;
+  padding: 0 15px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+/* ---------- KPI cards ---------- */
+
+.cp .cp-kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--cp-gap);
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 14px;
+}
+
+.cp .cp-kpis .kpi {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 9px;
+  row-gap: 7px;
+  min-width: 0;
+  min-height: 100px;
+  height: auto;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.cp .cp-kpis .kpi-ic {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+}
+
+.cp .cp-kpis .kpi-ic svg {
+  width: 21px;
+  height: 21px;
+}
+
+.cp .cp-kpis .kpi-t {
+  display: block;
+  min-width: 0;
+}
+
+.cp .cp-kpis .kpi-t > small {
+  display: block;
+  font-size: 10.5px;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.cp .cp-kpis .kpi-v {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  min-width: 0;
+}
+
+.cp .cp-kpis .kpi-v b {
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.cp .cp-kpis .kpi-v em {
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.cp .cp-kpis .kpi-d {
+  grid-column: 1 / -1;
+  min-width: 0;
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Main table card ---------- */
+
+.cp .cp-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* ---------- Toolbar ---------- */
+
+.cp .cp-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border-bottom: 1px solid var(--cp-border);
+}
+
+.cp .cp-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 240px;
+  width: auto;
+  min-width: 180px;
+  max-width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  background: #fff;
+  border: 1px solid var(--cp-border);
+  border-radius: 6px;
+}
+
+.cp .cp-search > svg {
+  flex: 0 0 auto;
+  color: var(--sec, #465477);
+}
+
+.cp .cp-search input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--navy, #101B4D);
+  font-size: 11.5px;
+}
+
+.cp .cp-search input:focus-visible {
+  outline: none;
+}
+
+.cp .cp-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cp .cp-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 27px 0 10px;
+  border: 1px solid var(--cp-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--navy, #101B4D);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.cp .cp-select > svg {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  flex: 0 0 auto;
+}
+
+.cp .cp-toolbar .grow {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.cp .cp-btn {
+  min-height: 36px;
+  padding: 0 12px;
+  justify-content: center;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.cp .cp-btn svg {
+  flex: 0 0 auto;
+}
+
+/* ---------- Horizontally scrollable table ---------- */
+
+.cp .cp-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 0;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.cp .cp-tbl {
+  width: 100%;
+  min-width: 1080px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.cp .cp-tbl thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.cp .cp-tbl th {
+  height: 38px;
+  padding: 8px 10px;
+  background: #F1F6FB;
+  border-bottom: 1px solid var(--cp-border);
+  color: var(--navy, #101B4D);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.cp .cp-tbl th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.cp .cp-tbl th.sortable svg {
+  display: inline-block;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.cp .cp-tbl td {
+  height: 42px;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--cp-border);
+  color: var(--navy, #101B4D);
+  vertical-align: middle;
+}
+
+.cp .cp-tbl tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cp .cp-tbl tbody tr:hover {
+  background: #F8FBFF;
+}
+
+.cp .cp-tbl th:first-child,
+.cp .cp-tbl td:first-child {
+  width: 42px;
+  text-align: center;
+}
+
+.cp .cp-tbl th:nth-child(2),
+.cp .cp-tbl td:nth-child(2) {
+  min-width: 195px;
+}
+
+.cp .cp-tbl td .name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.cp .cp-tbl .name .av {
+  flex: 0 0 26px;
+}
+
+.cp .cp-tbl .cp-link {
+  display: inline-block;
+  max-width: 230px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--blue, #0758F9);
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp .cp-tbl .cp-link:hover {
+  text-decoration: underline;
+}
+
+.cp .cp-tbl th:last-child,
+.cp .cp-tbl td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  text-align: right;
+  background: #fff;
+}
+
+.cp .cp-tbl th:last-child {
+  z-index: 3;
+  background: #F1F6FB;
+}
+
+.cp .cp-tbl tbody tr:hover td:last-child {
+  background: #F8FBFF;
+}
+
+.cp .cp-tbl .empty {
+  height: 100px;
+  padding: 24px;
+  text-align: center;
+  color: var(--sec, #465477);
+  white-space: normal;
+}
+
+.cp .cp-tbl .empty .cp-link {
+  margin-left: 4px;
+}
+
+/* ---------- Action menu ---------- */
+
+.cp .dots {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 28px;
+  border: 1px solid var(--cp-border);
+  border-radius: 5px;
+  background: #fff;
+}
+
+.cp .dots:hover,
+.cp .dots[aria-expanded="true"] {
+  border-color: var(--blue, #0758F9);
+  color: var(--blue, #0758F9);
+}
+
+.cp-menu {
+  position: fixed;
+  z-index: 100;
+  width: 190px;
+  max-width: calc(100vw - 16px);
+  padding: 5px;
+  background: #fff;
+  border: 1px solid var(--cp-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(16, 27, 77, 0.18);
+}
+
+.cp-menu button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 9px;
+  border-radius: 5px;
+  color: var(--navy, #101B4D);
+  background: transparent;
+  font-size: 11.5px;
+  text-align: left;
+  white-space: normal;
+}
+
+.cp-menu button:hover {
+  background: #F1F6FB;
+}
+
+.cp-menu button svg {
+  flex: 0 0 auto;
+}
+
+.cp-menu button.danger {
+  color: var(--red, #E8172D);
+}
+
+.cp-menu button.ok-i {
+  color: var(--green, #079447);
+}
+
+/* ---------- Pagination ---------- */
+
+.cp .cp-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-top: 1px solid var(--cp-border);
+  color: var(--sec, #465477);
+  font-size: 11px;
+}
+
+.cp .cp-pager {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.cp .cp-pager .pg {
+  display: inline-grid;
+  place-items: center;
+  min-width: 29px;
+  height: 29px;
+  padding: 0 6px;
+  border: 1px solid var(--cp-border);
+  border-radius: 5px;
+  background: #fff;
+  color: var(--navy, #101B4D);
+  font-size: 11px;
+}
+
+.cp .cp-pager .pg.on {
+  background: var(--blue, #0758F9);
+  border-color: var(--blue, #0758F9);
+  color: #fff;
+}
+
+.cp .cp-pager .pg:disabled {
+  opacity: 0.4;
+}
+
+/* ---------- Modal backdrop ---------- */
+
+.cp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(6, 27, 44, 0.48);
+  backdrop-filter: blur(2px);
+}
+
+.cp-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 650px;
+  max-height: calc(100vh - 40px);
+  min-width: 0;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--cp-border);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.cp-modal-h {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--cp-border);
+}
+
+.cp-modal-h h3 {
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.cp-modal-b {
+  padding: 18px 20px;
+}
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.cp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.cp-field > span:first-child {
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.cp-field > span:first-child i {
+  color: var(--red, #E8172D);
+  font-style: normal;
+}
+
+.cp-field input,
+.cp-field select {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--cp-border);
+  border-radius: 6px;
+  outline: none;
+  background: #fff;
+  color: var(--navy, #101B4D);
+  font-size: 12px;
+}
+
+.cp-field input:focus,
+.cp-field select:focus {
+  border-color: var(--blue, #0758F9);
+  box-shadow: 0 0 0 2px rgba(7, 88, 249, 0.1);
+}
+
+.cp-field.bad input {
+  border-color: var(--red, #E8172D);
+}
+
+.cp-field .cp-select {
+  width: 100%;
+}
+
+.cp-field .err {
+  color: var(--red, #E8172D);
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.cp-note {
+  margin: 14px 20px 0;
+  color: var(--sec, #465477);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.cp-modal-b > .cp-note {
+  margin: 0;
+}
+
+.cp-modal-f {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 20px;
+  margin-top: 16px;
+  background: #fff;
+  border-top: 1px solid var(--cp-border);
+}
+
+.cp-modal-f .btn-primary,
+.cp-modal-f .btn-sm {
+  min-height: 36px;
+  justify-content: center;
+}
+
+.cp-modal-f .cp-danger {
+  background: var(--red, #E8172D);
+}
+
+/* ---------- Responsive layout ---------- */
+
+@media (max-width: 1350px) {
+  .cp .cp-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cp .cp-toolbar .grow {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .cp .cp-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cp .cp-toolbar {
+    align-items: stretch;
+  }
+
+  .cp .cp-search {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .cp .cp-toolbar > .cp-select {
+    flex: 1 1 140px;
+  }
+
+  .cp .cp-toolbar > .cp-btn {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .cp .title-row {
+    align-items: stretch;
+  }
+
+  .cp .title-row h1 {
+    font-size: 23px;
+  }
+
+  .cp .title-row p {
+    font-size: 12px;
+  }
+
+  .cp .cp-add {
+    align-self: flex-start;
+  }
+
+  .cp .cp-kpis {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .cp .cp-kpis .kpi {
+    grid-template-columns: 42px minmax(0, 1fr);
+    min-height: 85px;
+  }
+
+  .cp .cp-toolbar {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .cp .cp-toolbar > .cp-select {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .cp .cp-toolbar > .cp-btn {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  .cp .cp-foot {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cp-modal {
+    max-height: calc(100vh - 24px);
+  }
+
+  .cp-backdrop {
+    padding: 12px;
+  }
+
+  .cp-modal-h,
+  .cp-modal-b {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .cp-modal-f {
+    padding: 12px 14px;
+  }
+}
+/* =========================================================
+   COMPANIES PAGE — LAYOUT OVERFLOW FIX
+   Scoped to Companies only; Dashboard remains unchanged.
+   ========================================================= */
+
+.cp {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.cp .title-row {
+  width: 100%;
+  min-width: 0;
+}
+
+.cp .cp-kpis {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+}
+
+.cp .cp-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cp .cp-toolbar {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cp .cp-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.cp .cp-tbl {
+  width: 100%;
+  min-width: 1080px;
+  table-layout: auto;
+}
+
+@media (max-width: 1350px) {
+  .cp .cp-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .cp .cp-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .cp .cp-kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* KPI cards are all interactive; keep the row action menu above sticky table cells. */
+.cp .cp-kpis .cp-kpi-clickable {
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.cp .cp-kpis .cp-kpi-clickable:hover,
+.cp .cp-kpis .cp-kpi-clickable:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(7, 88, 249, 0.18), 0 4px 12px rgba(16, 27, 77, 0.08);
+}
+.cp .cp-kpis .cp-kpi-clickable:focus-visible {
+  outline: 2px solid var(--blue, #0758F9);
+  outline-offset: 2px;
+}
+.cp-menu {
+  z-index: 99999;
+}
