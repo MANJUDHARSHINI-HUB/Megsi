@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
@@ -11,6 +11,8 @@ import UsageLimits from './pages/UsageLimits.jsx';
 import DataTablePage from './pages/DataTablePage.jsx';
 import SubscriptionPlans from './pages/SubscriptionPlans.jsx';
 import SuspendedTenants from './pages/SuspendedTenants.jsx';
+import TenantBilling from './pages/TenantBilling.jsx';
+import Onboarding from './pages/Onboarding.jsx';
 
 import useSuspendedTenants from './pages/suspended/useSuspendedTenants.js';
 
@@ -52,7 +54,9 @@ export default function App() {
   <SuspendedTenants store={suspendedStore} toast={toast} />
 )}
           {page === 'usage' && <UsageLimits toast={toast} />}
-          {item && !['dashboard', 'companies', 'usage', 'plans', 'suspended'].includes(page) && (
+          {page === 'billing' && <TenantBilling range={range} setRange={setRange} toast={toast} />}
+          {page === 'onboarding' && <Onboarding range={range} setRange={setRange} toast={toast} />}
+          {item && !['dashboard', 'companies', 'usage', 'plans', 'suspended', 'billing', 'onboarding'].includes(page) && (
   <UnavailablePage item={item} onBack={() => go('dashboard')} />
 )}        </div>
       </div>
@@ -61,3 +65,4 @@ export default function App() {
     </div>
   );
 }
+
