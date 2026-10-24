@@ -1,41 +1,37 @@
-﻿import { useEffect, useState } from 'react';
-
+﻿
+import { useEffect, useState } from 'react';
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
 import { DetailPanel } from './components/Common.jsx';
 import UnavailablePage from './components/UnavailablePage.jsx';
-
 import Dashboard from './pages/Dashboard.jsx';
 import Companies from './pages/Companies.jsx';
-import UsageLimits from './pages/UsageLimits.jsx';
-import PlatformUsers from './pages/PlatformUsers.jsx';
-import DataTablePage from './pages/DataTablePage.jsx';
-import SubscriptionPlans from './pages/SubscriptionPlans.jsx';
-import SuspendedTenants from './pages/SuspendedTenants.jsx';
 import TenantBilling from './pages/TenantBilling.jsx';
 import Onboarding from './pages/Onboarding.jsx';
-
-import useSuspendedTenants from './pages/suspended/useSuspendedTenants.js';
-
+import DataTablePage from './pages/DataTablePage.jsx';
 import { useI18n } from './i18n/I18nContext.jsx';
 import { NAV } from './data/mockData.js';
 import { PRESETS } from './data/selectors.js';
+import SubscriptionPlans from './pages/SubscriptionPlans.jsx';
+import UsageLimits from './pages/UsageLimits.jsx';
+import SuspendedTenants from './pages/SuspendedTenants.jsx';
+import PlatformUsers from './pages/PlatformUsers.jsx';
+import RolesPermissions from './pages/RolesPermissions.jsx';
+import useSuspendedTenants from './pages/suspended/useSuspendedTenants.js';
+import CustomerAdmins from './pages/CustomerAdmins.jsx';
+import AccessLogs from './pages/AccessLog.jsx';
 
 const ITEMS = NAV.flatMap((g) => g.items);
 
 export default function App() {
-  const { t, lang, fmtDate } = useI18n();
-
-  const [page, setPage] = useState('dashboard');
   const suspendedStore = useSuspendedTenants();
-
+  const { t, lang, fmtDate } = useI18n();
+  const [page, setPage] = useState('dashboard');
   const [collapsed, setCollapsed] = useState(false);
-
   const [range, setRange] = useState({
     start: PRESETS[0].start,
     end: PRESETS[0].end,
   });
-
   const [detail, setDetail] = useState(null);
   const [msg, setMsg] = useState(null);
 
@@ -43,9 +39,7 @@ export default function App() {
 
   useEffect(() => {
     if (!msg) return;
-
     const id = setTimeout(() => setMsg(null), 3000);
-
     return () => clearTimeout(id);
   }, [msg]);
 
@@ -123,7 +117,25 @@ export default function App() {
 
           {page === 'companies' && <Companies toast={toast} />}
 
+          {page === 'billing' && (
+            <TenantBilling
+              range={range}
+              setRange={setRange}
+              toast={toast}
+            />
+          )}
+
+          {page === 'onboarding' && (
+            <Onboarding
+              range={range}
+              setRange={setRange}
+              toast={toast}
+            />
+          )}
+
           {page === 'plans' && <SubscriptionPlans toast={toast} />}
+
+          {page === 'usage' && <UsageLimits />}
 
           {page === 'suspended' && (
             <SuspendedTenants
@@ -132,8 +144,50 @@ export default function App() {
             />
           )}
 
-          {page === 'usage' && <UsageLimits toast={toast} />}
+          {page === 'pusers' && <PlatformUsers />}
+          {page === 'cadmins' && (
+            <CustomerAdmins
+              range={range}
+              setRange={setRange}
+              toast={toast}
+            />
+          )}
 
+          {page === 'roles' && (
+            <RolesPermissions
+              range={range}
+              setRange={setRange}
+              toast={toast}
+            />
+          )}
+          {page === 'alogs' && (
+            <AccessLogs
+              range={range}
+              setRange={setRange}
+              toast={toast}
+            />
+          )}
+
+          {item &&
+            ![
+              'dashboard',
+              'companies',
+              'billing',
+              'onboarding',
+              'plans',
+              'usage',
+              'suspended',
+              'pusers',
+              'cadmins',
+              'roles',
+              'alogs',
+            ].includes(page) && (
+              <UnavailablePage
+                item={item}
+                onBack={() => go('dashboard')}
+              />
+            )}
+        </div>
       </div>
 
       <DetailPanel
@@ -145,4 +199,3 @@ export default function App() {
     </div>
   );
 }
-
