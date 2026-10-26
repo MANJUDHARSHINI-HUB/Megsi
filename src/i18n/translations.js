@@ -141,16 +141,110 @@ const usageTranslations = {
     'usage.export':'Bericht exportieren','usage.manage':'Limits verwalten','usage.month':'Berichtsmonat auswählen','usage.month.note':'Monatsauswahl ist beispielhaft; Demodaten sind nicht historisch.','usage.month.changed':'Monat geändert. Die Messwerte bleiben Demodaten.','usage.exported':'Nutzungsbericht heruntergeladen.','usage.resource':'Ressourcennutzung im Überblick','usage.distribution':'Verteilung der Mandantennutzung','usage.table':'Mandantennutzung und Limits','usage.alerts':'Nutzungswarnungen','usage.recommendations':'Empfohlene Maßnahmen','usage.viewAll':'Alle anzeigen','usage.review':'Prüfen','usage.done':'Fertig','usage.search':'Unternehmen suchen...','usage.allPlans':'Alle Pläne','usage.allStatuses':'Alle Nutzungsstatus','usage.allResources':'Alle Ressourcen','usage.reset':'Filter zurücksetzen','usage.noResults':'Keine Mandanten entsprechen den Filtern.','usage.matching':'passende Mandanten','usage.normal':'Normal','usage.near':'Limit fast erreicht','usage.critical':'Kritisch','usage.col.company':'Unternehmensname','usage.col.plan':'Abonnementplan','usage.col.users':'Benutzer','usage.col.guards':'Sicherheitskräfte','usage.col.sites':'Standorte','usage.col.storage':'Speicher','usage.col.overall':'Gesamtnutzung','usage.col.status':'Status','usage.col.actions':'Aktionen','usage.limits.intro':'Nur lesbare Abonnementlimits für diese Demo. Plankonfigurationen werden nicht geändert.','usage.limits.demo':'Limits für Sicherheitskräfte und Speicher sind Demowerte.','usage.allAlerts':'Alle Nutzungswarnungen','usage.allRecommendations':'Alle empfohlenen Maßnahmen','usage.close':'Schließen','usage.details':'Details anzeigen','usage.reviewUsage':'Nutzung prüfen'
   }
 };
+// Merge Usage & Limits translations.
 Object.assign(en, usageTranslations.en);
 Object.assign(fr, usageTranslations.fr);
 Object.assign(de, usageTranslations.de);
 
-export const TRANSLATIONS = { en, fr, de };
-const MONTHS = {
-  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-  fr: ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'],
-  de: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+const featureRequestTranslations = {
+  en: {
+    'fr.title':'Feature Requests','fr.subtitle':'Track, manage and prioritize feature requests from your users and customers.','fr.startDate':'Start date','fr.endDate':'End date','fr.to':'to',
+    'fr.totalRequests':'Total Requests','fr.allTime':'All time requests','fr.implemented':'Implemented','fr.released':'Successfully released','fr.inProgress':'In Progress','fr.developing':'Currently being developed','fr.pending':'Pending','fr.review':'Under review','fr.rejected':'Rejected','fr.notPlanned':'Not planned / duplicate',
+    'fr.overview':'Requests Overview','fr.total':'Total','fr.status':'Request Status','fr.top':'Top Requested Features','fr.recent':'Recent Updates','fr.viewAll':'View All','fr.noRequests':'No feature requests available.','fr.noUpdates':'No recent updates.','fr.newIdea':'Have a new idea?','fr.improve':'Help us improve! Submit your feature request and make MEGSI even better.',
+    'fr.submit':'Submit Feature Request','fr.tellUs':'Tell us what feature would improve your experience.','fr.close':'Close','fr.featureTitle':'Feature title','fr.enterTitle':'Enter feature title','fr.description':'Description','fr.describe':'Describe your idea...','fr.requestedBy':'Requested by','fr.yourName':'Your name','fr.category':'Category','fr.priority':'Priority','fr.cancel':'Cancel','fr.submitRequest':'Submit Request','fr.role':'Role','fr.dateRequested':'Date requested','fr.votes':'Votes',
+    'fr.search':'Search feature requests...','fr.clearSearch':'Clear search','fr.filterStatus':'Filter by status','fr.sortRequests':'Sort requests','fr.allStatuses':'All Statuses','fr.newest':'Newest First','fr.oldest':'Oldest First','fr.mostVotes':'Most Votes','fr.titleAZ':'Title A-Z','fr.clearFilters':'Clear Filters','fr.featureTitleCol':'Feature Title','fr.requestedByCol':'Requested By','fr.dateRequestedCol':'Date Requested','fr.actions':'Actions','fr.empty':'No feature requests found. Try changing your search, date range, or status filter.','fr.showing':'Showing {shown} of {total} feature requests','fr.previous':'Previous page','fr.next':'Next page','fr.filterBy':'Filter by {status}','fr.filterMonth':'Filter requests for {month}','fr.requestsCount':'{count} requests','fr.statusDistribution':'Status distribution for {count} requests','fr.viewRequest':'View {title}'
+  },
+  fr: {
+    'fr.title':'Demandes de fonctionnalités','fr.subtitle':'Suivez, gérez et priorisez les demandes de fonctionnalités de vos utilisateurs et clients.','fr.startDate':'Date de début','fr.endDate':'Date de fin','fr.to':'à',
+    'fr.totalRequests':'Demandes au total','fr.allTime':'Toutes les demandes','fr.implemented':'Mise en œuvre','fr.released':'Publiées avec succès','fr.inProgress':'En cours','fr.developing':'En cours de développement','fr.pending':'En attente','fr.review':'En cours d’examen','fr.rejected':'Refusées','fr.notPlanned':'Non prévues / doublons',
+    'fr.overview':'Aperçu des demandes','fr.total':'Total','fr.status':'État des demandes','fr.top':'Fonctionnalités les plus demandées','fr.recent':'Mises à jour récentes','fr.viewAll':'Tout afficher','fr.noRequests':'Aucune demande de fonctionnalité disponible.','fr.noUpdates':'Aucune mise à jour récente.','fr.newIdea':'Une nouvelle idée ?','fr.improve':'Aidez-nous à nous améliorer ! Envoyez votre demande de fonctionnalité pour améliorer MEGSI.',
+    'fr.submit':'Envoyer une demande','fr.tellUs':'Indiquez la fonctionnalité qui améliorerait votre expérience.','fr.close':'Fermer','fr.featureTitle':'Titre de la fonctionnalité','fr.enterTitle':'Saisissez le titre','fr.description':'Description','fr.describe':'Décrivez votre idée...','fr.requestedBy':'Demandé par','fr.yourName':'Votre nom','fr.category':'Catégorie','fr.priority':'Priorité','fr.cancel':'Annuler','fr.submitRequest':'Envoyer la demande','fr.role':'Rôle','fr.dateRequested':'Date de demande','fr.votes':'Votes',
+    'fr.search':'Rechercher des demandes...','fr.clearSearch':'Effacer la recherche','fr.filterStatus':'Filtrer par état','fr.sortRequests':'Trier les demandes','fr.allStatuses':'Tous les états','fr.newest':'Plus récentes','fr.oldest':'Plus anciennes','fr.mostVotes':'Plus de votes','fr.titleAZ':'Titre A-Z','fr.clearFilters':'Effacer les filtres','fr.featureTitleCol':'Fonctionnalité','fr.requestedByCol':'Demandé par','fr.dateRequestedCol':'Date de demande','fr.actions':'Actions','fr.empty':'Aucune demande trouvée. Modifiez la recherche, la période ou le filtre d’état.','fr.showing':'Affichage de {shown} sur {total} demandes','fr.previous':'Page précédente','fr.next':'Page suivante','fr.filterBy':'Filtrer par {status}','fr.filterMonth':'Filtrer les demandes de {month}','fr.requestsCount':'{count} demandes','fr.statusDistribution':'Répartition des états pour {count} demandes','fr.viewRequest':'Afficher {title}'
+  },
+  de: {
+    'fr.title':'Funktionsanfragen','fr.subtitle':'Verfolgen, verwalten und priorisieren Sie Funktionsanfragen Ihrer Benutzer und Kunden.','fr.startDate':'Startdatum','fr.endDate':'Enddatum','fr.to':'bis',
+    'fr.totalRequests':'Anfragen gesamt','fr.allTime':'Alle bisherigen Anfragen','fr.implemented':'Umgesetzt','fr.released':'Erfolgreich veröffentlicht','fr.inProgress':'In Bearbeitung','fr.developing':'Wird derzeit entwickelt','fr.pending':'Ausstehend','fr.review':'Wird geprüft','fr.rejected':'Abgelehnt','fr.notPlanned':'Nicht geplant / Duplikat',
+    'fr.overview':'Anfragenübersicht','fr.total':'Gesamt','fr.status':'Anfragestatus','fr.top':'Am häufigsten angefragte Funktionen','fr.recent':'Neueste Aktualisierungen','fr.viewAll':'Alle anzeigen','fr.noRequests':'Keine Funktionsanfragen verfügbar.','fr.noUpdates':'Keine aktuellen Aktualisierungen.','fr.newIdea':'Eine neue Idee?','fr.improve':'Helfen Sie uns, besser zu werden! Senden Sie Ihre Funktionsanfrage für ein besseres MEGSI.',
+    'fr.submit':'Funktionsanfrage senden','fr.tellUs':'Welche Funktion würde Ihre Erfahrung verbessern?','fr.close':'Schließen','fr.featureTitle':'Funktionstitel','fr.enterTitle':'Funktionstitel eingeben','fr.description':'Beschreibung','fr.describe':'Beschreiben Sie Ihre Idee...','fr.requestedBy':'Angefragt von','fr.yourName':'Ihr Name','fr.category':'Kategorie','fr.priority':'Priorität','fr.cancel':'Abbrechen','fr.submitRequest':'Anfrage senden','fr.role':'Rolle','fr.dateRequested':'Anfragedatum','fr.votes':'Stimmen',
+    'fr.search':'Funktionsanfragen suchen...','fr.clearSearch':'Suche löschen','fr.filterStatus':'Nach Status filtern','fr.sortRequests':'Anfragen sortieren','fr.allStatuses':'Alle Status','fr.newest':'Neueste zuerst','fr.oldest':'Älteste zuerst','fr.mostVotes':'Meiste Stimmen','fr.titleAZ':'Titel A-Z','fr.clearFilters':'Filter löschen','fr.featureTitleCol':'Funktionstitel','fr.requestedByCol':'Angefragt von','fr.dateRequestedCol':'Anfragedatum','fr.actions':'Aktionen','fr.empty':'Keine Anfragen gefunden. Ändern Sie Suche, Zeitraum oder Statusfilter.','fr.showing':'{shown} von {total} Anfragen angezeigt','fr.previous':'Vorherige Seite','fr.next':'Nächste Seite','fr.filterBy':'Nach {status} filtern','fr.filterMonth':'Anfragen für {month} filtern','fr.requestsCount':'{count} Anfragen','fr.statusDistribution':'Statusverteilung für {count} Anfragen','fr.viewRequest':'{title} anzeigen'
+  }
 };
-export const monthShort = (key, lang) => MONTHS[lang][+key.slice(5, 7) - 1];
-export const fmtDate = (iso, lang) => `${iso.slice(8, 10)} ${monthShort(iso, lang)} ${iso.slice(0, 4)}`;
-export const fmtDateTime = (iso, lang) => `${fmtDate(iso, lang)} ${iso.slice(11, 16)}`;
+
+// Merge Feature Requests translations.
+Object.assign(en, featureRequestTranslations.en);
+Object.assign(fr, featureRequestTranslations.fr);
+Object.assign(de, featureRequestTranslations.de);
+
+// Export the complete translation dictionary after merging all translations.
+export const TRANSLATIONS = { en, fr, de };
+
+// Short month names used by the date helpers.
+const MONTHS = {
+en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+fr: ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'],
+de: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+};
+
+// Return the short month name for a YYYY-MM key.
+export const monthShort = (key, lang = 'en') => {
+if (typeof key !== 'string' || !/^\d{4}-\d{2}$/.test(key)) {
+return '';
+}
+
+const monthIndex = Number(key.slice(5, 7)) - 1;
+const months = MONTHS[lang] || MONTHS.en;
+
+return months[monthIndex] || '';
+};
+
+// Format a date according to the selected language.
+export const fmtDate = (iso, lang = 'en') => {
+if (typeof iso !== 'string' || !iso.trim()) {
+return '';
+}
+
+const date = new Date(iso);
+
+if (Number.isNaN(date.getTime())) {
+return '';
+}
+
+const locales = {
+en: 'en',
+fr: 'fr-FR',
+de: 'de-DE',
+};
+
+return new Intl.DateTimeFormat(locales[lang] || 'en', {
+day: '2-digit',
+month: 'short',
+year: 'numeric',
+}).format(date);
+};
+
+// Format a date and time according to the selected language.
+export const fmtDateTime = (iso, lang = 'en') => {
+if (typeof iso !== 'string' || !iso.trim()) {
+return '';
+}
+
+const date = new Date(iso);
+
+if (Number.isNaN(date.getTime())) {
+return '';
+}
+
+const locales = {
+en: 'en',
+fr: 'fr-FR',
+de: 'de-DE',
+};
+
+return new Intl.DateTimeFormat(locales[lang] || 'en', {
+day: '2-digit',
+month: 'short',
+year: 'numeric',
+hour: '2-digit',
+minute: '2-digit',
+}).format(date);
+};
