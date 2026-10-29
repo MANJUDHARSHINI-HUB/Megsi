@@ -1720,3 +1720,339 @@
     transition-duration: 0.01ms !important;
   }
 }
+/* ==========================================
+   DATA BACKUP — DASHBOARD TYPOGRAPHY MATCH
+   Typography only; preserve existing layout
+   ========================================== */
+
+/* Base font and text colour */
+.db-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+}
+
+/* Apply Dashboard font to controls */
+.db-page button,
+.db-page input,
+.db-page select,
+.db-page textarea {
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* Main page title */
+.db-page .db-heading h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #101B4D;
+  letter-spacing: -0.5px;
+}
+
+/* Page description */
+.db-page .db-heading p {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Date range selector */
+.db-page .db-date-selector > span {
+  font-size: 12px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* Date range options */
+.db-page .db-date-option strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: #101B4D;
+}
+
+.db-page .db-date-option span {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Buttons — retain existing colours */
+.db-page .db-btn,
+.db-page .db-back-btn {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* KPI labels */
+.db-page .db-kpi-info > span {
+  font-size: 12px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* KPI values */
+.db-page .db-kpi-info strong {
+  font-size: 24px;
+  font-weight: 800;
+  color: #101B4D;
+  letter-spacing: -0.4px;
+}
+
+/* Date KPI value */
+.db-page .db-kpi-info .db-date-value {
+  font-size: clamp(15px, 1.4vw, 22px);
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* KPI supporting text */
+.db-page .db-kpi-info small {
+  font-size: 10px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* KPI growth label — retain existing green colour */
+.db-page .db-kpi-info .db-growth {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Panel headings */
+.db-page .db-panel-title h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+  letter-spacing: 0;
+}
+
+/* Dropdowns */
+.db-page .db-compact-select {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Chart legends */
+.db-page .db-chart-legend > span,
+.db-page .db-legend-button {
+  font-size: 11px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* Chart drill-down summary */
+.db-page .db-drill-summary span {
+  font-size: 10px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+.db-page .db-drill-summary strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Table column headings */
+.db-page .db-table th,
+.db-page .db-schedule-table th {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Table content */
+.db-page .db-table td,
+.db-page .db-schedule-table td {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Job ID */
+.db-page .db-job-id {
+  color: #465477 !important;
+  font-weight: 500;
+}
+
+/* Time information */
+.db-page .db-time-cell {
+  color: #465477 !important;
+}
+
+/* Job status — retain existing status colours */
+.db-page .db-job-status {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Schedule name */
+.db-page .db-schedule-name {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Storage chart legend */
+.db-page .db-storage-legend > span {
+  font-size: 10px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* Schedule toggle */
+.db-page .db-switch-control {
+  font-size: 11px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* Table action menu */
+.db-page .db-dropdown-menu button {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Empty states */
+.db-page .db-empty-state,
+.db-page .db-empty-schedules {
+  color: #66728B !important;
+}
+
+/* Right-side details panel */
+.db-page .db-side-header h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+.db-page .db-side-row > span {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.db-page .db-side-row > strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+.db-page .db-side-note,
+.db-page .db-side-empty {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+.db-page .db-side-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+.db-page .db-side-job strong {
+  font-size: 11px;
+  font-weight: 600;
+  color: #101B4D;
+}
+
+.db-page .db-side-job > div > span {
+  font-size: 10px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Modal headings */
+.db-page .db-modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+.db-page .db-modal-header p {
+  font-size: 12px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Modal form labels */
+.db-page .db-form label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #465477;
+}
+
+/* Modal inputs */
+.db-page .db-form input:not([type='checkbox']),
+.db-page .db-form select {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Confirmation heading */
+.db-page .db-confirmation h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Confirmation description */
+.db-page .db-confirmation > p {
+  font-size: 12px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Confirmation details */
+.db-page .db-confirmation-info span,
+.db-page .db-details-list span {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+.db-page .db-confirmation-info strong,
+.db-page .db-details-list strong {
+  font-size: 11px;
+  font-weight: 600;
+  color: #101B4D;
+}
+
+/* Preserve success and failure colours */
+.db-page .db-details-list strong.db-detail-success {
+  color: #11834f;
+}
+
+.db-page .db-details-list strong.db-detail-failed {
+  color: #d62c36;
+}
+
+/* Recharts axis labels */
+.db-page .recharts-cartesian-axis-tick-value {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  fill: #66728B;
+}
+
+/* Mobile typography */
+@media (max-width: 600px) {
+  .db-page .db-heading h1 {
+    font-size: 23px;
+  }
+
+  .db-page .db-heading p {
+    font-size: 11px;
+  }
+
+  .db-page .db-panel-title h2 {
+    font-size: 12px;
+  }
+
+  .db-page .db-kpi-info > span {
+    font-size: 10px;
+  }
+
+  .db-page .db-kpi-info strong {
+    font-size: 21px;
+  }
+}

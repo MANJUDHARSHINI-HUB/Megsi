@@ -7,3 +7,291 @@
 .st-overlay{position:fixed;inset:0;background:rgba(7,22,42,.32);z-index:80;cursor:default}.st-ticket-drawer{position:fixed;z-index:81;right:0;top:0;bottom:0;width:min(430px,94vw);background:#fff;box-shadow:-8px 0 30px #10294a20;display:flex;flex-direction:column;animation:st-slide-in .18s ease-out}.st-drawer-head{display:flex;justify-content:space-between;align-items:center;padding:19px 20px;border-bottom:1px solid #e4ecf5}.st-drawer-head small{color:#0758f9;font-weight:700}.st-drawer-head h2{font-size:20px;margin-top:4px}.st-drawer-head button{width:30px;height:30px;display:grid;place-items:center;border-radius:5px}.st-drawer-head button:hover{background:#f1f5fa}.st-drawer-content{padding:20px;overflow-y:auto}.st-drawer-content>h3{font-size:15px;margin-bottom:8px}.st-drawer-content>p{font-size:12px;line-height:1.6;color:#566581;margin-bottom:18px}.st-detail-list{border-top:1px solid #e6edf5;margin-bottom:16px}.st-detail-list>div{display:flex;justify-content:space-between;gap:15px;padding:11px 0;border-bottom:1px solid #e6edf5;font-size:11px}.st-detail-list span{color:#667592}.st-detail-list b{text-align:right}.st-field{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0;font-size:11px}.st-field select{width:58%;max-width:none}.st-convo-title{margin-top:22px!important}.st-message{border:1px solid #e5edf7;border-radius:6px;padding:10px;margin:8px 0}.st-message b{font-size:11px}.st-message small{display:block;color:#7b88a0;font-size:9px;margin-top:3px}.st-message p{margin-top:7px;font-size:11px;line-height:1.5;color:#475674}.st-drawer-content textarea{width:100%;height:75px;resize:vertical;border:1px solid #d8e3f0;border-radius:6px;padding:10px;font:inherit;margin:8px 0}.st-primary{height:33px;padding:0 12px;display:inline-flex;align-items:center;gap:7px;background:#0758f9;color:#fff;border-radius:5px;margin-right:8px}.st-primary:disabled{opacity:.45;cursor:not-allowed}.st-secondary{height:33px}.st-primary:hover{background:#0047d5}@keyframes st-slide-in{from{transform:translateX(20px);opacity:.7}to{transform:translateX(0);opacity:1}}
 @media(max-width:1250px){.st-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.st-charts{grid-template-columns:repeat(2,minmax(0,1fr))}.st-charts .st-panel:last-child{grid-column:1/-1}.st-bottom-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.st-tools{width:100%}.st-search{flex:1}}
 @media(max-width:760px){.st-heading{align-items:flex-start;flex-direction:column}.st-heading h1{font-size:23px}.st-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.st-metric{padding:10px;gap:8px}.st-metric-icon{width:36px;height:36px}.st-metric-copy strong{font-size:20px}.st-charts{grid-template-columns:1fr}.st-charts .st-panel:last-child{grid-column:auto}.st-bottom-grid{grid-template-columns:1fr}.st-tools select{max-width:calc(50% - 5px);flex:1}.st-search{min-width:100%}.st-table-title{align-items:flex-start}.st-panel{min-height:215px}.st-donut-wrap{height:190px}.st-table{min-width:900px}}
+/* ==========================================
+   SUPPORT TICKETS — DASHBOARD TYPOGRAPHY
+   Typography only; preserves existing layout
+   ========================================== */
+
+.st-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101b4d;
+}
+
+/* Page heading */
+.st-page .st-heading h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+  color: #101b4d;
+}
+
+.st-page .st-heading p {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* KPI cards */
+.st-page .st-metric-copy > small:first-child {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-metric-copy strong {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #101b4d;
+}
+
+.st-page .st-metric-copy em {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.st-page .st-metric-copy .st-caption {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+/* Chart and panel headings */
+.st-page .st-panel-head h3,
+.st-page .st-table-title h3,
+.st-page .st-small-panel h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+/* Dropdowns and pills */
+.st-page .st-pill {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.st-page .st-tools select,
+.st-page .st-field select,
+.st-page .st-search input {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.st-page .st-btn,
+.st-page .st-secondary {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Chart legends and labels */
+.st-page .st-legend span {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-donut-total b {
+  font-size: 24px;
+  font-weight: 800;
+  color: #101b4d;
+}
+
+.st-page .st-donut-total span {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.st-page .st-category-legend div {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-category-legend b {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+/* Table */
+.st-page .st-table {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+}
+
+.st-page .st-table th {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.st-page .st-table th button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.st-page .st-table td {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-badge {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Pagination */
+.st-page .st-pagination {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.st-page .st-pagination b {
+  font-size: 11px;
+  font-weight: 600;
+  color: #101b4d;
+}
+
+/* Bottom panels */
+.st-page .st-bar-row {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-activity b {
+  font-size: 11px;
+  font-weight: 600;
+  color: #101b4d;
+}
+
+.st-page .st-activity small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.st-page .st-resolution b {
+  font-size: 12px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.st-page .st-resolution small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.st-page .st-health {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-health b {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.st-page .st-demo-note {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+/* Ticket drawer */
+.st-page .st-drawer-head small {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.st-page .st-drawer-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #101b4d;
+}
+
+.st-page .st-drawer-content > h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.st-page .st-drawer-content > p {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-detail-list > div {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.st-page .st-detail-list span {
+  color: #66728b;
+}
+
+.st-page .st-detail-list b {
+  font-weight: 600;
+  color: #101b4d;
+}
+
+.st-page .st-field {
+  font-size: 11px;
+  font-weight: 500;
+  color: #465477;
+}
+
+.st-page .st-message b {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.st-page .st-message small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.st-page .st-message p {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.st-page .st-drawer-content textarea {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.st-page .st-primary {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Responsive title */
+@media (max-width: 760px) {
+  .st-page .st-heading h1 {
+    font-size: 23px;
+  }
+
+  .st-page .st-metric-copy strong {
+    font-size: 20px;
+  }
+}

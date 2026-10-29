@@ -178,3 +178,314 @@
 .rp-tbl.compact td:last-child { white-space: nowrap; }
 .rp-tbl.compact .name { white-space: nowrap; }
 .rp-tbl.compact td { height: 40px; }
+
+
+/* KPI detail drawer additions; original page palette and layout remain unchanged */
+.rp-kpi[aria-expanded="true"] { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+.rp-kpi-drawer { z-index: 121; }
+.rp-kpi-panel-subtitle { margin: 5px 0 0; color: var(--sec); font-size: 11.5px; line-height: 1.45; max-width: 330px; }
+.rp-kpi-panel-summary { display: flex; align-items: baseline; gap: 9px; padding: 12px 14px; margin-bottom: 12px; background: #F1F6FB; border: 1px solid var(--bd); border-radius: 7px; }
+.rp-kpi-panel-summary strong { color: var(--navy); font-size: 25px; line-height: 1.2; }
+.rp-kpi-panel-summary span { color: var(--sec); font-size: 11.5px; }
+.rp-kpi-panel-item { padding: 12px 0; border-bottom: 1px solid var(--bd); }
+.rp-kpi-panel-item:last-child { border-bottom: 0; }
+.rp-kpi-panel-item-top { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.rp-kpi-panel-item-top > .av { flex: none; }
+.rp-kpi-panel-item-info { display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
+.rp-kpi-panel-item-info strong { color: var(--navy); font-size: 12px; font-weight: 650; }
+.rp-kpi-panel-item-info span { color: var(--sec); font-size: 11px; line-height: 1.45; white-space: normal; }
+.rp-kpi-panel-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 9px 0 0; color: var(--sec); font-size: 10.5px; line-height: 1.5; }
+.rp-kpi-panel-meta b { color: var(--navy); }
+.rp-kpi-panel-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+.rp-kpi-panel-chips em { padding: 3px 7px; border-radius: 4px; background: #DFEBFF; color: var(--blue); font-size: 10.5px; font-style: normal; }
+.rp-kpi-panel-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.rp-kpi-panel-count { color: var(--navy); font-size: 18px; margin-left: auto; }
+.rp-kpi-panel-module-icon { display: grid; flex: none; place-items: center; width: 32px; height: 32px; border-radius: 6px; color: var(--blue); background: #DFEBFF; }
+.rp-kpi-panel-request-tag { padding: 3px 7px; border-radius: 4px; background: #FFF2D8; color: #9A5B00; font-size: 10px; font-weight: 600; }
+.rp-kpi-panel-reason { margin: 8px 0 0; color: var(--sec); font-size: 11.5px; line-height: 1.5; white-space: normal; }
+.rp-kpi-drawer .rp-drawer-h { align-items: flex-start; }
+.rp-kpi-drawer .rp-drawer-f .rp-btn { width: 100%; }
+/* =========================================================
+   ROLES & PERMISSIONS — DASHBOARD TYPOGRAPHY
+   Typography only: no layout, spacing, or colour changes
+   to existing cards, buttons, badges, or icons.
+   ========================================================= */
+
+.rp {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+  font-size: 12px;
+}
+
+/* Main page heading */
+.rp .rp-h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #101B4D;
+}
+
+/* Main page description */
+.rp .title-row p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #465477;
+}
+
+/* Card headings */
+.rp .card-h h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* KPI titles */
+.rp .rp-kpi-t small {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #465477;
+}
+
+/* KPI values */
+.rp .rp-kpi-v b {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* KPI descriptions */
+.rp .rp-kpi-d {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #465477;
+}
+
+/* Table headings */
+.rp .rp-tbl thead th,
+.rp .rp-perm thead th {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Table content */
+.rp .rp-tbl tbody td,
+.rp .rp-perm tbody td {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Role names and clickable text */
+.rp .rp-link {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Descriptions and secondary text */
+.rp .desc,
+.rp .rp-desc,
+.rp .rp-note {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #465477;
+}
+
+/* Permission module names */
+.rp .rp-mod {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #101B4D;
+}
+
+/* Buttons */
+.rp .rp-btn,
+.rp .rp-viewall,
+.rp .rp-colbtn {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Dropdowns */
+.rp .rp-select,
+.rp .rp-select select {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Status badges */
+.rp .rp-status {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Role labels and activity text */
+.rp .rp-role,
+.rp .rp-act {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Role usage legend */
+.rp .rp-usage-l {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #101B4D;
+}
+
+.rp .rp-usage-l li span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #465477;
+}
+
+/* Modal headings */
+.rp .rp-modal-h h3,
+.rp .rp-drawer-h h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Modal labels */
+.rp .rp-field > span,
+.rp .rp-field label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #101B4D;
+}
+
+/* Input fields */
+.rp .rp-field input,
+.rp .rp-field select,
+.rp .rp-field textarea,
+.rp input:not([type="checkbox"]):not([type="radio"]),
+.rp select,
+.rp textarea {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  color: #101B4D;
+}
+
+/* Input placeholder text */
+.rp input::placeholder,
+.rp textarea::placeholder {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  color: #66728B;
+}
+
+/* Detail drawer labels */
+.rp .kv span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.rp .kv b {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Detail drawer section headings */
+.rp .rp-drawer-b h4 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* KPI details drawer */
+.rp .rp-kpi-panel-summary strong {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+.rp .rp-kpi-panel-summary span,
+.rp .rp-kpi-panel-item-info span,
+.rp .rp-kpi-panel-meta {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.rp .rp-kpi-panel-item-info strong {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Pending request text */
+.rp .rp-req-t b {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+.rp .rp-req-t small {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Empty-state messages */
+.rp .empty {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Form validation */
+.rp .err {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Dropdown action menu */
+.rp-menu {
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.rp-menu button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Keep checkbox and icon sizing unchanged */
+.rp input[type="checkbox"] {
+  font-family: inherit;
+}

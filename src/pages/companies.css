@@ -1,6 +1,7 @@
 /* =========================================================
-   MEGSI COMPANIES PAGE
-   All styles are scoped to .cp to protect the Dashboard.
+   MEGSI COMPANIES PAGE — FINAL DESIGN
+   Matches the Dashboard's font, colours, and layout.
+   Existing functionality is preserved.
    ========================================================= */
 
 .cp {
@@ -10,8 +11,12 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  margin: 0;
   padding: 0;
-  overflow: visible;
+
+  color: var(--navy, #101B4D);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
   box-sizing: border-box;
 }
 
@@ -36,16 +41,17 @@
   opacity: 0.5;
 }
 
-/* ---------- Page heading ---------- */
+/* ================= PAGE HEADING ================= */
 
 .cp .title-row {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 0 2px 14px;
+  gap: 12px;
+
+  width: 100%;
   min-width: 0;
+  padding: 2px 4px 12px;
 }
 
 .cp .title-row > div {
@@ -53,62 +59,110 @@
 }
 
 .cp .title-row h1 {
-  font-size: 26px;
-  line-height: 1.25;
   margin: 0;
+  color: var(--navy, #101B4D);
+  font-family: inherit;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .cp .title-row p {
-  margin-top: 5px;
+  margin-top: 4px;
+  color: var(--sec, #465477);
   font-size: 13px;
   line-height: 1.5;
-  color: var(--sec, #465477);
 }
 
 .cp .cp-add {
-  min-height: 38px;
-  padding: 0 15px;
-  flex: 0 0 auto;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 36px;
+  padding: 0 14px;
+
+  background: var(--blue, #0758F9);
+  border: 1px solid var(--blue, #0758F9);
+  border-radius: 6px;
+
+  color: #fff;
   font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  transition: background 0.15s ease;
 }
 
-/* ---------- KPI cards ---------- */
+.cp .cp-add:hover {
+  background: #0649D8;
+}
+
+/* ================= KPI CARDS ================= */
 
 .cp .cp-kpis {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--cp-gap);
+  gap: 12px;
+
   width: 100%;
   min-width: 0;
-  margin: 0 0 14px;
+  margin: 0 0 12px;
 }
 
 .cp .cp-kpis .kpi {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-columns: 44px minmax(0, 1fr);
   grid-template-rows: auto auto;
   align-items: center;
-  column-gap: 9px;
-  row-gap: 7px;
+
   min-width: 0;
-  min-height: 100px;
+  min-height: 94px;
   height: auto;
   padding: 12px;
-  overflow: hidden;
+
+  background: #fff;
+  border: 1px solid var(--bd, #E4ECF5);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(16, 27, 77, 0.04);
+
+  column-gap: 10px;
+  row-gap: 5px;
+  text-align: left;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.cp .cp-kpis .kpi:hover {
+  border-color: var(--blue, #0758F9);
+  box-shadow: 0 3px 10px rgba(16, 27, 77, 0.07);
+  transform: translateY(-1px);
+}
+
+.cp .cp-kpis .kpi:focus-visible {
+  outline: 2px solid var(--blue, #0758F9);
+  outline-offset: 2px;
 }
 
 .cp .cp-kpis .kpi-ic {
-  width: 42px;
-  height: 42px;
   display: grid;
   place-items: center;
-  border-radius: 7px;
+
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+
+  color: #fff;
 }
 
 .cp .cp-kpis .kpi-ic svg {
-  width: 21px;
-  height: 21px;
+  width: 22px;
+  height: 22px;
 }
 
 .cp .cp-kpis .kpi-t {
@@ -118,8 +172,11 @@
 
 .cp .cp-kpis .kpi-t > small {
   display: block;
-  font-size: 10.5px;
+  color: var(--sec, #465477);
+  font-size: 11px;
+  font-weight: 500;
   line-height: 1.4;
+
   white-space: normal;
   overflow-wrap: anywhere;
 }
@@ -127,68 +184,106 @@
 .cp .cp-kpis .kpi-v {
   display: flex;
   align-items: center;
-  gap: 5px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  gap: 6px;
+
   min-width: 0;
+  margin-top: 4px;
 }
 
 .cp .cp-kpis .kpi-v b {
-  font-size: 21px;
+  color: var(--navy, #101B4D);
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
   line-height: 1.2;
 }
 
 .cp .cp-kpis .kpi-v em {
-  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 3px;
+
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
   white-space: nowrap;
+}
+
+.cp .cp-kpis .kpi-v em.up {
+  background: #E4F6EA;
+  color: var(--green, #079447);
+}
+
+.cp .cp-kpis .kpi-v em.down {
+  background: #FDE6E9;
+  color: var(--red, #E8172D);
 }
 
 .cp .cp-kpis .kpi-d {
   grid-column: 1 / -1;
+  align-self: end;
+
   min-width: 0;
-  font-size: 10px;
+  color: var(--sec, #465477);
+  font-size: 11px;
   line-height: 1.4;
-  text-align: left;
+
   white-space: normal;
   overflow-wrap: anywhere;
 }
 
-/* ---------- Main table card ---------- */
+/* ================= MAIN TABLE CARD ================= */
 
 .cp .cp-card {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  overflow: hidden;
   margin: 0;
+
+  overflow: hidden;
+
+  background: #fff;
+  border: 1px solid var(--bd, #E4ECF5);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(16, 27, 77, 0.04);
 }
 
-/* ---------- Toolbar ---------- */
+/* ================= SEARCH AND FILTERS ================= */
 
 .cp .cp-toolbar {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+
   width: 100%;
   min-width: 0;
   padding: 12px;
-  border-bottom: 1px solid var(--cp-border);
+
+  border-bottom: 1px solid var(--bd, #E4ECF5);
+  background: #fff;
 }
 
 .cp .cp-search {
   display: flex;
   align-items: center;
   gap: 8px;
+
   flex: 1 1 240px;
   width: auto;
   min-width: 180px;
   max-width: 100%;
   height: 36px;
   padding: 0 10px;
+
   background: #fff;
-  border: 1px solid var(--cp-border);
+  border: 1px solid var(--bd, #E4ECF5);
   border-radius: 6px;
+}
+
+.cp .cp-search:focus-within {
+  border-color: var(--blue, #0758F9);
+  box-shadow: 0 0 0 2px rgba(7, 88, 249, 0.08);
 }
 
 .cp .cp-search > svg {
@@ -202,21 +297,24 @@
   min-width: 0;
   height: 100%;
   padding: 0;
+
+  background: transparent;
   border: 0;
   outline: none;
-  background: transparent;
+
   color: var(--navy, #101B4D);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
-.cp .cp-search input:focus-visible {
-  outline: none;
+.cp .cp-search input::placeholder {
+  color: #78849C;
 }
 
 .cp .cp-select {
   position: relative;
   display: inline-flex;
   align-items: center;
+
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
@@ -225,25 +323,36 @@
 .cp .cp-select select {
   appearance: none;
   -webkit-appearance: none;
+
   width: 100%;
   min-width: 0;
   height: 36px;
-  padding: 0 27px 0 10px;
-  border: 1px solid var(--cp-border);
-  border-radius: 6px;
+  padding: 0 28px 0 10px;
+
   background: #fff;
+  border: 1px solid var(--bd, #E4ECF5);
+  border-radius: 6px;
+
   color: var(--navy, #101B4D);
-  font-size: 11px;
+  font-size: 11.5px;
   cursor: pointer;
+}
+
+.cp .cp-select select:focus {
+  outline: none;
+  border-color: var(--blue, #0758F9);
 }
 
 .cp .cp-select > svg {
   position: absolute;
-  right: 9px;
   top: 50%;
+  right: 9px;
+
+  flex: 0 0 auto;
   transform: translateY(-50%);
   pointer-events: none;
-  flex: 0 0 auto;
+
+  color: var(--sec, #465477);
 }
 
 .cp .cp-toolbar .grow {
@@ -252,27 +361,58 @@
 }
 
 .cp .cp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
   min-height: 36px;
   padding: 0 12px;
-  justify-content: center;
+
+  border: 1px solid var(--bd, #E4ECF5);
+  border-radius: 6px;
+
+  font-size: 11.5px;
+  font-weight: 600;
   white-space: nowrap;
-  font-size: 11px;
+}
+
+.cp .cp-toolbar .btn-sm {
+  background: #fff;
+  color: var(--blue, #0758F9);
+}
+
+.cp .cp-toolbar .btn-sm:hover:not(:disabled) {
+  background: #F1F6FB;
+}
+
+.cp .cp-toolbar .btn-primary {
+  background: var(--blue, #0758F9);
+  border-color: var(--blue, #0758F9);
+  color: #fff;
+}
+
+.cp .cp-toolbar .btn-primary:hover {
+  background: #0649D8;
 }
 
 .cp .cp-btn svg {
   flex: 0 0 auto;
 }
 
-/* ---------- Horizontally scrollable table ---------- */
+/* ================= COMPANY TABLE ================= */
 
 .cp .cp-scroll {
   display: block;
+
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  overflow-x: auto;
-  overflow-y: visible;
   padding: 0;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
 }
@@ -280,10 +420,13 @@
 .cp .cp-tbl {
   width: 100%;
   min-width: 1080px;
+
   border-collapse: separate;
   border-spacing: 0;
   table-layout: auto;
-  font-size: 11px;
+
+  color: var(--navy, #101B4D);
+  font-size: 11.5px;
   white-space: nowrap;
 }
 
@@ -296,10 +439,12 @@
 .cp .cp-tbl th {
   height: 38px;
   padding: 8px 10px;
+
   background: #F1F6FB;
-  border-bottom: 1px solid var(--cp-border);
+  border-bottom: 1px solid var(--bd, #E4ECF5);
+
   color: var(--navy, #101B4D);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-align: left;
   white-space: nowrap;
@@ -308,6 +453,10 @@
 .cp .cp-tbl th.sortable {
   cursor: pointer;
   user-select: none;
+}
+
+.cp .cp-tbl th.sortable:hover {
+  color: var(--blue, #0758F9);
 }
 
 .cp .cp-tbl th.sortable svg {
@@ -319,8 +468,12 @@
 .cp .cp-tbl td {
   height: 42px;
   padding: 5px 10px;
-  border-bottom: 1px solid var(--cp-border);
+
+  background: #fff;
+  border-bottom: 1px solid var(--bd, #E4ECF5);
+
   color: var(--navy, #101B4D);
+  font-size: 11.5px;
   vertical-align: middle;
 }
 
@@ -328,7 +481,7 @@
   border-bottom: 0;
 }
 
-.cp .cp-tbl tbody tr:hover {
+.cp .cp-tbl tbody tr:hover td {
   background: #F8FBFF;
 }
 
@@ -347,6 +500,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
+
   min-width: 0;
 }
 
@@ -356,14 +510,18 @@
 
 .cp .cp-tbl .cp-link {
   display: inline-block;
+
   max-width: 230px;
   padding: 0;
-  border: 0;
+
   background: transparent;
+  border: 0;
+
   color: var(--blue, #0758F9);
-  text-align: left;
   font: inherit;
   font-weight: 600;
+  text-align: left;
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -378,8 +536,9 @@
   position: sticky;
   right: 0;
   z-index: 1;
-  text-align: right;
+
   background: #fff;
+  text-align: right;
 }
 
 .cp .cp-tbl th:last-child {
@@ -394,25 +553,26 @@
 .cp .cp-tbl .empty {
   height: 100px;
   padding: 24px;
-  text-align: center;
+
   color: var(--sec, #465477);
+  text-align: center;
   white-space: normal;
 }
 
-.cp .cp-tbl .empty .cp-link {
-  margin-left: 4px;
-}
-
-/* ---------- Action menu ---------- */
+/* ================= ROW ACTIONS ================= */
 
 .cp .dots {
   display: inline-grid;
   place-items: center;
-  width: 30px;
+
+  width: 32px;
   height: 28px;
-  border: 1px solid var(--cp-border);
-  border-radius: 5px;
+
   background: #fff;
+  border: 1px solid var(--bd, #E4ECF5);
+  border-radius: 5px;
+
+  color: var(--navy, #101B4D);
 }
 
 .cp .dots:hover,
@@ -423,29 +583,35 @@
 
 .cp-menu {
   position: fixed;
-  z-index: 100;
+  z-index: 99999;
+
   width: 190px;
   max-width: calc(100vw - 16px);
   padding: 5px;
+
   background: #fff;
-  border: 1px solid var(--cp-border);
+  border: 1px solid var(--bd, #E4ECF5);
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(16, 27, 77, 0.18);
+
+  font-family: Inter, system-ui, sans-serif;
 }
 
 .cp-menu button {
   display: flex;
   align-items: center;
   gap: 9px;
+
   width: 100%;
-  min-height: 34px;
-  padding: 7px 9px;
-  border-radius: 5px;
-  color: var(--navy, #101B4D);
+  min-height: 36px;
+  padding: 8px 9px;
+
   background: transparent;
-  font-size: 11.5px;
+  border-radius: 5px;
+
+  color: var(--navy, #101B4D);
+  font-size: 12px;
   text-align: left;
-  white-space: normal;
 }
 
 .cp-menu button:hover {
@@ -464,18 +630,20 @@
   color: var(--green, #079447);
 }
 
-/* ---------- Pagination ---------- */
+/* ================= PAGINATION ================= */
 
 .cp .cp-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
+
   padding: 12px;
-  border-top: 1px solid var(--cp-border);
+
+  border-top: 1px solid var(--bd, #E4ECF5);
   color: var(--sec, #465477);
-  font-size: 11px;
+  font-size: 11.5px;
 }
 
 .cp .cp-pager {
@@ -488,14 +656,22 @@
 .cp .cp-pager .pg {
   display: inline-grid;
   place-items: center;
-  min-width: 29px;
-  height: 29px;
+
+  min-width: 30px;
+  height: 30px;
   padding: 0 6px;
-  border: 1px solid var(--cp-border);
-  border-radius: 5px;
+
   background: #fff;
+  border: 1px solid var(--bd, #E4ECF5);
+  border-radius: 5px;
+
   color: var(--navy, #101B4D);
-  font-size: 11px;
+  font-size: 11.5px;
+}
+
+.cp .cp-pager .pg:hover:not(:disabled):not(.on) {
+  background: #F1F6FB;
+  border-color: var(--blue, #0758F9);
 }
 
 .cp .cp-pager .pg.on {
@@ -508,17 +684,20 @@
   opacity: 0.4;
 }
 
-/* ---------- Modal backdrop ---------- */
+/* ================= MODALS ================= */
 
 .cp-backdrop {
   position: fixed;
   inset: 0;
   z-index: 90;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 20px;
   overflow-y: auto;
+
   background: rgba(6, 27, 44, 0.48);
   backdrop-filter: blur(2px);
 }
@@ -526,32 +705,40 @@
 .cp-modal {
   display: flex;
   flex-direction: column;
+
   width: 100%;
   max-width: 650px;
   max-height: calc(100vh - 40px);
   min-width: 0;
+
   overflow: auto;
+
   background: #fff;
-  border: 1px solid var(--cp-border);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--bd, #E4ECF5);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(16, 27, 77, 0.2);
 }
 
 .cp-modal-h {
   position: sticky;
   top: 0;
   z-index: 2;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+
   padding: 16px 20px;
+
   background: #fff;
-  border-bottom: 1px solid var(--cp-border);
+  border-bottom: 1px solid var(--bd, #E4ECF5);
 }
 
 .cp-modal-h h3 {
-  font-size: 17px;
+  color: var(--navy, #101B4D);
+  font-size: 16px;
+  font-weight: 700;
   line-height: 1.4;
 }
 
@@ -573,7 +760,8 @@
 }
 
 .cp-field > span:first-child {
-  font-size: 11.5px;
+  color: var(--navy, #101B4D);
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -588,11 +776,14 @@
   min-width: 0;
   height: 38px;
   padding: 0 10px;
-  border: 1px solid var(--cp-border);
+
+  background: #fff;
+  border: 1px solid var(--bd, #E4ECF5);
   border-radius: 6px;
   outline: none;
-  background: #fff;
+
   color: var(--navy, #101B4D);
+  font-family: inherit;
   font-size: 12px;
 }
 
@@ -612,14 +803,14 @@
 
 .cp-field .err {
   color: var(--red, #E8172D);
-  font-size: 10.5px;
+  font-size: 11px;
   line-height: 1.4;
 }
 
 .cp-note {
   margin: 14px 20px 0;
   color: var(--sec, #465477);
-  font-size: 11px;
+  font-size: 11.5px;
   line-height: 1.6;
 }
 
@@ -631,27 +822,43 @@
   position: sticky;
   bottom: 0;
   z-index: 2;
+
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: flex-end;
   gap: 9px;
+
   padding: 13px 20px;
   margin-top: 16px;
+
   background: #fff;
-  border-top: 1px solid var(--cp-border);
+  border-top: 1px solid var(--bd, #E4ECF5);
 }
 
 .cp-modal-f .btn-primary,
 .cp-modal-f .btn-sm {
-  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+
+  min-height: 36px;
+  padding: 0 14px;
+
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cp-modal-f .btn-primary {
+  background: var(--blue, #0758F9);
+  color: #fff;
 }
 
 .cp-modal-f .cp-danger {
   background: var(--red, #E8172D);
 }
 
-/* ---------- Responsive layout ---------- */
+/* ================= RESPONSIVE LAYOUT ================= */
 
 @media (max-width: 1350px) {
   .cp .cp-kpis {
@@ -689,10 +896,11 @@
 @media (max-width: 600px) {
   .cp .title-row {
     align-items: stretch;
+    flex-direction: column;
   }
 
   .cp .title-row h1 {
-    font-size: 23px;
+    font-size: 24px;
   }
 
   .cp .title-row p {
@@ -708,14 +916,9 @@
     gap: 9px;
   }
 
-  .cp .cp-kpis .kpi {
-    grid-template-columns: 42px minmax(0, 1fr);
-    min-height: 85px;
-  }
-
   .cp .cp-toolbar {
-    padding: 10px;
     gap: 8px;
+    padding: 10px;
   }
 
   .cp .cp-toolbar > .cp-select {
@@ -736,107 +939,21 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .cp-modal {
-    max-height: calc(100vh - 24px);
-  }
-
   .cp-backdrop {
     padding: 12px;
   }
 
+  .cp-modal {
+    max-height: calc(100vh - 24px);
+  }
+
   .cp-modal-h,
   .cp-modal-b {
-    padding-left: 14px;
     padding-right: 14px;
+    padding-left: 14px;
   }
 
   .cp-modal-f {
     padding: 12px 14px;
   }
-}
-/* =========================================================
-   COMPANIES PAGE — LAYOUT OVERFLOW FIX
-   Scoped to Companies only; Dashboard remains unchanged.
-   ========================================================= */
-
-.cp {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  margin: 0;
-}
-
-.cp .title-row {
-  width: 100%;
-  min-width: 0;
-}
-
-.cp .cp-kpis {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  width: 100%;
-  min-width: 0;
-}
-
-.cp .cp-card {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.cp .cp-toolbar {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.cp .cp-scroll {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.cp .cp-tbl {
-  width: 100%;
-  min-width: 1080px;
-  table-layout: auto;
-}
-
-@media (max-width: 1350px) {
-  .cp .cp-kpis {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 900px) {
-  .cp .cp-kpis {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .cp .cp-kpis {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* KPI cards are all interactive; keep the row action menu above sticky table cells. */
-.cp .cp-kpis .cp-kpi-clickable {
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
-}
-.cp .cp-kpis .cp-kpi-clickable:hover,
-.cp .cp-kpis .cp-kpi-clickable:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(7, 88, 249, 0.18), 0 4px 12px rgba(16, 27, 77, 0.08);
-}
-.cp .cp-kpis .cp-kpi-clickable:focus-visible {
-  outline: 2px solid var(--blue, #0758F9);
-  outline-offset: 2px;
-}
-.cp-menu {
-  z-index: 99999;
 }

@@ -1,11 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { BarChart3, Building2, Wallet } from 'lucide-react';
 import { Select } from './Common.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
-import { getPlanDist, growthSeries, revenueSeries } from '../data/selectors.js';
+import { MONTH_NAMES, PERIOD_LABELS, PERIOD_MODES, defaultPeriod, periodPlanDist, periodSeries } from '../data/chartPeriods.js';
 
-const WINDOWS = ['30d', '6m', '12m'];
 export const ChartCard = ({ icon, title, right, children }) => (
   <section className="card chart-card">
     <header className="card-h"><span className="ic-sq">{icon}</span><h3>{title}</h3><div className="grow" />{right}</header>
@@ -16,11 +15,46 @@ const ax = { fontSize: 11, fill: '#465477' };
 const Empty = () => { const { t } = useI18n(); return <div className="empty chart-empty">{t('empty.period')}</div>; };
 const ttLabel = (l, p) => p?.[0]?.payload?.full ?? l;
 
-export function CompanyGrowthChart({ range }) {
-  const { t, lang } = useI18n(); const [w, setW] = useState('12m');
-  const data = useMemo(() => growthSeries(range, w, lang), [range, w, lang]);
+// Small control compact enough to sit in a chart header: [period] + [month dropdown | year input].
+const miniField = {
+  height: 28, padding: '0 8px', fontSize: 12, fontFamily: 'inherit', color: '#465477',
+  background: '#fff', border: '1px solid #E4ECF5', borderRadius: 6, outline: 'none',
+};
+
+export function PeriodControl({ value, onChange }) {
+  const [yearText, setYearText] = useState(String(value.year));
+  useEffect(() => { setYearText(String(value.year)); }, [value.year]);
+
+  const commitYear = () => {
+    const y = Number(yearText);
+    if (Number.isInteger(y) && y >= 1900 && y <= 2100) onChange({ ...value, year: y });
+    else setYearText(String(value.year)); // reject invalid input, restore last good year
+  };
+
   return (
-    <ChartCard icon={<BarChart3 size={16} />} title={t('ch.growth')} right={<Select value={w} options={WINDOWS} onChange={setW} format={(o) => t(`range.${o}`)} />}>
+    <div className="period-ctl" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <Select value={value.mode} options={PERIOD_MODES} onChange={(mode) => onChange({ ...value, mode })} format={(o) => PERIOD_LABELS[o]} />
+      {value.mode === 'month' && (
+        <select aria-label="Month" style={miniField} value={value.month} onChange={(e) => onChange({ ...value, month: Number(e.target.value) })}>
+          {MONTH_NAMES.map((name, i) => <option key={name} value={i}>{name}</option>)}
+        </select>
+      )}
+      {value.mode === 'year' && (
+        <input
+          aria-label="Year" inputMode="numeric" maxLength={4} placeholder="YYYY" style={{ ...miniField, width: 58 }}
+          value={yearText} onChange={(e) => setYearText(e.target.value.replace(/\D/g, ''))}
+          onKeyDown={(e) => { if (e.key === 'Enter') commitYear(); }} onBlur={commitYear}
+        />
+      )}
+    </div>
+  );
+}
+
+export function CompanyGrowthChart() {
+  const { t, lang } = useI18n(); const [period, setPeriod] = useState(defaultPeriod);
+  const data = useMemo(() => periodSeries(period, 'g', lang), [period, lang]);
+  return (
+    <ChartCard icon={<BarChart3 size={16} />} title={t('ch.growth')} right={<PeriodControl value={period} onChange={setPeriod} />}>
       {!data.length ? <Empty /> : (
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 8, right: 10, left: -18, bottom: 0 }}>
@@ -35,14 +69,20 @@ export function CompanyGrowthChart({ range }) {
   );
 }
 
-export function TenantPlanChart({ range }) {
-  const { t } = useI18n(); const [p, setP] = useState('all');
-  const { total, plans } = useMemo(() => getPlanDist(range), [range]);
+export function TenantPlanChart() {
+  const { t } = useI18n(); const [p, setP] = useState('all'); const [period, setPeriod] = useState(defaultPeriod);
+  const { total, plans } = useMemo(() => periodPlanDist(period), [period]);
   const sel = plans.find((x) => x.name === p);
   const pct = (v) => (total ? Math.round((v / total) * 100) : 0);
   const data = sel ? [sel, { name: t('others'), value: total - sel.value, color: '#E4ECF5' }] : plans;
+  const right = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <Select value={p} options={['all', ...plans.map((x) => x.name)]} onChange={setP} format={(o) => (o === 'all' ? t('plan.all') : o)} />
+      <PeriodControl value={period} onChange={setPeriod} />
+    </div>
+  );
   return (
-    <ChartCard icon={<Building2 size={16} />} title={t('ch.plans')} right={<Select value={p} options={['all', ...plans.map((x) => x.name)]} onChange={setP} format={(o) => (o === 'all' ? t('plan.all') : o)} />}>
+    <ChartCard icon={<Building2 size={16} />} title={t('ch.plans')} right={right}>
       {!total ? <Empty /> : (
         <div className="donut-wrap">
           <div className="donut">
@@ -60,11 +100,11 @@ export function TenantPlanChart({ range }) {
   );
 }
 
-export function RevenueChart({ range }) {
-  const { t, lang } = useI18n(); const [w, setW] = useState('12m');
-  const data = useMemo(() => revenueSeries(range, w, lang), [range, w, lang]);
+export function RevenueChart() {
+  const { t, lang } = useI18n(); const [period, setPeriod] = useState(defaultPeriod);
+  const data = useMemo(() => periodSeries(period, 'r', lang), [period, lang]);
   return (
-    <ChartCard icon={<Wallet size={16} />} title={t('ch.revenue')} right={<Select value={w} options={WINDOWS} onChange={setW} format={(o) => t(`range.${o}`)} />}>
+    <ChartCard icon={<Wallet size={16} />} title={t('ch.revenue')} right={<PeriodControl value={period} onChange={setPeriod} />}>
       {!data.length ? <Empty /> : (
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 6, left: -4, bottom: 0 }}>

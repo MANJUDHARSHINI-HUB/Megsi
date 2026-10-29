@@ -946,3 +946,183 @@
     padding: 16px;
   }
 }
+
+/* =========================================================
+   MEGSI EMAIL & SMS — DASHBOARD TYPOGRAPHY
+   Typography only: font family, size, weight and text colour.
+   Append at the bottom of email-sms.css.
+   ========================================================= */
+
+/* Base typography */
+.es-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+  font-size: 12px;
+}
+
+/* Main page title */
+.es-page .es-page-heading h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* Page subtitle */
+.es-page .es-page-heading p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Export button text — preserve existing colours */
+.es-page .es-export-button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Overview card headings */
+.es-page .es-overview-info h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Overview card descriptions */
+.es-page .es-overview-info p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Overview statistics */
+.es-page .es-overview-stats > span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* Email Providers and SMS Providers headings */
+.es-page .es-section-title h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Search field */
+.es-page .es-search-box input {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+.es-page .es-search-box input::placeholder {
+  color: #66728B;
+}
+
+/* Status dropdown */
+.es-page .es-status-select {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Provider names */
+.es-page .es-provider-info h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Provider descriptions */
+.es-page .es-provider-info p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Email and SMS category badges
+   Preserve existing badge colours. */
+.es-page .es-category-tag {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Provider connection status
+   Preserve existing connected/disconnected colours. */
+.es-page .es-status {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Provider action buttons
+   Preserve existing button colours and borders. */
+.es-page .es-action-button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Empty search results */
+.es-page .es-empty-state {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Demo notice */
+.es-page .es-demo-note {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Provider totals */
+.es-page .es-total-providers {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Modal headings */
+.es-page .es-modal h2,
+.es-page .es-modal h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Modal body text */
+.es-page .es-modal p,
+.es-page .es-modal label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+}
+
+/* Modal inputs and dropdowns */
+.es-page .es-modal input,
+.es-page .es-modal select,
+.es-page .es-modal textarea {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+}
+
+/* Modal buttons — preserve existing colours */
+.es-page .es-modal button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}

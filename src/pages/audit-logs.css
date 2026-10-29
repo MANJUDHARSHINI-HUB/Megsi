@@ -36,6 +36,8 @@
   opacity: 0.4;
 }
 
+/* ---------- Page heading ---------- */
+
 .audit-page-heading {
   display: flex;
   justify-content: space-between;
@@ -262,7 +264,8 @@
   color: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .audit-kpi-card:hover {
@@ -407,6 +410,8 @@
   padding-bottom: 8px;
 }
 
+/* ---------- Audit activity graph ---------- */
+
 .audit-chart-legend {
   display: flex;
   align-items: center;
@@ -432,6 +437,7 @@
 
 .audit-chart-legend .audit-chart-range {
   color: #64748b;
+  font-variant-numeric: tabular-nums;
 }
 
 .audit-chart-legend i {
@@ -467,11 +473,18 @@
   border-radius: 6px;
 }
 
+/* Keep the graph's date selector independent visually. */
+.audit-page .audit-overview-panel .audit-compact-select {
+  flex-shrink: 0;
+}
+
 .audit-result-count {
   color: #64748b;
   font-size: 11px;
   white-space: nowrap;
 }
+
+/* ---------- Audit logs table ---------- */
 
 .audit-table-panel {
   padding-bottom: 8px;
@@ -611,7 +624,8 @@
   border-bottom: 0;
 }
 
-.audit-timestamp {
+.audit-timestamp,
+.audit-ip {
   font-variant-numeric: tabular-nums;
 }
 
@@ -655,10 +669,6 @@
   max-width: 210px;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.audit-ip {
-  font-variant-numeric: tabular-nums;
 }
 
 .audit-status {
@@ -764,6 +774,8 @@
   background: #fff;
 }
 
+/* ---------- Table pagination ---------- */
+
 .audit-table-footer {
   display: flex;
   align-items: center;
@@ -818,6 +830,8 @@
   color: #64748b;
 }
 
+/* ---------- Bottom panels ---------- */
+
 .audit-bottom-grid {
   display: grid;
   grid-template-columns: 1.08fr 1fr;
@@ -843,6 +857,8 @@
   background: #eff6ff;
   border-color: #a8c9f4;
 }
+
+/* ---------- Critical event timeline ---------- */
 
 .audit-timeline {
   display: flex;
@@ -926,11 +942,15 @@
   white-space: nowrap;
 }
 
+/* ---------- Category chart ---------- */
+
 .audit-category-chart {
   width: 100%;
   height: 170px;
   min-width: 0;
 }
+
+/* ---------- Toast notification ---------- */
 
 .audit-toast {
   position: fixed;
@@ -1321,7 +1341,7 @@
   font-size: 11px;
 }
 
-/* ---------- Responsive ---------- */
+/* ---------- Responsive styles ---------- */
 
 @media (min-width: 1500px) {
   .audit-page {

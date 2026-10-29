@@ -65,6 +65,7 @@ export default function SuspendedTenants({ store, toast }) {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(() => new Set());
   const [drawerId, setDrawerId] = useState(null);
+  const [kpiPanel, setKpiPanel] = useState(null);
   const [modal, setModal] = useState(null); // { type:'review'|'reactivate'|'policies', tenant|tenants }
   const tableRef = useRef(null);
 
@@ -91,6 +92,15 @@ export default function SuspendedTenants({ store, toast }) {
   const selEligible = selTenants.filter((t) => t.review === REVIEW.ELIGIBLE);
   const allShownSelected = shown.length > 0 && shown.every((t) => selected.has(t.id));
 
+  useEffect(() => {
+    if (!kpiPanel) return;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setKpiPanel(null);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [kpiPanel]);
+
   // keep the page valid when rows disappear (e.g. after a reactivation)
   useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
   // drop selections for tenants that no longer exist
@@ -98,12 +108,21 @@ export default function SuspendedTenants({ store, toast }) {
 
   const monthPrefix = DEMO_TODAY.slice(0, 7);
   const kpis = [
-    { t: 'Total Suspended', v: tenants.length, c: 'red', I: Ban, go: () => clear() },
-    { t: 'Suspended This Month', v: tenants.filter((x) => x.suspendedDate.startsWith(monthPrefix)).length, c: 'orange', I: AlertTriangle, go: () => { clear(); setDateF({ mode: 'month', from: '', to: '' }); } },
-    { t: 'Pending Review', v: tenants.filter((x) => x.review === REVIEW.PENDING).length, c: 'blue', I: FileText, go: () => { clear(); setStatus(REVIEW.PENDING); } },
-    { t: 'Eligible for Reactivation', v: tenants.filter((x) => x.review === REVIEW.ELIGIBLE).length, c: 'purple', I: ShieldCheck, go: () => { clear(); setStatus(REVIEW.ELIGIBLE); } },
-    { t: 'Critical Suspensions', v: tenants.filter((x) => x.review === REVIEW.CRITICAL).length, c: 'green', I: ShieldAlert, go: () => { clear(); setStatus(REVIEW.CRITICAL); } },
+    { key: 'total', t: 'Total Suspended', v: tenants.length, c: 'red', I: Ban },
+    { key: 'month', t: 'Suspended This Month', v: tenants.filter((x) => x.suspendedDate.startsWith(monthPrefix)).length, c: 'orange', I: AlertTriangle },
+    { key: 'pending', t: 'Pending Review', v: tenants.filter((x) => x.review === REVIEW.PENDING).length, c: 'blue', I: FileText },
+    { key: 'eligible', t: 'Eligible for Reactivation', v: tenants.filter((x) => x.review === REVIEW.ELIGIBLE).length, c: 'purple', I: ShieldCheck },
+    { key: 'critical', t: 'Critical Suspensions', v: tenants.filter((x) => x.review === REVIEW.CRITICAL).length, c: 'green', I: ShieldAlert },
   ];
+  const kpiPanelTitle = kpis.find((k) => k.key === kpiPanel)?.t || '';
+  const kpiRows = useMemo(() => {
+    if (!kpiPanel) return [];
+    if (kpiPanel === 'month') return tenants.filter((t) => t.suspendedDate.startsWith(monthPrefix));
+    if (kpiPanel === 'pending') return tenants.filter((t) => t.review === REVIEW.PENDING);
+    if (kpiPanel === 'eligible') return tenants.filter((t) => t.review === REVIEW.ELIGIBLE);
+    if (kpiPanel === 'critical') return tenants.filter((t) => t.review === REVIEW.CRITICAL);
+    return tenants;
+  }, [tenants, kpiPanel, monthPrefix]);
   const byReason = REASONS.map((n) => ({ name: n, value: tenants.filter((t) => t.reason === n).length, color: REASON_COLORS[n] }));
   const byPlan = PLAN_LIST.map((n) => ({ name: n, value: tenants.filter((t) => t.plan === n).length, color: PLAN_COLORS[n] }));
   const pending = tenants.filter((t) => t.review === REVIEW.PENDING).sort((a, b) => b.suspendedDate.localeCompare(a.suspendedDate));
@@ -114,9 +133,10 @@ export default function SuspendedTenants({ store, toast }) {
   const toggleOne = (id) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const toggleAll = () => setSelected((s) => { const n = new Set(s); shown.forEach((t) => (allShownSelected ? n.delete(t.id) : n.add(t.id))); return n; });
   const pickReason = (name) => { setReason((r) => (r === name ? 'All' : name)); setPage(1); };
-  const pickPlan = (name) => { setPlan((p) => (p === name ? 'All' : name)); setPage(1); };
-  const viewAllPending = () => { setQ(''); setReason('All'); setPlan('All'); setDateF({ mode: 'all', from: '', to: '' }); setStatus(REVIEW.PENDING); setPage(1); tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-
+  const pickPlan = (name) => { setPlan((p) => (p === name ? 'All' : name)); setPage(1); }
+  const viewAllPending = () => {
+  setKpiPanel('pending');
+};
   const exportCsv = (rows, label) => {
     if (!rows.length) return toast('Nothing to export — no tenants match the current filters.');
     const head = ['Tenant ID', 'Company Name', 'Subscription Plan', 'Company Admin', 'Email', 'Users', 'Suspension Reason', 'Suspended Date', 'Suspended By', 'Review Status'];
@@ -161,11 +181,65 @@ export default function SuspendedTenants({ store, toast }) {
       </div>
 
       <div className="st-kpis">{kpis.map((k) => (
-        <button key={k.t} className="card st-kpi" onClick={k.go} aria-label={`${k.t}: ${k.v}. Click to filter the table`}>
+        <button
+          key={k.t}
+          type="button"
+          className={`card st-kpi ${kpiPanel === k.key ? 'is-open' : ''}`}
+          onClick={() => setKpiPanel((current) => current === k.key ? null : k.key)}
+          aria-label={`Show details for ${k.t}: ${k.v}`}
+          aria-expanded={kpiPanel === k.key}
+        >
           <span className={`st-kpi-ic ${k.c}`}><k.I size={24} /></span>
           <span className="st-kpi-t"><small>{k.t}</small><b>{k.v}</b></span>
         </button>))}
       </div>
+
+      {kpiPanel && (
+        <div className="st-kpi-panel-backdrop" onMouseDown={(e) => {
+          if (e.target === e.currentTarget) setKpiPanel(null);
+        }}>
+          <aside className="st-kpi-panel" role="dialog" aria-modal="true" aria-label={`${kpiPanelTitle} details`}>
+            <div className="st-kpi-panel-head">
+              <div>
+                <span className="st-kpi-panel-eyebrow">SUSPENDED TENANTS</span>
+                <h2>{kpiPanelTitle}</h2>
+                <p>{kpiRows.length} {kpiRows.length === 1 ? 'tenant' : 'tenants'} found</p>
+              </div>
+              <button type="button" className="st-kpi-panel-close" onClick={() => setKpiPanel(null)} aria-label="Close details panel"><X size={19} /></button>
+            </div>
+
+            <div className="st-kpi-panel-list">
+              {kpiRows.length === 0 ? (
+                <div className="st-kpi-panel-empty">
+                  <Users size={28} />
+                  <b>No tenants to show</b>
+                  <span>There are no tenants in this category.</span>
+                </div>
+              ) : kpiRows.map((t) => (
+                <button
+                  type="button"
+                  className="st-kpi-tenant"
+                  key={t.id}
+                  onClick={() => { setKpiPanel(null); setDrawerId(t.id); }}
+                >
+                  <Avatar name={t.name} />
+                  <span className="st-kpi-tenant-main">
+                    <b>{t.name}</b>
+                    <small>{t.email}</small>
+                    <span>{t.reason} · {fmtDate(t.suspendedDate)}</span>
+                  </span>
+                  <span className="st-kpi-tenant-status">{t.review}</span>
+                  <ChevronRight size={16} className="st-kpi-tenant-chevron" />
+                </button>
+              ))}
+            </div>
+            <div className="st-kpi-panel-foot">
+              <span>Showing details only — the table filters are unchanged.</span>
+              <button type="button" className="st-btn sm" onClick={() => setKpiPanel(null)}>Close</button>
+            </div>
+          </aside>
+        </div>
+      )}
 
       <div className="st-charts">
         <TrendChart reactivatedNow={reactivated} />

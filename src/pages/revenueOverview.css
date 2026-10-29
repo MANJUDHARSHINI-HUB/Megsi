@@ -1,0 +1,112 @@
+/* Revenue Overview only - every rule is scoped to .revenue-overview-card. */
+.revenue-overview-card { display: flex; flex-direction: column; min-width: 0; height: auto; max-height: none; overflow: hidden; }
+
+/* Header: title + Sample data badge + View all, wraps instead of overlapping on narrow widths */
+.revenue-overview-card > .card-h { flex-wrap: wrap; row-gap: 8px; column-gap: 10px; }
+.revenue-overview-card > .card-h h3 { margin: 0; }
+.revenue-overview-card > .card-h .grow { flex: 1 1 0; min-width: 0; }
+.revenue-overview-card .ro-sample { white-space: nowrap; }
+.revenue-overview-card > .card-h .btn-sm { flex: 0 0 auto; white-space: nowrap; }
+
+/* Four summary cards: even columns, equal heights, room around them */
+.revenue-overview-card .revenue-overview-metrics {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+  padding: 8px 16px 16px; margin: 0; box-sizing: border-box;
+}
+.revenue-overview-card .ro-metric {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+  min-width: 0; min-height: 76px; padding: 12px 14px; box-sizing: border-box;
+}
+.revenue-overview-card .ro-metric > span { line-height: 1.3; overflow-wrap: anywhere; }
+.revenue-overview-card .ro-metric > div { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.revenue-overview-card .ro-metric svg { flex: 0 0 auto; }
+.revenue-overview-card .ro-metric b { line-height: 1.2; white-space: nowrap; }
+
+/* Table: contained scroll area, readable rows, scrollbar reserves its own space */
+.revenue-overview-card .ro-scroll {
+  flex: 1 1 auto; min-height: 0; max-height: 280px; margin: 0 16px 16px; padding-right: 2px;
+  overflow: auto; scrollbar-gutter: stable; box-sizing: border-box;
+}
+.revenue-overview-card .ro-table { width: 100%; border-collapse: collapse; }
+.revenue-overview-card .ro-table th,
+.revenue-overview-card .ro-table td { padding: 11px 14px; white-space: nowrap; vertical-align: middle; }
+.revenue-overview-card .ro-table thead th { position: sticky; top: 0; z-index: 1; background: #fff; }
+.revenue-overview-card .ro-table .badge { display: inline-block; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .revenue-overview-card .revenue-overview-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .revenue-overview-card .revenue-overview-metrics { grid-template-columns: minmax(0, 1fr); padding: 4px 12px 12px; }
+  .revenue-overview-card .ro-scroll { margin: 0 12px 12px; }
+}
+
+
+/* Dashboard layout correction: keep Revenue Overview aligned with Recent Activities. */
+.revenue-overview-card {
+  height: 244px;
+  min-height: 244px;
+  max-height: 244px;
+  box-sizing: border-box;
+}
+
+.revenue-overview-card .revenue-overview-metrics {
+  gap: 8px;
+  padding: 6px 12px 8px;
+}
+
+.revenue-overview-card .ro-metric {
+  min-height: 54px;
+  padding: 8px 10px;
+  gap: 5px;
+}
+
+.revenue-overview-card .ro-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0 12px 8px;
+  overflow: auto;
+}
+
+.revenue-overview-card .ro-table th,
+.revenue-overview-card .ro-table td {
+  padding: 5px 8px;
+}
+
+
+/* Expanded Revenue Overview page: show 10+ company records without a tiny table. */
+.revenue-all-page .revenue-overview-card {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+}
+
+.revenue-all-page .revenue-overview-card .ro-scroll {
+  flex: 0 1 auto;
+  max-height: 440px;
+  min-height: 0;
+  margin-bottom: 16px;
+  overflow: auto;
+}
+
+.revenue-all-page .revenue-overview-card .ro-table th,
+.revenue-all-page .revenue-overview-card .ro-table td {
+  padding: 8px 12px;
+}
+
+.revenue-all-page .revenue-overview-card .ro-table tfoot th {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: #fff;
+}
+
+@media (max-width: 700px) {
+  .revenue-all-page .revenue-overview-card .ro-scroll {
+    max-height: 420px;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+}

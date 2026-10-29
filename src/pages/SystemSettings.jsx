@@ -1,9 +1,8 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Activity, Bell, Check, ChevronRight, CircleHelp, Clock3, Database,
   FileText, LockKeyhole, Monitor, Plug, RotateCcw, Save, Settings,
-  ShieldCheck, SlidersHorizontal, Users, X, AlertTriangle, Download, RefreshCw
+  ShieldCheck, SlidersHorizontal, Users, X, AlertTriangle, Download, RefreshCw, Sun
 } from "lucide-react";
 import "./system-settings.css";
 import { Toggle } from "./SettingsWidgets.jsx";
@@ -181,12 +180,18 @@ function Field({
   );
 }
 
-function Heading({ eyebrow, title, description }) {
+function Heading({ eyebrow, title, description, icon: Icon = Settings }) {
   return (
     <div className="ss-heading">
-      <small>{eyebrow}</small>
-      <h2>{title}</h2>
-      <p>{description}</p>
+      <span className="ic-sq">
+        <Icon />
+      </span>
+
+      <div>
+        <small>{eyebrow}</small>
+        <h2>{title}</h2>
+        <p>{description}</p>
+      </div>
     </div>
   );
 }
@@ -339,11 +344,10 @@ export default function SystemSettings({ toast }) {
     setDialog(null);
   };
 
-  const title = TABS.find((item) => item[0] === tab)?.[1] || "Overview";
-
   const overview = () => (
     <>
       <Heading
+        icon={Activity}
         eyebrow="PLATFORM CONFIGURATION"
         title="System overview"
         description="Monitor key configuration and manage your platform settings from one place."
@@ -476,6 +480,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={SlidersHorizontal}
               eyebrow="PLATFORM CONFIGURATION"
               title="General settings"
               description="Manage platform identity, regional preferences, and display formats."
@@ -561,6 +566,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={Bell}
               eyebrow="COMMUNICATION"
               title="Notification settings"
               description="Choose which platform events should generate notifications."
@@ -639,6 +645,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={ShieldCheck}
               eyebrow="ACCOUNT PROTECTION"
               title="Security settings"
               description="Set authentication rules; production enforcement must be implemented by your backend."
@@ -740,6 +747,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={Users}
               eyebrow="ADMIN GOVERNANCE"
               title="Access control"
               description="Set default access rules and safeguards for sensitive actions."
@@ -814,6 +822,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={Database}
               eyebrow="DATA PROTECTION"
               title="Backup & data retention"
               description="Configure backup preferences and data retention policies."
@@ -925,6 +934,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={Plug}
               eyebrow="CONNECTED SERVICES"
               title="Integration settings"
               description="Review providers and run a frontend demo connection check."
@@ -1024,6 +1034,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={Monitor}
               eyebrow="PLATFORM OPERATIONS"
               title="System & maintenance"
               description="Manage maintenance preferences and review environment information."
@@ -1115,6 +1126,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={Monitor}
               eyebrow="WORKSPACE APPEARANCE"
               title="Display settings"
               description="Personalize the appearance, colour, and layout of your MEGSI workspace."
@@ -1175,6 +1187,7 @@ export default function SystemSettings({ toast }) {
         return (
           <>
             <Heading
+              icon={FileText}
               eyebrow="GOVERNANCE"
               title="Audit & compliance"
               description="Configure audit defaults and privacy controls for platform operations."
@@ -1253,16 +1266,23 @@ export default function SystemSettings({ toast }) {
   };
 
   return (
-    <div className="ss-page">
-      <div className="ss-topline">
-        <div className="ss-breadcrumb">
-          <span>Platform</span>
-          <ChevronRight />
-          <b>System Settings</b>
+    <div className="ss ss-page">
+      <div className="ss-title-row">
+        <div>
+          <h1>System Settings</h1>
+          <p>
+            Configure and monitor your MEGSI platform from one place.
+          </p>
         </div>
 
-        <div className="ss-top-right">
-          <span className={dirty ? "dirty" : ""}>
+        <div className="ss-head-actions">
+          {savedAt && (
+            <span className="ss-saved-at">
+              <Check /> Last saved {savedAt}
+            </span>
+          )}
+
+          <span className={`ss-status ${dirty ? "dirty" : ""}`}>
             <i />
             {dirty ? "Unsaved changes" : "All changes saved"}
           </span>
@@ -1276,19 +1296,6 @@ export default function SystemSettings({ toast }) {
           >
             <CircleHelp />
           </button>
-        </div>
-      </div>
-
-      <div className="ss-page-title">
-        <span className="ss-title-icon">
-          <Settings />
-        </span>
-
-        <div>
-          <h1>System Settings</h1>
-          <p>
-            Configure and monitor your MEGSI platform from one place.
-          </p>
         </div>
       </div>
 
@@ -1329,23 +1336,6 @@ export default function SystemSettings({ toast }) {
         </aside>
 
         <main className="ss-main">
-          <div className="ss-main-top">
-            <div>
-              <small>
-                {tab === "overview"
-                  ? "OVERVIEW"
-                  : `SETTINGS / ${title.toUpperCase()}`}
-              </small>
-              <p>Manage platform configuration</p>
-            </div>
-
-            {savedAt && (
-              <span className="ss-saved-at">
-                <Check /> Last saved {savedAt}
-              </span>
-            )}
-          </div>
-
           {error && (
             <div className="ss-error">
               <AlertTriangle />

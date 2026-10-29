@@ -220,3 +220,375 @@
   .al-page .al-charts { grid-template-columns: minmax(0, 1fr); }
   .al-page .al-drawer { width: 100vw; }
 }
+/* =========================================================
+   ACCESS LOGS — DASHBOARD TYPOGRAPHY ONLY
+   Changes only font family, font size, font weight and text colour.
+   ========================================================= */
+
+/* Base typography */
+.al,
+.access-logs,
+.access-logs-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+}
+
+/* Main page heading */
+.al h1,
+.access-logs h1,
+.access-logs-page h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* Section headings and card titles */
+.al h2,
+.al h3,
+.access-logs h2,
+.access-logs h3,
+.access-logs-page h2,
+.access-logs-page h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Descriptions and supporting text */
+.al p,
+.al .description,
+.al .subtitle,
+.al .muted,
+.access-logs p,
+.access-logs .description,
+.access-logs .subtitle,
+.access-logs .muted,
+.access-logs-page p,
+.access-logs-page .description,
+.access-logs-page .subtitle,
+.access-logs-page .muted {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* KPI values and highlighted numbers */
+.al .kpi-value,
+.al .stat-value,
+.al .metric-value,
+.access-logs .kpi-value,
+.access-logs .stat-value,
+.access-logs .metric-value,
+.access-logs-page .kpi-value,
+.access-logs-page .stat-value,
+.access-logs-page .metric-value {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* KPI labels and metadata */
+.al .kpi-label,
+.al .stat-label,
+.al .metric-label,
+.al small,
+.access-logs .kpi-label,
+.access-logs .stat-label,
+.access-logs .metric-label,
+.access-logs small,
+.access-logs-page .kpi-label,
+.access-logs-page .stat-label,
+.access-logs-page .metric-label,
+.access-logs-page small {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #465477;
+}
+
+/* Table headings */
+.al table th,
+.al .table th,
+.al .logs-table th,
+.access-logs table th,
+.access-logs .table th,
+.access-logs .logs-table th,
+.access-logs-page table th,
+.access-logs-page .table th,
+.access-logs-page .logs-table th {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Table content */
+.al table td,
+.al .table td,
+.al .logs-table td,
+.access-logs table td,
+.access-logs .table td,
+.access-logs .logs-table td,
+.access-logs-page table td,
+.access-logs-page .table td,
+.access-logs-page .logs-table td {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Search fields, inputs and dropdowns */
+.al input,
+.al select,
+.al textarea,
+.access-logs input,
+.access-logs select,
+.access-logs textarea,
+.access-logs-page input,
+.access-logs-page select,
+.access-logs-page textarea {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Placeholder text */
+.al input::placeholder,
+.al textarea::placeholder,
+.access-logs input::placeholder,
+.access-logs textarea::placeholder,
+.access-logs-page input::placeholder,
+.access-logs-page textarea::placeholder {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Form labels */
+.al label,
+.access-logs label,
+.access-logs-page label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #465477;
+}
+
+/* Buttons — typography only */
+.al button,
+.access-logs button,
+.access-logs-page button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Status labels and badges — preserve existing colours */
+.al .badge,
+.al .status,
+.al .status-badge,
+.al .chip,
+.access-logs .badge,
+.access-logs .status,
+.access-logs .status-badge,
+.access-logs .chip,
+.access-logs-page .badge,
+.access-logs-page .status,
+.access-logs-page .status-badge,
+.access-logs-page .chip {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Modal and detail-panel headings */
+.al .modal h2,
+.al .modal h3,
+.al .drawer h2,
+.al .drawer h3,
+.access-logs .modal h2,
+.access-logs .modal h3,
+.access-logs .drawer h2,
+.access-logs .drawer h3,
+.access-logs-page .modal h2,
+.access-logs-page .modal h3,
+.access-logs-page .drawer h2,
+.access-logs-page .drawer h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #101B4D;
+}
+/* =========================================================
+   MEGSI ACCESS LOGS — DASHBOARD TYPOGRAPHY
+   Typography only: font family, size, weight, and text colour.
+   Append this block at the bottom of access-logs.css.
+   ========================================================= */
+
+/* Base typography */
+.al-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+  font-size: 12px;
+}
+
+/* Main page title */
+.al-page .al-top h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* Page subtitle */
+.al-page .al-top p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Section headings */
+.al-page .al-panel-head strong,
+.al-page .al-panel-head h2,
+.al-page .al-panel-head h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* KPI labels */
+.al-page .al-kpi-label,
+.al-page .al-kpi-label span,
+.al-page .al-kpi small,
+.al-page .al-kpi .label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* KPI values */
+.al-page .al-kpi-value,
+.al-page .al-kpi strong,
+.al-page .al-kpi .value {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* Supporting text */
+.al-page p,
+.al-page small,
+.al-page .muted,
+.al-page .subtitle,
+.al-page .meta,
+.al-page .description {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Chart labels and legends */
+.al-page .recharts-cartesian-axis-tick-value,
+.al-page .recharts-legend-item-text,
+.al-page .chart-label,
+.al-page .chart-legend,
+.al-page .axis-label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  fill: #66728B;
+  color: #66728B;
+}
+
+/* Table typography */
+.al-page table,
+.al-page table th,
+.al-page table td {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+}
+
+.al-page table th {
+  font-weight: 700;
+  color: #101B4D;
+}
+
+.al-page table td {
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Form labels */
+.al-page label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* Inputs and dropdowns — typography only */
+.al-page input,
+.al-page select,
+.al-page textarea {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Buttons — preserve existing colours and borders */
+.al-page button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Status badges — preserve their existing colours */
+.al-page .badge,
+.al-page .status,
+.al-page .status-badge {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Detail drawer headings, if present */
+.al-page .al-drawer h2,
+.al-page .al-drawer h3,
+.al-page .al-side-panel h2,
+.al-page .al-side-panel h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Detail drawer supporting text */
+.al-page .al-drawer p,
+.al-page .al-side-panel p,
+.al-page .al-drawer span,
+.al-page .al-side-panel span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Warning text — preserve its existing colours */
+.al-page .al-note {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+}
+

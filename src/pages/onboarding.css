@@ -277,3 +277,88 @@
 @keyframes onb-drawer-in{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes onb-drawer-fade{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.onb-drawer,.onb-drawer-backdrop{animation:none}}
+/* ==========================================
+   ONBOARDING — DASHBOARD TYPOGRAPHY
+   Changes typography only.
+   ========================================== */
+
+.onboarding-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+}
+
+/* Main page heading */
+.onboarding-page h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #101B4D;
+  line-height: 1.2;
+}
+
+/* Section headings */
+.onboarding-page h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Smaller headings */
+.onboarding-page h3,
+.onboarding-page h4 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Paragraphs and descriptions */
+.onboarding-page p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #526B9A;
+  line-height: 1.5;
+}
+
+/* Labels and helper text */
+.onboarding-page label,
+.onboarding-page small {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #526B9A;
+}
+
+/* Table headings */
+.onboarding-page th {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Table content */
+.onboarding-page td {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Buttons */
+.onboarding-page button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Inputs and dropdowns */
+.onboarding-page input,
+.onboarding-page select,
+.onboarding-page textarea {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  color: #101B4D;
+}

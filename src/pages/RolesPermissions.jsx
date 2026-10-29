@@ -287,6 +287,82 @@ function ListModal({ title, cols, rows, onClose }) {
   );
 }
 
+/* ---------- KPI information drawer ---------- */
+function KpiDetailsDrawer({ type, roles, assignments, requests, onClose, onOpenRole, onDecide, fmt }) {
+  useEffect(() => {
+    const key = (event) => { if (event.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', key);
+    return () => document.removeEventListener('keydown', key);
+  }, [onClose]);
+
+  if (!type) return null;
+
+  const customRoles = roles.filter((role) => role.custom && !SYSTEM_IDS.includes(role.id));
+  const assignedTotal = roles.reduce((sum, role) => sum + Number(role.users || 0), 0);
+  const config = {
+    roles: { title: 'Total Roles', subtitle: 'All roles currently configured on the platform.', count: roles.length },
+    permissions: { title: 'Total Permissions', subtitle: 'Available actions across all platform modules.', count: TOTAL_PERMISSIONS },
+    assigned: { title: 'Assigned Users', subtitle: 'User counts grouped by their assigned role.', count: assignedTotal },
+    custom: { title: 'Custom Roles', subtitle: 'Custom roles configured for specific tenant needs.', count: customRoles.length },
+    requests: { title: 'Pending Access Requests', subtitle: 'Access requests awaiting a decision.', count: requests.length },
+  }[type];
+
+  return (
+    <>
+      <div className="rp-drawer-bd" onClick={onClose} />
+      <aside className="rp-drawer rp-kpi-drawer" role="dialog" aria-modal="true" aria-label={`${config.title} details`}>
+        <div className="rp-drawer-h">
+          <div><h3>{config.title}</h3><p className="rp-kpi-panel-subtitle">{config.subtitle}</p></div>
+          <button className="icon-btn" onClick={onClose} aria-label="Close details"><X size={18} /></button>
+        </div>
+        <div className="rp-drawer-b">
+          <div className="rp-kpi-panel-summary"><strong>{config.count}</strong><span>{type === 'permissions' ? 'available permissions' : type === 'assigned' ? 'users assigned across roles' : type === 'requests' ? 'requests pending review' : type === 'custom' ? 'custom roles' : 'roles configured'}</span></div>
+
+          {type === 'roles' && (roles.length ? roles.map((role) => (
+            <div className="rp-kpi-panel-item" key={role.id}>
+              <div className="rp-kpi-panel-item-top"><Avatar name={role.name} /><div className="rp-kpi-panel-item-info"><strong>{role.name}</strong><span>{role.description}</span></div><StatusBadge v={role.status} /></div>
+              <div className="rp-kpi-panel-meta"><span>{role.users} assigned users</span><span>{countPerms(role.permissions)} / {TOTAL_PERMISSIONS} permissions</span><span>{SYSTEM_IDS.includes(role.id) ? 'Built-in' : role.custom ? 'Custom' : 'Built-in'}</span></div>
+              <div className="rp-kpi-panel-actions"><button className="rp-btn sm" onClick={() => onOpenRole(role)}>View role details</button></div>
+            </div>
+          )) : <p className="empty">No roles configured.</p>)}
+
+          {type === 'permissions' && MODULES.map((module) => (
+            <div className="rp-kpi-panel-item" key={module.id}>
+              <div className="rp-kpi-panel-item-top"><span className="rp-kpi-panel-module-icon"><module.Icon size={16} /></span><div className="rp-kpi-panel-item-info"><strong>{module.name}</strong><span>{ACTIONS.length} possible actions</span></div></div>
+              <div className="rp-kpi-panel-chips">{ACTIONS.map(([key, label]) => <em key={key}>{label}</em>)}</div>
+            </div>
+          ))}
+
+          {type === 'assigned' && (roles.length ? [...roles].sort((a, b) => b.users - a.users).map((role) => (
+            <div className="rp-kpi-panel-item" key={role.id}>
+              <div className="rp-kpi-panel-item-top"><Avatar name={role.name} /><div className="rp-kpi-panel-item-info"><strong>{role.name}</strong><span>{role.description}</span></div><b className="rp-kpi-panel-count">{role.users}</b></div>
+              <div className="rp-kpi-panel-meta"><span>{assignedTotal ? `${Math.round((role.users / assignedTotal) * 100)}% of assigned users` : '0% of assigned users'}</span></div>
+            </div>
+          )) : <p className="empty">No assigned users.</p>)}
+
+          {type === 'custom' && (customRoles.length ? customRoles.map((role) => (
+            <div className="rp-kpi-panel-item" key={role.id}>
+              <div className="rp-kpi-panel-item-top"><Avatar name={role.name} /><div className="rp-kpi-panel-item-info"><strong>{role.name}</strong><span>{role.description}</span></div><StatusBadge v={role.status} /></div>
+              <div className="rp-kpi-panel-meta"><span>{role.users} assigned users</span><span>{countPerms(role.permissions)} permissions granted</span></div>
+              <div className="rp-kpi-panel-actions"><button className="rp-btn sm" onClick={() => onOpenRole(role)}>View role details</button></div>
+            </div>
+          )) : <p className="empty">No custom roles configured.</p>)}
+
+          {type === 'requests' && (requests.length ? [...requests].sort((a, b) => b.at.localeCompare(a.at)).map((request) => (
+            <div className="rp-kpi-panel-item" key={request.id}>
+              <div className="rp-kpi-panel-item-top"><Avatar name={request.user} /><div className="rp-kpi-panel-item-info"><strong>{request.user}</strong><span>{request.company}</span></div><span className="rp-kpi-panel-request-tag">Pending</span></div>
+              <div className="rp-kpi-panel-meta"><span>Requested role: <b>{request.role}</b></span><span>{fmt(request.at)}</span></div>
+              <p className="rp-kpi-panel-reason">{request.reason}</p>
+              <div className="rp-kpi-panel-actions"><button className="rp-btn primary sm" onClick={() => onDecide(request, true)}><Check size={14} />Approve</button><button className="rp-btn danger sm" onClick={() => onDecide(request, false)}><X size={14} />Reject</button></div>
+            </div>
+          )) : <p className="empty">There are no pending access requests.</p>)}
+        </div>
+        <div className="rp-drawer-f"><button className="rp-btn" onClick={onClose}>Close</button></div>
+      </aside>
+    </>
+  );
+}
+
 /* =====================================================================
    Page
    ===================================================================== */
@@ -298,6 +374,7 @@ export default function RolesPermissions({ range, setRange, toast }) {
   const [matrixRole, setMatrixRole] = useState('all'); const [matrixModule, setMatrixModule] = useState('all');
   const [modal, setModal] = useState(null); // {type, role?}
   const [drawerId, setDrawerId] = useState(null);
+  const [kpiPanel, setKpiPanel] = useState(null);
   const rolesRef = useRef(null); const matrixRef = useRef(null);
 
   useEffect(() => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch { /* storage unavailable: state still works in memory */ } }, [state]);
@@ -313,11 +390,11 @@ export default function RolesPermissions({ range, setRange, toast }) {
 
   const scrollTo = (r) => r.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const kpis = [
-    { t: 'Total Roles', v: roles.length, c: 'blue', I: Users, ch: 14, d: 'Defined roles in the platform', go: () => scrollTo(rolesRef) },
-    { t: 'Total Permissions', v: TOTAL_PERMISSIONS, c: 'green', I: Users, ch: 8, d: 'Module-wise permissions', go: () => scrollTo(matrixRef) },
-    { t: 'Assigned Users', v: totalUsers, c: 'orange', I: ShieldCheck, ch: 12, d: 'Users with role assignments', go: () => setModal({ type: 'assignments' }) },
-    { t: 'Custom Roles', v: roles.filter((r) => r.custom).length, c: 'purple', I: KeyRound, ch: 0, d: 'Tenant-specific roles', go: () => scrollTo(rolesRef) },
-    { t: 'Pending Access Requests', v: requests.length, c: 'red', I: Lock, ch: -60, d: 'Awaiting approval', go: () => setModal({ type: 'requests' }) },
+    { key: 'roles', t: 'Total Roles', v: roles.length, c: 'blue', I: Users, ch: 14, d: 'Defined roles in the platform' },
+    { key: 'permissions', t: 'Total Permissions', v: TOTAL_PERMISSIONS, c: 'green', I: Users, ch: 8, d: 'Module-wise permissions' },
+    { key: 'assigned', t: 'Assigned Users', v: totalUsers, c: 'orange', I: ShieldCheck, ch: 12, d: 'Users with role assignments' },
+    { key: 'custom', t: 'Custom Roles', v: roles.filter((r) => r.custom && !SYSTEM_IDS.includes(r.id)).length, c: 'purple', I: KeyRound, ch: 0, d: 'Tenant-specific roles' },
+    { key: 'requests', t: 'Pending Access Requests', v: requests.length, c: 'red', I: Lock, ch: -60, d: 'Awaiting approval' },
   ];
 
   /* ----- role actions ----- */
@@ -380,7 +457,7 @@ export default function RolesPermissions({ range, setRange, toast }) {
       </div>
 
       <div className="rp-kpis">{kpis.map((k) => (
-        <button key={k.t} className="card rp-kpi" onClick={k.go} aria-label={`${k.t}: ${k.v}`}>
+        <button key={k.t} className="card rp-kpi" onClick={() => setKpiPanel(k.key)} aria-expanded={kpiPanel === k.key} aria-label={`${k.t}: ${k.v}. Open details`}>
           <span className={`rp-kpi-ic ${k.c}`}><k.I size={26} /></span>
           <span className="rp-kpi-t"><small>{k.t}</small><span className="rp-kpi-v"><b>{k.v}</b><em className={k.ch < 0 ? 'down' : k.ch > 0 ? 'up' : 'neutral'}>{k.ch < 0 ? '↓' : '↑'} {Math.abs(k.ch)}%</em></span></span>
           <span className="rp-kpi-d">{k.d}</span>
@@ -451,6 +528,7 @@ export default function RolesPermissions({ range, setRange, toast }) {
         </Card>
       </div>
 
+      {kpiPanel && <KpiDetailsDrawer type={kpiPanel} roles={roles} assignments={assignments} requests={requests} fmt={fmt} onClose={() => setKpiPanel(null)} onOpenRole={(role) => { setKpiPanel(null); setDrawerId(role.id); }} onDecide={decide} />}
       {drawerRole && <RoleDrawer role={drawerRole} onClose={() => setDrawerId(null)} onEdit={(r) => { setDrawerId(null); setModal({ type: 'form', role: r }); }} />}
       {modal?.type === 'form' && <RoleForm role={modal.role} roles={roles} onSave={saveRole} onClose={() => setModal(null)} />}
       {modal?.type === 'delete' && <DeleteModal role={modal.role} onClose={() => setModal(null)} onConfirm={deleteRole} />}

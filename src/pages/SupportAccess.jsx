@@ -89,6 +89,68 @@ function Modal({ title, onClose, wide, children, footer }) {
     </div>, document.body);
 }
 
+function KpiSidePanel({ panel, requests, sessions, range, fmtDate, onAction, onEndSession, onClose }) {
+  useEffect(() => {
+    if (!panel) return undefined;
+    const handleKey = (event) => { if (event.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [panel, onClose]);
+
+  if (!panel) return null;
+  const isSessions = panel.type === 'sessions';
+  const filteredRequests = requests.filter((request) =>
+    request.date >= range.start && request.date <= range.end
+    && (!panel.status || request.status === panel.status)
+    && (!panel.accessType || request.type === panel.accessType)
+  ).sort((a, b) => b.date.localeCompare(a.date));
+  const title = isSessions
+    ? (panel.title || 'Live Support Sessions')
+    : panel.status
+      ? `${panel.status} Requests`
+      : panel.accessType || 'Support Access Requests';
+
+  return createPortal(
+    <div className="sa-side-bg" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <aside className="sa-side-panel" role="dialog" aria-modal="true" aria-label={title}>
+        <header className="sa-side-h">
+          <div><h2>{title}</h2><p>{isSessions ? `${sessions.length} active session${sessions.length === 1 ? '' : 's'}` : `${filteredRequests.length} request${filteredRequests.length === 1 ? '' : 's'} in the selected date range`}</p></div>
+          <button type="button" className="sa-x" aria-label="Close panel" onClick={onClose}><X size={18} /></button>
+        </header>
+        <div className="sa-side-b">
+          {isSessions ? (
+            sessions.length ? sessions.map((session) => (
+              <article className="sa-side-item" key={session.id}>
+                <div className="sa-side-item-head"><div><strong>{session.engineer}</strong><span>{session.company}</span></div><span className="sa-pill green"><i />Active</span></div>
+                <dl className="sa-side-details">
+                  <div><dt>Request ID</dt><dd>{session.request}</dd></div>
+                  <div><dt>Started</dt><dd>{session.started}</dd></div>
+                  <div><dt>Duration</dt><dd>{fmtMins(session.mins)}</dd></div>
+                </dl>
+                <div className="sa-side-actions"><button type="button" className="sa-btn bad" onClick={() => onEndSession(session)}>End Session</button></div>
+              </article>
+            )) : <p className="sa-side-empty">There are no live support sessions.</p>
+          ) : (
+            filteredRequests.length ? filteredRequests.map((request) => (
+              <article className="sa-side-item" key={request.id}>
+                <div className="sa-side-item-head"><div><strong>{request.id}</strong><span>{request.company}</span></div><Pill status={request.status} /></div>
+                <dl className="sa-side-details">
+                  <div><dt>Requested by</dt><dd>{request.by}</dd></div>
+                  <div><dt>Access type</dt><dd>{request.type}</dd></div>
+                  <div><dt>Duration</dt><dd>{request.hours} hours</dd></div>
+                  <div><dt>Requested on</dt><dd>{fmtDate(request.date)} {request.time || ''}</dd></div>
+                </dl>
+                {request.status === 'Pending' && <div className="sa-side-actions"><button type="button" className="sa-btn solid ok" onClick={() => onAction('approve', request)}><Check size={14} />Approve</button><button type="button" className="sa-btn bad" onClick={() => onAction('reject', request)}><X size={14} />Reject</button></div>}
+                {request.status === 'Approved' && <div className="sa-side-actions"><button type="button" className="sa-btn" onClick={() => onAction('extend', request)}><TimerReset size={14} />Extend by 2 Hours</button><button type="button" className="sa-btn bad" onClick={() => onAction('revoke', request)}><Ban size={14} />Revoke</button></div>}
+              </article>
+            )) : <p className="sa-side-empty">No requests match this KPI and the selected date range.</p>
+          )}
+        </div>
+      </aside>
+    </div>, document.body
+  );
+}
+
 function RowMenu({ req, onAction }) {
   const [pos, setPos] = useState(null);
   const btn = useRef(null);
@@ -167,6 +229,7 @@ export default function SupportAccess({ toast }) {
   const [durRange, setDurRange] = useState('This Month');
   const [accessRange, setAccessRange] = useState('Last 30 Days');
   const [modal, setModal] = useState(null);
+  const [kpiPanel, setKpiPanel] = useState(null);
   const [hiDist, setHiDist] = useState(null);
 
   // live session clocks
@@ -241,7 +304,7 @@ export default function SupportAccess({ toast }) {
       {/* KPIs */}
       <div className="sa-kpis">
         {kpis.map((k) => (
-          <button type="button" key={k.id} className="sa-card sa-kpi" onClick={() => setModal(k.open)}>
+          <button type="button" key={k.id} className="sa-card sa-kpi" onClick={() => setKpiPanel({ ...k.open, title: k.label })}>
             <span className={`sa-kpi-ic ${k.cls}`}><k.Icon /></span>
             <span className="sa-kpi-main">
               <small>{k.label}</small>
@@ -436,6 +499,17 @@ export default function SupportAccess({ toast }) {
           </section>
         </div>
       </div>
+
+      <KpiSidePanel
+        panel={kpiPanel}
+        requests={requests}
+        sessions={sessions}
+        range={range}
+        fmtDate={fmtDate}
+        onAction={act}
+        onEndSession={endSession}
+        onClose={() => setKpiPanel(null)}
+      />
 
       {/* modals */}
       {modal?.type === 'requests' && (

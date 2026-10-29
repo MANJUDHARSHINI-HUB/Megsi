@@ -1,4 +1,3 @@
-
 /* =========================================================
    MEGSI — ANNOUNCEMENTS PAGE
    Page-scoped styles; other dashboard pages are unaffected.
@@ -154,14 +153,13 @@
 
 .an-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 285px;
-  gap: 12px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: stretch;
   width: auto;
   margin: 0 6px;
   min-width: 0;
 }
-
 .an-grid > * {
   min-width: 0;
 }
@@ -189,12 +187,15 @@
 /* MAIN ANNOUNCEMENTS PANEL
    Height follows the table content instead of the sidebar. */
 
+/* MAIN ANNOUNCEMENTS PANEL */
+
 .an-grid > .an-panel:first-child {
   display: flex;
   flex-direction: column;
-  align-self: start;
-  min-height: 0;
-  height: auto;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 100%;
+  height: 100%;
 }
 
 .an-grid > .an-panel:first-child > .an-head,
@@ -204,8 +205,9 @@
 }
 
 .an-grid > .an-panel:first-child > .an-twrap {
-  flex: 0 0 auto;
-  min-height: 0;
+  flex: 1 1 auto;
+  min-height: 250px;
+  overflow-x: auto;
 }
 
 /* PANEL HEADERS */
@@ -1286,85 +1288,168 @@
   }
 }
 
-/* FIX: Announcements page extra bottom whitespace */
+
+/* =========================================================
+   ANNOUNCEMENTS PAGE — FINAL LAYOUT FIX
+   Keep all existing styles above this section.
+   ========================================================= */
+
 .an-page {
-  padding-bottom: 0;
-  margin-bottom: 0;
-  min-height: 0;
+  width: 100%;
+  min-width: 0;
   height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 16px;
+  box-sizing: border-box;
 }
 
 .an-grid {
-  align-items: start;
-  min-height: 0;
-  height: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: stretch;
+  gap: 16px;
+  width: auto;
+  min-width: 0;
+  margin: 0 6px;
 }
 
+.an-grid > *,
+.an-left,
 .an-side {
-  align-content: start;
-  height: auto;
-  min-height: 0;
+  min-width: 0;
 }
-/* =========================================================
-   ANNOUNCEMENT CALENDAR — NEW SECTION
-   ========================================================= */
 
 .an-left {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
-  gap: 12px;
+  gap: 14px;
+}
+
+.an-grid > .an-panel:first-child {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 520px;
+  height: auto;
+}
+
+.an-grid > .an-panel:first-child > .an-twrap {
+  flex: 1 1 auto;
+  min-height: 250px;
+  overflow-x: auto;
+}
+
+.an-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.an-table th {
+  height: 40px;
+  padding: 0 10px;
+}
+
+.an-table td {
+  height: 54px;
+  padding: 9px 10px;
+}
+
+.an-foot {
+  min-height: 48px;
+  margin-top: auto;
+  padding: 9px 12px;
+}
+
+.an-side {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  height: auto;
+}
+
+.an-side > .an-panel {
+  width: 100%;
   min-width: 0;
 }
 
+.an-donutwrap {
+  gap: 12px;
+  padding: 4px 12px 14px;
+}
+
+.an-donut {
+  width: 108px;
+  height: 108px;
+  flex: 0 0 108px;
+}
+
+.an-bar {
+  height: 170px;
+  padding: 0 10px;
+}
+
+.an-recent {
+  padding: 0 10px 10px;
+}
+
+.an-recent button {
+  padding: 11px 6px;
+}
+
+.an-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 6px 16px;
+}
+
+.an-metric {
+  min-width: 0;
+  min-height: 96px;
+  padding: 13px;
+  gap: 10px;
+}
+
+.an-metric-icon {
+  width: 42px;
+  height: 44px;
+  flex: 0 0 42px;
+}
+
+.an-head {
+  min-height: 46px;
+  padding: 10px 12px;
+}
+
+.an-tools {
+  gap: 9px;
+  padding: 0 12px 12px;
+}
+
+.an-tabs {
+  gap: 6px;
+}
+
+.an-filters {
+  gap: 8px;
+}
+
 .an-calendar {
+  width: 100%;
   min-width: 0;
   overflow: hidden;
 }
 
-.an-calendar-count {
-  color: #0758f9;
-  background: #edf5ff;
-  border-radius: 5px;
-  padding: 5px 8px;
-  font-size: 10px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
 .an-calendar-stats {
-  display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  padding: 0 12px 12px;
-}
-
-.an-calendar-stats > div {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  padding: 12px;
-  border: 1px solid #e1edfb;
-  border-radius: 7px;
-  background: #f8fbff;
-  color: #0758f9;
-}
-
-.an-calendar-stats > div span {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.an-calendar-stats b {
-  font-size: 19px;
-  color: #092b94;
-}
-
-.an-calendar-stats small {
-  color: #6581b5;
-  font-size: 10px;
 }
 
 .an-calendar-list {
@@ -1372,104 +1457,99 @@
 }
 
 .an-calendar-item {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  width: 100%;
-  min-width: 0;
   padding: 12px 8px;
-  text-align: left;
-  border-top: 1px solid #e6eff9;
-  border-radius: 5px;
 }
 
-.an-calendar-item:hover {
-  background: #f4f9ff;
+/* Medium screens */
+
+@media (max-width: 1150px) {
+  .an-grid {
+    grid-template-columns: minmax(0, 1fr) 270px;
+    gap: 12px;
+  }
+
+  .an-metrics {
+    gap: 9px;
+  }
+
+  .an-metric {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .an-metric-icon {
+    width: 36px;
+    height: 38px;
+    flex-basis: 36px;
+  }
+
+  .an-metric-info b {
+    font-size: 20px;
+  }
+
+  .an-donut {
+    width: 88px;
+    height: 88px;
+    flex-basis: 88px;
+  }
 }
 
-.an-calendar-date {
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 3px;
-  width: 54px;
-  min-width: 54px;
-  min-height: 52px;
-  background: #edf5ff;
-  border: 1px solid #dce9fa;
-  border-radius: 7px;
-}
-
-.an-calendar-date small {
-  color: #0758f9;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.an-calendar-date b {
-  color: #092b94;
-  font-size: 20px;
-  line-height: 1;
-}
-
-.an-calendar-info {
-  display: grid;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
-}
-
-.an-calendar-info b {
-  color: #0a2a91;
-  font-size: 11.5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.an-calendar-info small {
-  color: #6a7fa8;
-  font-size: 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.an-calendar-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
-  padding: 24px 12px;
-  text-align: center;
-  color: #647da9;
-}
-
-.an-calendar-empty b {
-  color: #092b94;
-  font-size: 12px;
-}
-
-.an-calendar-empty span {
-  font-size: 11px;
-}
+/* Tablet layout */
 
 @media (max-width: 900px) {
   .an-grid {
     grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .an-grid > .an-panel:first-child {
+    min-height: 0;
+  }
+
+  .an-grid > .an-panel:first-child > .an-twrap {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .an-side {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .an-side > .an-panel:last-child {
+    grid-column: 1 / -1;
   }
 
   .an-left {
     grid-column: 1;
   }
-
-  .an-side {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
+/* Mobile layout */
+
 @media (max-width: 650px) {
+  .an-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .an-top h1 {
+    font-size: 25px;
+  }
+
+  .an-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .an-side {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .an-side > .an-panel:last-child {
+    grid-column: auto;
+  }
+
   .an-calendar-stats {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1487,7 +1567,467 @@
     white-space: normal;
   }
 
-  .an-side {
+  .an-2col {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .an-title b,
+  .an-title small {
+    max-width: 170px;
+  }
+
+  .an-filters select {
+    flex-basis: 45%;
+    max-width: none;
+  }
+
+  .detail.an-drawer.wide {
+    width: 100vw;
+  }
+}
+
+@media (max-width: 420px) {
+  .an-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .an-metric {
+    min-height: 80px;
+  }
+}
+
+.an-overview-empty {
+  min-height: 300px;
+  padding: 20px 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #64748b;
+}
+
+.an-empty-icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  margin-bottom: 12px;
+}
+
+.an-overview-empty h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #173b8e;
+}
+
+.an-overview-empty p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.an-empty-bars {
+  width: 100%;
+  max-width: 240px;
+  height: 85px;
+  margin-top: 18px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  border-bottom: 1px solid #dbe5f2;
+}
+
+.an-empty-bars span {
+  width: 20px;
+  border-radius: 4px 4px 0 0;
+  background: #cbdcf8;
+}
+
+.an-empty-bars span:nth-child(2),
+.an-empty-bars span:nth-child(5) {
+  background: #93b4ef;
+}
+
+.an-empty-bars span:nth-child(4) {
+  background: #60a5fa;
+}
+
+.an-empty-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 12px;
+  margin-top: 12px;
+  font-size: 10px;
+}
+
+.an-empty-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.an-empty-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: #94a3b8;
+}
+
+.an-empty-legend span:nth-child(2) i {
+  background: #60a5fa;
+}
+
+.an-empty-legend span:nth-child(3) i {
+  background: #cbd5e1;
+}
+/* =========================================================
+   ANNOUNCEMENTS — DASHBOARD TYPOGRAPHY OVERRIDE
+   Typography only; preserves existing layout and colours
+   ========================================================= */
+
+.an-page {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  color: #101b4d;
+}
+
+/* Main page heading */
+.an-page .an-top h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #101b4d;
+}
+
+.an-page .an-top p {
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Summary cards */
+.an-page .an-metric-info small {
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.an-page .an-metric-info b {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #101b4d;
+}
+
+.an-page .an-metric-info em {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.an-page .an-metric-info > span {
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #66728b;
+}
+
+/* Panel headings */
+.an-page .an-head strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.an-page .an-plist h4,
+.an-page .an-h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+/* Buttons and controls */
+.an-page .an-create,
+.an-page .an-btn,
+.an-page .an-clear,
+.an-page .an-menu button,
+.an-page .an-empty button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.an-page .an-outline,
+.an-page .an-tabs button,
+.an-page .an-filters select,
+.an-page .an-pager button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+}
+
+.an-page .an-search input {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Table */
+.an-page .an-table {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+}
+
+.an-page .an-table th {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.an-page .an-sort {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.an-page .an-table td {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.an-page .an-title b {
+  font-size: 11px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.an-page .an-title small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-cat,
+.an-page .an-pri,
+.an-page .an-st {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Pagination */
+.an-page .an-foot {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-pager button {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.an-page .an-pg em {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+/* Analytics */
+.an-page .an-donut-c b {
+  font-size: 24px;
+  font-weight: 800;
+  color: #101b4d;
+}
+
+.an-page .an-donut-c span {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-legend button {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.an-page .an-legend em {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-barleg {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Recent announcements */
+.an-page .an-recent b {
+  font-size: 11px;
+  font-weight: 600;
+  color: #101b4d;
+}
+
+.an-page .an-recent small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+/* Empty states */
+.an-page .an-empty,
+.an-page .an-mini-empty,
+.an-page .an-overview-empty {
+  font-size: 12px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-overview-empty h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #101b4d;
+}
+
+.an-page .an-overview-empty p {
+  font-size: 11px;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-empty-legend {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Detail drawer */
+.an-page .an-drawer .detail-h h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #101b4d;
+}
+
+.an-page .an-drawer .kv {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.an-page .an-drawer .kv b {
+  font-weight: 600;
+  color: #101b4d;
+}
+
+.an-page .an-plist h4 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.an-page .an-pempty {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-pitem-t b {
+  font-size: 11px;
+  font-weight: 600;
+  color: #101b4d;
+}
+
+.an-page .an-pitem-t small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-vhead small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+.an-page .an-msg {
+  font-size: 12px;
+  line-height: 1.55;
+  font-weight: 400;
+  color: #465477;
+}
+
+.an-page .an-hist li {
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.an-page .an-hist span {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+/* Create/edit form */
+.an-page .an-form label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #465477;
+}
+
+.an-page .an-form input,
+.an-page .an-form textarea,
+.an-page .an-form select {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+.an-page .an-err {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.an-page .an-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728b;
+}
+
+/* Delete confirmation modal */
+.an-page .an-modal h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #101b4d;
+}
+
+.an-page .an-modal p {
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Responsive typography */
+@media (max-width: 650px) {
+  .an-page .an-top h1 {
+    font-size: 25px;
+  }
+
+  .an-page .an-metric-info b {
+    font-size: 22px;
   }
 }

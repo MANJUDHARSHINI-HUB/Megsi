@@ -229,3 +229,395 @@
 .st-tbl td.mail { max-width: 112px; }
 .st-tbl .name .st-link { max-width: 98px; }
 @media (max-width: 560px) { .st-select.w-lg { width: 100%; } }
+/* ==========================================
+   SUSPENDED TENANTS — DASHBOARD TYPOGRAPHY
+   Typography only; preserve existing layout.
+   ========================================== */
+
+/* Main page wrapper */
+.suspended-tenants-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+}
+
+/* Main heading */
+.suspended-tenants-page h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #101B4D;
+}
+
+/* Section headings */
+.suspended-tenants-page h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Subheadings */
+.suspended-tenants-page h3,
+.suspended-tenants-page h4 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Paragraphs and descriptions */
+.suspended-tenants-page p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #465477;
+}
+
+/* Labels and supporting text */
+.suspended-tenants-page label,
+.suspended-tenants-page small {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* KPI values */
+.suspended-tenants-page .metric-value,
+.suspended-tenants-page .kpi-value {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* KPI labels */
+.suspended-tenants-page .metric-label,
+.suspended-tenants-page .kpi-label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #465477;
+}
+
+/* Table headings */
+.suspended-tenants-page th {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Table content */
+.suspended-tenants-page td {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Buttons */
+.suspended-tenants-page button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Inputs and dropdowns */
+.suspended-tenants-page input,
+.suspended-tenants-page select,
+.suspended-tenants-page textarea {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  color: #101B4D;
+}
+
+/* KPI details drawer: opens on the right and never changes the table filters. */
+.st .st-kpi.is-open {
+  border-color: #0758F9;
+  box-shadow: 0 0 0 2px rgba(7, 88, 249, 0.10), 0 8px 24px rgba(16, 27, 77, 0.07);
+}
+
+.st-kpi-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(6, 27, 44, 0.28);
+  animation: stKpiFadeIn 160ms ease-out;
+}
+
+.st-kpi-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(460px, 100vw);
+  height: 100%;
+  background: #fff;
+  box-shadow: -14px 0 40px rgba(6, 27, 44, 0.18);
+  animation: stKpiSlideIn 200ms ease-out;
+}
+
+.st-kpi-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 26px 24px 20px;
+  border-bottom: 1px solid #E4ECF5;
+}
+
+.st-kpi-panel-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: #0758F9;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+.st-kpi-panel-head h2 {
+  margin: 0;
+  color: #101B4D;
+  font-size: 21px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.st-kpi-panel-head p {
+  margin: 7px 0 0;
+  color: #66738F;
+  font-size: 12px;
+}
+
+.st-kpi-panel-close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #E4ECF5;
+  border-radius: 9px;
+  background: #fff;
+  color: #465477;
+  cursor: pointer;
+}
+
+.st-kpi-panel-close:hover {
+  border-color: #0758F9;
+  color: #0758F9;
+  background: #F4F8FF;
+}
+
+.st-kpi-panel-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 18px 18px;
+}
+
+.st-kpi-tenant {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 14px 8px;
+  border: 0;
+  border-bottom: 1px solid #EDF1F7;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.st-kpi-tenant:hover {
+  border-radius: 10px;
+  background: #F4F8FF;
+}
+
+.st-kpi-tenant-main {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.st-kpi-tenant-main b {
+  overflow: hidden;
+  color: #101B4D;
+  font-size: 13px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-kpi-tenant-main small {
+  overflow: hidden;
+  color: #66738F;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-kpi-tenant-main > span {
+  color: #465477;
+  font-size: 11px;
+}
+
+.st-kpi-tenant-status {
+  max-width: 94px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: #EEF4FF;
+  color: #0758F9;
+  font-size: 9px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.st-kpi-tenant-chevron {
+  flex: 0 0 auto;
+  color: #8A96AD;
+}
+
+.st-kpi-panel-empty {
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #8A96AD;
+  text-align: center;
+}
+
+.st-kpi-panel-empty b {
+  color: #101B4D;
+  font-size: 14px;
+}
+
+.st-kpi-panel-empty span {
+  color: #66738F;
+  font-size: 12px;
+}
+
+.st-kpi-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px 22px;
+  border-top: 1px solid #E4ECF5;
+  background: #FAFCFF;
+}
+
+.st-kpi-panel-foot > span {
+  color: #66738F;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@keyframes stKpiFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes stKpiSlideIn {
+  from { transform: translateX(24px); opacity: 0.7; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (max-width: 560px) {
+  .st-kpi-panel-head { padding: 20px 16px 16px; }
+  .st-kpi-panel-list { padding: 10px 12px 14px; }
+  .st-kpi-panel-foot { padding: 12px 16px; }
+  .st-kpi-tenant-status { display: none; }
+}
+
+
+/* FIX: keep the chart row tall enough so charts cannot collide with the table. */
+.st .st-charts {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-auto-rows: minmax(250px, auto);
+  align-items: stretch;
+  gap: 12px;
+  margin: 12px 0 0;
+  isolation: isolate;
+}
+
+.st .st-charts > .st-chart {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  height: 250px;
+  min-height: 250px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.st .st-charts > .st-chart > .card-h,
+.st .st-charts > .st-chart > header {
+  flex: 0 0 auto;
+}
+
+.st .st-charts .st-chart-body {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.st .st-charts .st-plot {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.st .st-charts + .st-card {
+  position: relative;
+  clear: both;
+  margin-top: 12px;
+}
+
+@media (max-width: 1100px) {
+  .st .st-charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(250px, auto);
+  }
+
+  .st .st-charts > .st-chart:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 800px) {
+  .st .st-charts {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: minmax(250px, auto);
+  }
+
+  .st .st-charts > .st-chart:first-child {
+    grid-column: auto;
+  }
+
+  .st .st-charts > .st-chart {
+    height: 250px;
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 560px) {
+  .st .st-charts > .st-chart {
+    height: 270px;
+    min-height: 270px;
+  }
+
+  .st .st-charts .st-chart-body {
+    min-height: 0;
+  }
+}

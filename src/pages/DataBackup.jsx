@@ -294,6 +294,8 @@ export default function DataBackup({ toast }) {
   const [schedules, setSchedules] = useState(INITIAL_BACKUP_SCHEDULES);
   const [scheduleEnabled, setScheduleEnabled] = useState(true);
   const [range, setRange] = useState(DEFAULT_RANGE);
+  // Separate range state for the activity graph dropdown only.
+  const [chartRange, setChartRange] = useState(DEFAULT_RANGE);
   const [modal, setModal] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
@@ -339,7 +341,10 @@ export default function DataBackup({ toast }) {
   /* ---------- Data that follows the selected date range ---------- */
 
   const stats = useMemo(() => getRangeStats(range.start, range.end), [range]);
-  const activity = useMemo(() => buildActivity(range.start, range.end), [range]);
+  const activity = useMemo(
+    () => buildActivity(chartRange.start, chartRange.end),
+    [chartRange]
+  );
   const typeData = useMemo(() => getTypeBreakdown(stats.total, range.end), [stats, range]);
   const storageData = useMemo(() => getStorageData(range.end), [range]);
 
@@ -359,7 +364,9 @@ export default function DataBackup({ toast }) {
 
   const displayedJobs = showAllJobs ? rangeJobs : rangeJobs.slice(0, 4);
 
-  const chartSelectValue = PRESETS.some((preset) => preset.id === range.id) ? range.id : 'selected';
+  const chartSelectValue = PRESETS.some((preset) => preset.id === chartRange.id)
+    ? chartRange.id
+    : 'selected';
 
   const typeDrillItem = typeDrill ? typeData.find((item) => item.name === typeDrill) : null;
   const typeDrillData = typeDrillItem ? getTypeDrill(typeDrillItem.name, typeDrillItem.count, stats) : null;
@@ -611,7 +618,7 @@ export default function DataBackup({ toast }) {
 
   const handleChartRange = (event) => {
     const preset = PRESETS.find((item) => item.id === event.target.value);
-    if (preset) setRange(preset);
+    if (preset) setChartRange(preset);
   };
 
   const drillIntoType = (data) => {

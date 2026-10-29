@@ -508,6 +508,8 @@ function AuditLogs() {
   const [actionFilter, setActionFilter] = useState('All Actions');
   const [userFilter, setUserFilter] = useState('All Users');
   const [range, setRange] = useState(DEFAULT_RANGE);
+  // Chart range is intentionally independent from the audit table date range.
+  const [chartRange, setChartRange] = useState(DEFAULT_RANGE);
   const [page, setPage] = useState(1);
   const [selectedLog, setSelectedLog] = useState(null);
   const [showCriticalEvents, setShowCriticalEvents] = useState(false);
@@ -534,15 +536,26 @@ function AuditLogs() {
 
   const chartRangeOptions = useMemo(
     () =>
-      range.id === 'custom'
+      chartRange.id === 'custom'
         ? [...PRESETS, { id: 'custom', label: 'Custom Range' }]
         : PRESETS,
-    [range.id]
+    [chartRange.id]
   );
 
-  const trend = useMemo(() => buildTrend(range.start, range.end), [range]);
+  // The page calendar controls all dashboard summaries and the audit table.
+  // The graph dropdown controls only the graph and never changes the cards/table.
+  const dashboardTrend = useMemo(
+    () => buildTrend(range.start, range.end),
+    [range]
+  );
 
-  const scale = trend.total / BASELINE_EVENTS;
+  const trend = useMemo(
+    () => buildTrend(chartRange.start, chartRange.end),
+    [chartRange]
+  );
+
+  // KPI cards and category chart follow the main page calendar, not chartRange.
+  const scale = dashboardTrend.total / BASELINE_EVENTS;
   const scaleValue = (value) => Math.round(value * scale);
 
   const kpiCards = KPI_DATA.map((item) => ({
@@ -803,10 +816,10 @@ function AuditLogs() {
           action={
             <select
               className="audit-compact-select"
-              value={range.id}
+              value={chartRange.id}
               onChange={(event) => {
                 const next = PRESETS.find((preset) => preset.id === event.target.value);
-                if (next) handleRangeChange(next);
+                if (next) setChartRange(next);
               }}
               aria-label="Chart date range"
             >
@@ -821,7 +834,7 @@ function AuditLogs() {
 
         <div className="audit-chart-legend">
           <span className="audit-chart-range">
-            {formatDate(range.start)} – {formatDate(range.end)} · {trend.granularity}
+            {formatDate(chartRange.start)} – {formatDate(chartRange.end)} · {trend.granularity}
           </span>
 
           <div className="audit-chart-legend-items">

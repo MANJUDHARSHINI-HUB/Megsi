@@ -1555,3 +1555,289 @@
   }
 }
 
+/* =========================================================
+   MEGSI SECURITY & COMPLIANCE
+   Match Dashboard typography.
+   Typography only — preserve existing layout and styling.
+   ========================================================= */
+
+/* Base typography */
+.sc-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+}
+
+/* Main page heading */
+.sc-page .sc-page-heading h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* Page subtitle */
+.sc-page .sc-page-heading p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* General buttons — preserve colours and dimensions */
+.sc-page .sc-button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Select controls */
+.sc-page select,
+.sc-page .sc-select-wrap select,
+.sc-page .sc-compact-select select {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* KPI card labels */
+.sc-page .sc-metric-copy > span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* KPI card values */
+.sc-page .sc-metric-copy strong {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* KPI supporting text */
+.sc-page .sc-metric-copy small {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Analytics and panel headings */
+.sc-page .sc-panel-heading h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Panel hints and descriptions */
+.sc-page .sc-panel-hint {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Chart legend text */
+.sc-page .sc-compliance-legend,
+.sc-page .sc-compliance-legend > div,
+.sc-page .sc-legend-item {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Donut chart centre value */
+.sc-page .sc-donut-center strong {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* Donut chart centre label */
+.sc-page .sc-donut-center span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Search input */
+.sc-page .sc-search input {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+.sc-page .sc-search input::placeholder {
+  color: #66728B;
+}
+
+/* Filter labels */
+.sc-page .sc-filter-group > span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #66728B;
+}
+
+/* Filter buttons */
+.sc-page .sc-segmented button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.sc-page .sc-segmented button[aria-pressed="true"] {
+  font-weight: 700;
+}
+
+/* Alert table */
+.sc-page .sc-alert-table {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+}
+
+.sc-page .sc-alert-table thead th {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+.sc-page .sc-alert-table tbody td {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Event ID */
+.sc-page .sc-event-id {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Severity badges — preserve existing background colours */
+.sc-page .sc-severity {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Status labels */
+.sc-page .sc-status {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* IP address notes */
+.sc-page .sc-ip-note {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Table footer */
+.sc-page .sc-table-footer {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+.sc-page .sc-table-footer b {
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Settings modal heading */
+.sc-page .sc-modal-heading h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Settings modal description */
+.sc-page .sc-modal-description {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Settings row titles */
+.sc-page .sc-setting-row b {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #101B4D;
+}
+
+/* Settings row supporting text */
+.sc-page .sc-setting-row small {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Detail panel text */
+.sc-page .sc-detail-panel {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+}
+
+.sc-page .sc-detail-eyebrow {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.sc-page .sc-detail-description {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Detail panel rows */
+.sc-page .sc-detail-row {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+}
+
+/* Empty state */
+.sc-page .sc-empty {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Row action menu */
+.sc-page .sc-row-menu button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Chart labels */
+.sc-page .recharts-cartesian-axis-tick-value,
+.sc-page .recharts-legend-item-text {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  fill: #66728B;
+  color: #66728B;
+}
+

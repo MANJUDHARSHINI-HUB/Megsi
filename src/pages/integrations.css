@@ -1586,3 +1586,172 @@
   .int-drawer-item .int-status { white-space: normal; }
   .int-drawer-footer { align-items: flex-start; }
 }
+
+/* =========================================================
+   MEGSI INTEGRATION PAGE
+   Match Dashboard typography.
+   Typography only — preserve existing layout and styling.
+   ========================================================= */
+
+/* Base font */
+.integrations-page {
+  font-family: Inter, system-ui, sans-serif;
+  color: #101B4D;
+}
+
+/* Main page heading */
+.integrations-page .int-title-row h1 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #101B4D;
+}
+
+/* Page subtitle */
+.integrations-page .int-title-row p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Section headings */
+.integrations-page .int-section-heading h2 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Section supporting text */
+.integrations-page .int-section-heading p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Summary card labels */
+.integrations-page .int-summary-item span:not(.int-summary-icon) {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Summary card values */
+.integrations-page .int-summary-item strong {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Integration card titles */
+.integrations-page .int-card-title h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Integration provider/category labels */
+.integrations-page .int-card-title span {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Integration descriptions */
+.integrations-page .int-description {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}
+
+/* Search input and placeholder */
+.integrations-page .int-search input {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+.integrations-page .int-search input::placeholder {
+  color: #66728B;
+}
+
+/* Category tabs */
+.integrations-page .int-tabs button {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Date and primary buttons */
+.integrations-page .int-date-btn,
+.integrations-page .int-primary {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Form labels */
+.integrations-page .int-date-pop label,
+.integrations-page .int-modal-body label {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #465477;
+}
+
+/* Form inputs */
+.integrations-page .int-date-pop input,
+.integrations-page .int-modal-body input {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #101B4D;
+}
+
+/* Results count */
+.integrations-page .int-results {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #66728B;
+}
+
+/* Connection status labels
+   Preserve their existing status colours. */
+.integrations-page .int-status {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Integration action buttons
+   Preserve existing button colours and borders. */
+.integrations-page .int-action {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Modal headings */
+.integrations-page .int-modal h2,
+.integrations-page .int-modal h3 {
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+  color: #101B4D;
+}
+
+/* Modal supporting text */
+.integrations-page .int-modal p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #465477;
+}

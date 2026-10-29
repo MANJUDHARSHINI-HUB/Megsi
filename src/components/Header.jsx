@@ -44,7 +44,7 @@ function GlobalSearch({ onPick }) {
   );
 }
 
-export default function Header({ onToggle, onPick, toast, go }) {
+export default function Header({ onToggle, onPick, toast, go, onSignOut }) {
   const { t, lang, setLang } = useI18n();
   const [notes, setNotes] = useState(NOTIFICATIONS);
   const cur = LANGS.find((l) => l.code === lang);
@@ -65,7 +65,7 @@ export default function Header({ onToggle, onPick, toast, go }) {
       <Menu button={<span className="lang"><Flag code={cur.code} />{cur.short}<ChevronDown size={14} /></span>}>{(close) => LANGS.map((l) => (
         <div key={l.code} className={`item lang-item ${l.code === lang ? 'sel' : ''}`} onClick={() => { setLang(l.code); close(); }}><span><Flag code={l.code} size={18} />{l.name}</span></div>))}</Menu>
       <Menu button={<span className="profile"><span className="pav">DM</span><span><b>David Miller</b><small>{t('role')}</small></span><ChevronDown size={14} /></span>}>{(close) => [['prof.profile'], ['prof.settings'], ['prof.signout']].map(([k]) => (
-        <div key={k} className="item" onClick={() => { toast(t('prof.demo', { label: t(k) })); close(); }}>{t(k)}</div>))}</Menu>
+        <div key={k} className="item" onClick={() => { close(); if (k === 'prof.signout' && onSignOut) { onSignOut(); return; } toast(t('prof.demo', { label: t(k) })); }}>{t(k)}</div>))}</Menu>
     </header>
   );
 }
