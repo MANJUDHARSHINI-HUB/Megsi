@@ -27,7 +27,7 @@ export function PlatformActivity({ items, onAll }) {
 
 export function TopCompanies({ rows, onAll }) {
   const { t } = useI18n();
-  const top = rows.slice(0, 5), max = top[0]?.users || 1;
+  const top = rows.slice(0, 6), max = Math.max(...rows.map((x) => x.users || 0), 1);
   return (
     <section className="card panel">
       <Head icon={<I.Building2 size={16} />} title={t('pn.top')} onAll={onAll} />

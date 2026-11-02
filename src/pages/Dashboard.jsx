@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo , useState} from 'react';
 import * as I from 'lucide-react';
 import { CompanyGrowthChart, RevenueChart, TenantPlanChart } from '../components/Charts.jsx';
 import { PlatformActivity, SystemHealth, TopCompanies } from '../components/Panels.jsx';
@@ -81,41 +81,163 @@ function RecentActivities({ companies = [], signups = [], onAll }) {
 const gbp = (n) => `£${Math.round(n).toLocaleString('en-GB')}`;
 const STATUS_BADGE = { Purchased: 'green', 'Demo Active': 'orange', Interested: 'blue', Pending: 'red' };
 
-function RevenueOverview({ onViewAll }) {
-  const { fmtDate } = useI18n();
-  const rows = useMemo(() => [...DEMO_TRACKING]
-    .map((d) => ({ ...d, contact: SIGNUPS.find((s) => s.name === d.company)?.contact || '—' }))
-    .sort((a, b) => b.date.localeCompare(a.date)), []);
-  const count = (status) => rows.filter((r) => r.status === status).length;
-  const revenue = rows.filter((r) => r.status === 'Purchased').reduce((sum, r) => sum + r.amount, 0);
-  const metrics = [
-    { label: 'Using demo', value: String(count('Demo Active')), icon: I.Users },
-    { label: 'Purchased', value: String(count('Purchased')), icon: I.CheckCircle2 },
-    { label: 'Interested', value: String(count('Interested')), icon: I.TrendingUp },
-    { label: 'Purchase revenue', value: gbp(revenue), icon: I.Wallet },
+function LeadsOverview({ onViewAll }) {
+  const leadRows = [
+    {
+      name: 'Ravi Kumar',
+      company: 'ABC Security Solutions',
+      source: 'Website',
+      interest: 'Professional',
+      status: 'New',
+      date: 'Oct 30, 2026',
+    },
+    {
+      name: 'Priya Nair',
+      company: 'BrightGuard Ltd',
+      source: 'Referral',
+      interest: 'Business',
+      status: 'Contacted',
+      date: 'Nov 02, 2026',
+    },
+    {
+      name: 'Arun Selvam',
+      company: 'Shield Tech',
+      source: 'Social Media',
+      interest: 'Enterprise',
+      status: 'Qualified',
+      date: 'Oct 31, 2026',
+    },
+    {
+      name: 'Sneha Pillai',
+      company: 'SafeWay Security',
+      source: 'Email',
+      interest: 'Professional',
+      status: 'Converted',
+      date: 'Oct 28, 2026',
+    },
+    {
+      name: 'Karthik R',
+      company: 'Crown Security',
+      source: 'Website',
+      interest: 'Business',
+      status: 'New',
+      date: 'Nov 03, 2026',
+    },
   ];
-  const viewAll = () => onViewAll?.();
+
+  const metrics = [
+    { label: 'Total Leads', value: 12, icon: I.Users, color: '#2563eb' },
+    { label: 'New', value: 5, icon: I.CirclePlus, color: '#2563eb' },
+    { label: 'Contacted', value: 3, icon: I.PhoneCall, color: '#92400e' },
+    { label: 'Qualified', value: 2, icon: I.BadgeCheck, color: '#f59e0b' },
+    { label: 'Converted', value: 2, icon: I.CheckCircle2, color: '#059669' },
+  ];
+
+  const statusColors = {
+  New: { color: '#2563eb', background: '#dbeafe' },
+  Contacted: { color: '#7c3aed', background: '#ede9fe' },
+  Qualified: { color: '#ee5913', background: '#fef3c7' },
+  Converted: { color: '#059669', background: '#d1fae5' },
+};
+
   return (
     <section className="card table-card revenue-overview-card">
       <header className="card-h">
-        <span className="ic-sq"><I.Wallet size={16} /></span><h3>Revenue Overview</h3><div className="grow" />
-        <span className="badge orange ro-sample">Sample data</span>
-        <button className="btn-sm" onClick={viewAll}>View all</button>
+        <span className="ic-sq">
+          <I.Users size={16} />
+        </span>
+        <h3>Leads Overview</h3>
+        <div className="grow" />
+        <button
+          type="button"
+          className="btn-sm"
+          onClick={onViewAll}
+        >
+          View All
+        </button>
       </header>
-      <div className="metrics revenue-overview-metrics">
-        {metrics.map(({ label, value, icon: Icon }) => (
-          <div className="metric ro-metric" key={label}><span>{label}</span><div><Icon size={18} className="mc blue" /><b>{value}</b></div></div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+          gap: 8,
+          padding: '0 12px 12px',
+        }}
+      >
+        {metrics.map(({ label, value, icon: Icon, color }) => (
+          <div
+            key={label}
+            style={{
+              border: '1px solid #dbeafe',
+              borderRadius: 7,
+              padding: '10px 8px',
+              minWidth: 0,
+              background: '#fff',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                color: '#53647c',
+                fontSize: 11,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Icon size={13} color={color} />
+              {label}
+            </div>
+            <div
+              style={{
+                marginTop: 7,
+                color: '#10264a',
+                fontWeight: 700,
+                fontSize: 19,
+              }}
+            >
+              {value}
+            </div>
+          </div>
         ))}
       </div>
+
       <div className="tscroll ro-scroll">
         <table className="tbl ro-table">
-          <thead><tr><th>Company</th><th>Contact</th><th>Status</th><th>Amount</th><th>Date</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Lead Name</th>
+              <th>Company</th>
+              <th>Source</th>
+              <th>Interest</th>
+              <th>Status</th>
+              <th>Follow-up Date</th>
+            </tr>
+          </thead>
           <tbody>
-            {rows.length === 0 ? <tr><td colSpan={5} className="empty">No demo activity</td></tr> : rows.map((item) => (
-              <tr key={item.id}>
-                <td>{item.company}</td><td>{item.contact}</td>
-                <td><span className={`badge ${STATUS_BADGE[item.status] || 'orange'}`}>{item.status}</span></td>
-                <td>{item.amount ? gbp(item.amount) : '—'}</td><td>{fmtDate(item.date)}</td>
+            {leadRows.map((lead) => (
+              <tr key={lead.name}>
+                <td>{lead.name}</td>
+                <td>{lead.company}</td>
+                <td>{lead.source}</td>
+                <td>{lead.interest}</td>
+                <td>
+                  <span
+                    style={{
+                      ...statusColors[lead.status],
+                      display: 'inline-block',
+                      padding: '3px 8px',
+                      borderRadius: 5,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {lead.status}
+                  </span>
+                </td>
+                <td>{lead.date}</td>
               </tr>
             ))}
           </tbody>
@@ -124,7 +246,6 @@ function RevenueOverview({ onViewAll }) {
     </section>
   );
 }
-
 export default function Dashboard({ range, openDetail, go, toast }) {
   const { t, fmtDate } = useI18n();
   const [revenueViewAll, setRevenueViewAll] = useState(false);
@@ -257,31 +378,41 @@ export default function Dashboard({ range, openDetail, go, toast }) {
       <div className="title-row"><div><h1>{t('title')}</h1><p>{t('welcome')}</p></div></div>
 
       <div className="kpis">
-        {kpis.map((k) => {
-          const Icon = I[META[k.id]?.[0] || 'CircleHelp'];
-          const down = k.change < 0;
-          const detailKey = ['guards', 'incidents', 'revenue'].includes(k.id) && !(month && k.id !== 'revenue') ? 'dp' : 'd';
-          const description = k.id === 'revenue' && month ? t('kpi.revenue.d') : t(`kpi.${k.id}.${detailKey}`);
-          return (
-            <button key={k.id} className="card kpi" onClick={() => openDetail?.({
-              title: t(`kpi.${k.id}.t`),
-              rows: [[t(`kpi.${k.id}.t`), k.value], [t('kd.change'), k.change == null ? '–' : `${k.change > 0 ? '+' : ''}${k.change}%`], ...(k.rows || []).map((row) => [row.k ? t(row.k) : row.txt, row.v])],
-            })}>
-              <span className={`kpi-ic ${META[k.id]?.[1] || 'blue'}`}><Icon size={26} /></span>
-              <span className="kpi-t"><small>{t(`kpi.${k.id}.t`)}</small><span className="kpi-v"><b>{k.value}</b>
-                {k.change == null ? <em className="neutral">–</em> : <em className={down ? 'down' : 'up'}>{down ? '↓' : '↑'} {Math.abs(k.change)}%</em>}
-              </span></span>
-              <span className="kpi-d">{description}</span>
-            </button>
-          );
-        })}
+  {kpis.map((k) => {
+    const Icon = I[META[k.id]?.[0] || 'CircleHelp'];
+    const down = k.change < 0;
+    const detailKey = ['guards', 'incidents', 'revenue'].includes(k.id) && !(month && k.id !== 'revenue') ? 'dp' : 'd';
+    const description = k.id === 'revenue' && month ? t('kpi.revenue.d') : t(`kpi.${k.id}.${detailKey}`);
+
+    return (
+      <div key={k.id} className="card kpi">
+        <span className={`kpi-ic ${META[k.id]?.[1] || 'blue'}`}>
+          <Icon size={26} />
+        </span>
+        <span className="kpi-t">
+          <small>{t(`kpi.${k.id}.t`)}</small>
+          <span className="kpi-v">
+            <b>{k.value}</b>
+            {k.change == null ? (
+              <em className="neutral">–</em>
+            ) : (
+              <em className={down ? 'down' : 'up'}>
+                {down ? '↓' : '↑'} {Math.abs(k.change)}%
+              </em>
+            )}
+          </span>
+        </span>
+        <span className="kpi-d">{description}</span>
       </div>
+    );
+  })}
+</div>
 
       <div className="row3"><CompanyGrowthChart /><TenantPlanChart /><RevenueChart /></div>
 
       <div className="row2 dashboard-lower-row">
         <RecentActivities companies={data.companies} signups={data.signups} onAll={() => go?.('table:companies')} openDetail={openDetail} toast={toast} />
-        <RevenueOverview onViewAll={() => setRevenueViewAll(true)} />
+        <LeadsOverview onViewAll={() => go?.('leads')} />
       </div>
 
       <div className="row3b">

@@ -3,6 +3,8 @@
 export const INDUSTRIES = ['Retail', 'Commercial', 'Healthcare', 'Education', 'Manufacturing', 'Logistics', 'Hospitality', 'Finance', 'Technology', 'Government'];
 export const PLANS = ['Starter', 'Professional', 'Business', 'Enterprise'];
 export const STATUSES = ['Active', 'Trial', 'Suspended'];
+export const TENURES = ['Monthly', 'Annual'];
+export const RENEWAL_FILTERS = ['Active', 'Due soon', 'Overdue'];
 // Plan limits and the base monthly price (used when a company is added in the form)
 export const PLAN_INFO = {
   Starter: { users: 100, sites: 20, price: 650 },
@@ -48,10 +50,41 @@ const generated = MORE_NAMES.map((name, i) => {
   return [name, INDUSTRIES[(i * 3 + 1) % INDUSTRIES.length], plan, users, sites, status, isoDaysBefore(i * 4 + 2), status === 'Trial' ? 0 : revenue, CONTACTS[i % CONTACTS.length]];
 });
 
-export const COMPANY_ROWS = [...first10, ...generated].map(([name, industry, plan, users, sites, status, joined, revenue, contact], i) => ({
-  id: i + 1,
-  code: `CMP-${String(1001 + i)}`,
-  name, industry, plan, users, sites, status, joined, revenue, contact,
-  email: `${contact.split(' ')[0].toLowerCase()}@${slug(name)}.co.uk`,
-  phone: `+44 20 7946 ${String(1000 + ((i * 137) % 9000)).padStart(4, '0')}`,
-}));
+const referenceRows = [
+  { industry: 'Security', location: 'London, UK', billingTenure: 'Annual', renewalDate: '2026-11-20', renewalStatusLabel: 'Due in 22 days', renewalState: 'Due soon', revenue: 2450 },
+  { industry: 'Commercial Security', location: 'Manchester, UK', billingTenure: 'Monthly', renewalDate: '2026-11-02', renewalStatusLabel: 'Due in 4 days', renewalState: 'Due soon', revenue: 850 },
+  { industry: 'Healthcare Security', location: 'Birmingham, UK', billingTenure: 'Annual', renewalDate: '2026-12-15', renewalStatusLabel: 'Active', renewalState: 'Active', revenue: 2200 },
+  { industry: 'Security', location: 'Leeds, UK', billingTenure: 'Monthly', renewalDate: '2026-10-31', renewalStatusLabel: 'Due in 2 days', renewalState: 'Due soon', revenue: 650 },
+  { industry: 'Manufacturing', location: 'Glasgow, UK', billingTenure: 'Annual', renewalDate: '2027-01-10', renewalStatusLabel: 'Active', renewalState: 'Active', revenue: 3800 },
+  { industry: 'Logistics', location: 'Liverpool, UK', billingTenure: 'Annual', renewalDate: '2026-11-15', renewalStatusLabel: 'Due in 17 days', renewalState: 'Due soon', revenue: 1300 },
+  { industry: 'Hospitality', location: 'Bristol, UK', billingTenure: 'Monthly', renewalDate: '2026-11-05', renewalStatusLabel: 'Due in 7 days', renewalState: 'Due soon', revenue: 220 },
+];
+
+// Subscription start overrides for the reference rows (index -> ISO date). Other rows start 0-7 days after joining.
+const SUBSCRIPTION_START = { 0: '2026-10-20', 1: '2026-10-19', 2: '2026-10-17', 3: '2026-10-15', 4: '2026-10-12', 5: '2026-10-13', 6: '2026-10-05' };
+const addDays = (iso, n) => { const d = new Date(`${iso}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+
+export const COMPANY_ROWS = [...first10, ...generated].map(([name, industry, plan, users, sites, status, joined, revenue, contact], i) => {
+  const reference = referenceRows[i] || {};
+  const subscriptionStartDate = SUBSCRIPTION_START[i] || addDays(joined, (i * 3) % 8);
+  const renewalDate = reference.renewalDate || (i < 8 ? `2026-11-${String(5 + i * 3).padStart(2, '0')}` : `2027-0${1 + (i % 3)}-${String(5 + (i % 20)).padStart(2, '0')}`);
+  const daysUntilRenewal = Math.ceil((new Date(`${renewalDate}T00:00:00`) - new Date('2026-10-30T00:00:00')) / 86400000);
+  const renewalState = reference.renewalState || (daysUntilRenewal < 0 ? 'Overdue' : daysUntilRenewal <= 30 ? 'Due soon' : 'Active');
+  return {
+    id: i + 1,
+    code: `CMP-${String(1001 + i)}`,
+    name, industry: reference.industry || industry, location: reference.location || ['London, UK', 'Manchester, UK', 'Birmingham, UK', 'Leeds, UK', 'Glasgow, UK', 'Liverpool, UK', 'Bristol, UK'][i % 7],
+    plan, users, sites, status, joiningDate: joined, subscriptionStartDate, revenue: reference.revenue ?? revenue, contact,
+    billingTenure: reference.billingTenure || (i % 2 === 0 ? 'Annual' : 'Monthly'),
+    renewalDate, renewalStatusLabel: reference.renewalStatusLabel || (renewalState === 'Active' ? 'Active' : renewalState === 'Overdue' ? 'Overdue' : `Due in ${daysUntilRenewal} days`), renewalState,
+    email: `${contact.split(' ')[0].toLowerCase()}@${slug(name)}.co.uk`,
+    phone: `+44 20 7946 ${String(1000 + ((i * 137) % 9000)).padStart(4, '0')}`,
+    // Additional profile fields used by the individual company details page.
+    address: i === 0 ? '123 Business Park, London Road, London, Greater London, SW1A 1AA, United Kingdom' : '',
+    licenseNumber: i === 0 ? 'ACS-12345' : '',
+    vatNumber: i === 0 ? 'GB123456789' : '',
+    whatsapp: i === 0 ? '+44 7700 900123' : '',
+    website: i === 0 ? 'www.secureguard.co.uk' : '',
+    designation: i === 0 ? 'Operations Manager' : 'Company Administrator',
+  };
+});

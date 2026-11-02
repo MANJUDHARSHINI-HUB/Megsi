@@ -6,6 +6,7 @@ import { DetailPanel } from './components/Common.jsx';
 import UnavailablePage from './components/UnavailablePage.jsx';
 
 import Dashboard from './pages/Dashboard.jsx';
+import LeadsOverviewPage from './pages/LeadsOverviewPage.jsx';
 import Companies from './pages/Companies.jsx';
 import TenantBilling from './pages/TenantBilling.jsx';
 import Onboarding from './pages/Onboarding.jsx';
@@ -43,6 +44,7 @@ const ITEMS = NAV.flatMap((group) => group.items ?? []);
 // Pages that have their own implemented components
 const IMPLEMENTED_PAGES = [
   'dashboard',
+  'leads',
   'companies',
   'billing',
   'onboarding',
@@ -177,6 +179,14 @@ export default function App({ onSignOut, userRole = 'Super Admin' }) {
               setRange={setRange}
               openDetail={setDetail}
               go={go}
+              toast={toast}
+            />
+          )}
+
+          {/* Full Leads Overview */}
+          {page === 'leads' && (
+            <LeadsOverviewPage
+              onBack={() => go('dashboard')}
               toast={toast}
             />
           )}
