@@ -88,3 +88,104 @@ export const COMPANY_ROWS = [...first10, ...generated].map(([name, industry, pla
     designation: i === 0 ? 'Operations Manager' : 'Company Administrator',
   };
 });
+/* ---------- Per-company mock activity, communication and payment history (demo only) ---------- */
+const TODAY_ISO = '2026-10-30';
+const fmtTime = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+const ACTIVITY_POOL = [
+  ['Subscription renewed', 'System'], ['Plan limits reviewed', 'Platform Admin'], ['Invoice generated', 'System'],
+  ['Payment received', 'System'], ['Company profile updated', null], ['New user added', null], ['Site added', null],
+  ['Support ticket resolved', 'Support Team'], ['Login from new device approved', null], ['Billing contact verified', 'Platform Admin'],
+  ['Renewal reminder sent', 'System'], ['Company registered', 'System'],
+];
+const COMM_POOL = [
+  ['Email', 'Welcome email'], ['Subscription Reminder', 'Renewal reminder'], ['Account Notification', 'Account notice'],
+  ['WhatsApp', 'Support follow-up'], ['Invoice Email', 'Invoice sent'], ['SMS', 'Payment confirmation'], ['Email', 'Plan usage summary'],
+];
+const COMM_STATUS = ['Sent', 'Delivered', 'Read', 'Delivered', 'Sent', 'Read', 'Delivered'];
+
+export function getCompanyExtras(c) {
+  const id = c.id || 1;
+  const pick = (n, step, offset = 0) => (id * step + n + offset);
+  const activity = Array.from({ length: 8 }, (_, n) => {
+    const [title, actor] = ACTIVITY_POOL[pick(n, 3) % ACTIVITY_POOL.length];
+    return { date: addDays(TODAY_ISO, -(n * 4 + (id % 4))), time: fmtTime(8 + ((id + n * 3) % 10), (id * 7 + n * 11) % 60), title, actor: actor || c.contact || 'Company Admin' };
+  });
+  const communications = Array.from({ length: 7 }, (_, n) => {
+    const [type, subject] = COMM_POOL[pick(n, 2) % COMM_POOL.length];
+    const failed = (id + n) % 11 === 0;
+    return { date: addDays(TODAY_ISO, -(n * 5 + (id % 5))), time: fmtTime(9 + ((id + n * 2) % 9), (id * 13 + n * 17) % 60), type, subject, to: type === 'WhatsApp' || type === 'SMS' ? (c.whatsapp || c.phone) : c.email, status: failed ? 'Failed' : COMM_STATUS[(id + n) % COMM_STATUS.length] };
+  });
+  const amount = c.revenue || 0;
+  const startDay = Math.min(28, Number((c.subscriptionStartDate || TODAY_ISO).slice(8, 10)) || 1);
+  const payments = [];
+  for (let k = 0; k < 12; k++) {
+    const d = new Date(Date.UTC(2026, 9 - k, startDay)); const iso = d.toISOString().slice(0, 10);
+    if (k > 0 && iso < (c.subscriptionStartDate || '')) break;
+    let status = 'Paid';
+    if (c.status === 'Trial') status = 'Trial';
+    else if (k === 0 && c.status === 'Suspended') status = 'Failed';
+    else if (k === 0 && c.renewalState === 'Overdue') status = 'Overdue';
+    else if (k === 0 && c.renewalState === 'Due soon' && id % 3 === 0) status = 'Pending';
+    payments.push({ invoice: `INV-${id * 100 + 12 - k}`, date: iso, amount: status === 'Trial' ? 0 : amount, method: id % 2 ? 'Card' : 'Bank Transfer', status });
+  }
+  const paid = payments.filter((p) => p.status === 'Paid');
+  const outstanding = payments.filter((p) => ['Failed', 'Overdue', 'Pending'].includes(p.status)).reduce((s, p) => s + p.amount, 0);
+  return {
+    activity, communications, payments,
+    totalRevenue: paid.reduce((s, p) => s + p.amount, 0), outstanding,
+    lastPayment: paid[0]?.date || null,
+    paymentStatus: c.status === 'Suspended' ? 'Review required' : outstanding > 0 ? 'Payment pending' : c.status === 'Trial' ? 'Free trial' : 'Up to date',
+  };
+}
+
+/* ---------- Per-company mock sites and users (demo only, deterministic) ---------- */
+const STREETS = ['High Street', 'Station Road', 'Park Lane', 'Victoria Road', 'Mill Lane', 'Church Street', 'Queens Road', 'King Street'];
+const SITE_TYPES = ['Head Office', 'Retail Park', 'Shopping Centre', 'Distribution Depot', 'Hospital Wing', 'Campus', 'Business Park', 'Station Concourse', 'Residential Block', 'Industrial Estate', 'Car Park', 'Stadium Gate'];
+const AREAS = ['Central', 'Riverside', 'Northgate', 'Eastside', 'Westfield', 'Harbour', 'Southbank', 'Parkway'];
+const SHIFTS = ['24/7 cover', 'Day shift', 'Night shift', 'Day & night'];
+const FIRST_NAMES = ['Adam', 'Beth', 'Callum', 'Dina', 'Ethan', 'Fiona', 'George', 'Hannah', 'Imran', 'Jade', 'Kyle', 'Layla', 'Marcus', 'Nina', 'Owen', 'Pooja', 'Quinn', 'Ravi', 'Stella', 'Tariq'];
+const LAST_NAMES = ['Ahmed', 'Bailey', 'Cooper', 'Dawson', 'Edwards', 'Fisher', 'Grant', 'Hayes', 'Irwin', 'Jones', 'Khan', 'Lewis', 'Mills', 'Nolan', 'Owens', 'Patel', 'Quigley', 'Roberts', 'Singh', 'Walker'];
+
+// Individual site records are not part of the supplied company data, so they are derived from the
+// company's site count. Workforce per site always adds up to the company's user count.
+export function getCompanySites(c) {
+  const count = Number(c.sites) || 0;
+  const users = Number(c.users) || 0;
+  const id = c.id || 1;
+  const city = (c.location || 'UK').split(',')[0].trim();
+  const country = (c.location || '').split(',').slice(1).join(',').trim() || 'UK';
+  return Array.from({ length: count }, (_, n) => ({
+    id: `${c.code || `CMP-${id}`}-S${String(n + 1).padStart(3, '0')}`,
+    index: n,
+    companyId: id,
+    name: `${city} ${AREAS[(id + n) % AREAS.length]} ${SITE_TYPES[(id * 2 + n) % SITE_TYPES.length]}`,
+    address: `${((id * 7 + n * 13) % 90) + 1} ${STREETS[(id + n * 3) % STREETS.length]}`,
+    city,
+    location: `${city}, ${country}`,
+    status: c.status === 'Suspended' ? 'Suspended' : 'Operational',
+    workforce: Math.floor(users / count) + (n < users % count ? 1 : 0),
+    manager: `${FIRST_NAMES[(id + n * 5) % FIRST_NAMES.length]} ${LAST_NAMES[(id * 3 + n) % LAST_NAMES.length]}`,
+    shift: SHIFTS[(id + n) % SHIFTS.length],
+  }));
+}
+
+export function getCompanyUsers(c) {
+  const count = Number(c.users) || 0;
+  const id = c.id || 1;
+  const sites = getCompanySites(c);
+  const domain = (c.email || '').split('@')[1] || 'example.co.uk';
+  const managerCut = Math.max(1, Math.round(count * 0.04));
+  return Array.from({ length: count }, (_, i) => {
+    const name = i === 0 && c.contact ? c.contact : `${FIRST_NAMES[(id * 3 + i * 7) % FIRST_NAMES.length]} ${LAST_NAMES[(id + i * 11) % LAST_NAMES.length]}`;
+    const role = i === 0 ? 'Company Admin' : i <= managerCut ? 'Site Manager' : i % 9 === 0 ? 'Supervisor' : 'Security Officer';
+    const site = sites.length ? sites[i % sites.length] : null;
+    return {
+      id: `${c.code || `CMP-${id}`}-U${String(i + 1).padStart(3, '0')}`,
+      name, role,
+      siteId: site ? site.id : null,
+      siteName: site ? site.name : 'Unassigned',
+      email: i === 0 && c.email ? c.email : `${name.toLowerCase().replace(/[^a-z]+/g, '.')}@${domain}`,
+      status: c.status === 'Suspended' ? 'Suspended' : i % 17 === 16 ? 'Inactive' : 'Active',
+    };
+  });
+}

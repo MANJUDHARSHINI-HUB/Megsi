@@ -95,14 +95,120 @@ export const TENANT_USAGE = COMPANY_ROWS.map((company, index) => {
   };
 });
 
+
+// Additional Usage & Limits-only demonstration tenants. These records are local
+// to this page; the shared Companies directory remains unchanged.
+const EXTRA_USAGE_COMPANIES = [
+  'Atlas Protection Group', 'BluePeak Security', 'Cedar Shield Services', 'Delta Guard Network',
+  'Everest Safety Solutions', 'Frontline Patrol Ltd', 'Goldline Security', 'Horizon Guarding',
+  'Ivory Tower Protection', 'Jade Secure Systems', 'Keystone Security Co', 'Liberty Guard Services',
+  'Monarch Protection Ltd', 'Northstar Security', 'Opal Defence Services', 'Pinnacle Guarding',
+  'Quantum Security Group', 'Redwood Protection', 'Summit Watch Services', 'Titan Secure Ltd',
+  'Urban Shield Security', 'Vertex Guarding', 'Willow Security Partners', 'Zenith Protection'
+];
+
+const EXTRA_USAGE_TENANTS = EXTRA_USAGE_COMPANIES.map((companyName, index) => {
+  const plan = ['Starter', 'Professional', 'Business', 'Enterprise'][index % 4];
+  const limits = DEMO_PLAN_LIMITS[plan];
+  const planInfo = PLAN_INFO[plan] || { users: 100, sites: 20 };
+  const userLimit = planInfo.users ?? limits.enterpriseUsersDisplay;
+  const siteLimit = planInfo.sites ?? limits.enterpriseSitesDisplay;
+  const targetPct = index < 3 ? [97, 94, 91][index] : index < 11 ? 82 + (index % 7) : 35 + ((index * 9) % 42);
+  const makeMetric = (limit, pct) => resource(Math.max(1, Math.round(limit * pct / 100)), limit);
+  const users = makeMetric(userLimit, Math.min(99, targetPct + ((index * 3) % 8) - 3));
+  const guards = makeMetric(limits.guards, Math.min(99, targetPct + ((index * 5) % 10) - 4));
+  const sites = makeMetric(siteLimit, Math.min(99, targetPct + ((index * 7) % 9) - 4));
+  const storage = makeMetric(limits.storageGB, Math.min(99, targetPct + ((index * 2) % 11) - 5));
+  const overallUsagePct = Math.round((users.percentage + guards.percentage + sites.percentage + storage.percentage) / 4);
+  const status = overallUsagePct >= 95 ? 'Critical' : overallUsagePct >= 80 ? 'Near Limit' : 'Normal';
+  const companyStatus = index % 12 === 4 ? 'Trial' : index % 15 === 7 ? 'Suspended' : 'Active';
+  const company = { id: 9001 + index, code: `CP-${9001 + index}`, name: companyName, plan, status: companyStatus, users: users.used, sites: sites.used };
+  return {
+    id: company.id, companyId: company.id, code: company.code, companyName, plan, companyStatus,
+    users, guards, sites, storage, resources: { users, guards, sites, storage },
+    overallUsagePct, status,
+    resourceNearLimit: [users, guards, sites, storage].some((metric) => metric.percentage >= 85),
+    company
+  };
+});
+
+TENANT_USAGE.push(...EXTRA_USAGE_TENANTS);
+
+// More Usage & Limits-only demonstration tenants (low, medium, high, near-limit
+// and exceeded usage across every plan and status). Totals, KPIs and the
+// distribution below are derived from the final TENANT_USAGE list.
+const MORE_USAGE_COMPANIES = [
+  'Ashford Security Services', 'Brightwater Guarding', 'Cambrian Protection Ltd', 'Dunmore Security Group',
+  'Eastgate Patrol Services', 'Fairway Security UK', 'Greystone Guarding', 'Hartwell Protection',
+  'Ironbridge Security', 'Juniper Guard Services', 'Kingfisher Security', 'Lakeside Protection Ltd',
+  'Mercia Guarding', 'Newbury Security Group', 'Oxford Shield Services', 'Penrose Protection',
+  'Quayside Security', 'Ridgeway Guarding', 'Stanmore Security Ltd', 'Tamar Protection Services',
+  'Ulster Watch Security', 'Vantage Guard Group', 'Wessex Security Services', 'Yorkshire Shield Ltd',
+  'Albion Protection Group', 'Birchwood Security', 'Calder Guarding Services', 'Dovetail Security Ltd',
+  'Elmstead Protection', 'Fenwick Guard Services', 'Glenfield Security Group', 'Harrow Patrol Ltd',
+  'Islington Shield Security', 'Jubilee Guarding', 'Kestrel Point Security', 'Lancaster Protection',
+  'Marlowe Security Services', 'Netherby Guard Group', 'Overton Security Ltd', 'Preston Shield Services',
+  'Queensway Protection', 'Rochdale Guarding Ltd', 'Severn Security Group', 'Tyneside Protection',
+  'Upton Guard Services', 'Vale Security Partners', 'Wharfside Guarding', 'Yarrow Protection Ltd',
+  'Ashdown Security', 'Brackley Guard Services', 'Cheshire Shield Group', 'Dartmoor Security Ltd',
+  'Exmoor Protection', 'Foxhill Guarding', 'Gatwick Secure Services', 'Hollin Security Group',
+  'Ingleby Protection', 'Kendal Guard Ltd', 'Lindum Security Services', 'Mersey Shield Group',
+  'Norwood Protection Ltd', 'Orchard Guarding', 'Pennine Security Group', 'Rowan Guard Services',
+  'Sherwood Protection', 'Thornbury Security Ltd', 'Uxbridge Shield Services', 'Walcott Guarding Group',
+  'Yeovil Security Services', 'Zetland Protection Ltd'
+];
+
+// Target usage level (%) cycled across the records: low, medium, high,
+// near limit, exceeded and critical.
+const MORE_USAGE_LEVELS = [24, 52, 74, 88, 108, 38, 63, 91, 79, 98];
+
+const MORE_USAGE_TENANTS = MORE_USAGE_COMPANIES.map((companyName, index) => {
+  const plan = ['Starter', 'Professional', 'Business', 'Enterprise'][(index + Math.floor(index / 4)) % 4];
+  const limits = DEMO_PLAN_LIMITS[plan];
+  const planInfo = PLAN_INFO[plan] || { users: 100, sites: 20 };
+  const userLimit = planInfo.users ?? limits.enterpriseUsersDisplay;
+  const siteLimit = planInfo.sites ?? limits.enterpriseSitesDisplay;
+  const base = MORE_USAGE_LEVELS[index % MORE_USAGE_LEVELS.length];
+  const makeMetric = (limit, offset) =>
+    resource(Math.max(1, Math.round(limit * Math.max(5, base + offset) / 100)), limit);
+  const users = makeMetric(userLimit, ((index * 3) % 9) - 4);
+  const guards = makeMetric(limits.guards, ((index * 5 + 2) % 9) - 4);
+  const sites = makeMetric(siteLimit, ((index * 7 + 4) % 9) - 4);
+  const storage = makeMetric(limits.storageGB, ((index * 2 + 6) % 9) - 4);
+  const overallUsagePct = Math.round((users.percentage + guards.percentage + sites.percentage + storage.percentage) / 4);
+  const status = overallUsagePct >= 95 ? 'Critical' : overallUsagePct >= 80 ? 'Near Limit' : 'Normal';
+  const companyStatus = index % 11 === 5 ? 'Trial' : index % 17 === 9 ? 'Suspended' : 'Active';
+  const id = 9025 + index;
+  const company = { id, code: `CP-${id}`, name: companyName, plan, status: companyStatus, users: users.used, sites: sites.used };
+  return {
+    id, companyId: id, code: company.code, companyName, plan, companyStatus,
+    users, guards, sites, storage, resources: { users, guards, sites, storage },
+    overallUsagePct, status,
+    resourceNearLimit: [users, guards, sites, storage].some((metric) => metric.percentage >= 85),
+    company
+  };
+});
+
+// Never add a record whose id or company name already exists.
+{
+  const seenIds = new Set(TENANT_USAGE.map((tenant) => tenant.id));
+  const seenNames = new Set(TENANT_USAGE.map((tenant) => tenant.companyName.toLowerCase()));
+  MORE_USAGE_TENANTS.forEach((tenant) => {
+    if (seenIds.has(tenant.id) || seenNames.has(tenant.companyName.toLowerCase())) return;
+    seenIds.add(tenant.id);
+    seenNames.add(tenant.companyName.toLowerCase());
+    TENANT_USAGE.push(tenant);
+  });
+}
+
 export const USAGE_SUMMARY = {
-  totalTenants: COMPANY_ROWS.length,
+  totalTenants: TENANT_USAGE.length,
   totalUsers: TENANT_USAGE.reduce((sum, tenant) => sum + tenant.users.used, 0),
   totalGuards: TENANT_USAGE.reduce((sum, tenant) => sum + tenant.guards.used, 0),
   totalSites: TENANT_USAGE.reduce((sum, tenant) => sum + tenant.sites.used, 0),
   totalStorageGB: TENANT_USAGE.reduce((sum, tenant) => sum + tenant.storage.used, 0),
   // Resource-specific KPI threshold; separate from the overall-status donut.
-  nearLimit: 8,
+  nearLimit: TENANT_USAGE.filter((tenant) => tenant.resourceNearLimit).length,
   limitExceeded: TENANT_USAGE.filter((tenant) => tenant.status === 'Critical').length,
   normalUsage: TENANT_USAGE.filter((tenant) => tenant.status === 'Normal').length,
   overallNearLimit: TENANT_USAGE.filter((tenant) => tenant.status === 'Near Limit').length,
@@ -118,13 +224,17 @@ export const RESOURCE_OVERVIEW = [
 ];
 
 export const TENANT_USAGE_DISTRIBUTION = [
-  { key: 'normal', status: 'Normal', label: 'Normal Usage', tenants: 35, color: '#16a765' },
-  { key: 'near', status: 'Near Limit', label: 'Near Limit', tenants: 18, color: '#f79009' },
-  { key: 'critical', status: 'Critical', label: 'Limit Reached', tenants: 3, color: '#f04452' },
-].map((item) => ({
-  ...item,
-  percentage: Math.round((item.tenants / COMPANY_ROWS.length) * 100),
-}));
+  { key: 'normal', status: 'Normal', label: 'Normal Usage', color: '#16a765' },
+  { key: 'near', status: 'Near Limit', label: 'Near Limit', color: '#f79009' },
+  { key: 'critical', status: 'Critical', label: 'Limit Reached', color: '#f04452' },
+].map((item) => {
+  const tenants = TENANT_USAGE.filter((tenant) => tenant.status === item.status).length;
+  return {
+    ...item,
+    tenants,
+    percentage: Math.round((tenants / Math.max(1, TENANT_USAGE.length)) * 100)
+  };
+});
 
 export const USAGE_ALERTS = [
   { id: 'alert-metro-users', companyName: 'Metro Security Group', companyId: 2, resource: 'users', message: 'Users at 96% of configured limit', severity: 'Critical', time: '10 min ago' },

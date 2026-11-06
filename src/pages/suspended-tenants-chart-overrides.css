@@ -1,0 +1,263 @@
+/* ==========================================================
+   SUSPENDED TENANTS CHARTS — MATCH MAIN DASHBOARD CONTROLS
+   Scoped only to the three chart panels. Do not affect other cards.
+========================================================== */
+.st .st-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  margin: 14px 0 0;
+}
+
+.st .st-chart-grid > .st-suspended-chart {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 350px;
+  min-height: 350px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #DCE6F2;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(24, 54, 95, 0.045);
+}
+
+/* Put title on its own line and the shared main-dashboard controls below it. */
+.st .st-chart-grid > .st-suspended-chart > .chart-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 12px 13px 7px;
+}
+
+.st .st-chart-grid .st-suspended-chart .chart-card-icon {
+  flex: 0 0 26px;
+}
+
+.st .st-chart-grid .st-suspended-chart .chart-card-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.st .st-chart-grid .st-suspended-chart .chart-card-header > .grow {
+  display: none;
+}
+
+.st .st-chart-grid .st-suspended-chart .chart-card-controls {
+  display: flex;
+  flex: 1 1 100%;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  margin: 2px 0 0;
+}
+
+.st .st-chart-grid .st-suspended-chart .period-ctl {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+}
+
+.st .st-chart-grid .st-suspended-chart .period-ctl .select {
+  flex: 0 0 auto;
+  min-width: 104px;
+  max-width: 120px;
+  min-height: 30px;
+  font-size: 10.5px;
+}
+
+.st .st-chart-grid .st-suspended-chart .week-nav-btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 9px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.st .st-chart-grid .st-suspended-chart .period-ctl select,
+.st .st-chart-grid .st-suspended-chart .period-ctl input {
+  height: 30px;
+  font-size: 11px;
+}
+
+.st .st-chart-grid .st-suspended-chart .period-ctl .period-month {
+  width: 112px;
+}
+
+.st .st-chart-grid .st-suspended-chart .period-ctl .period-year {
+  width: 82px;
+}
+
+.st .st-chart-grid .st-suspended-chart > .chart-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 13px 12px;
+  overflow: hidden;
+}
+
+.st .st-suspended-chart-inner {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.st .st-chart-period-caption {
+  flex: 0 0 auto;
+  margin: 2px 0 5px;
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.st .st-trend-legend {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 2px 5px;
+  color: #526581;
+  font-size: 10px;
+}
+
+.st .st-trend-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.st .st-trend-legend i,
+.st .st-chart-legend i {
+  display: inline-block;
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.st .st-bar-area {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 190px;
+}
+
+.st .st-donut-layout {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(125px, 1fr) minmax(105px, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.st .st-donut-graphic {
+  position: relative;
+  width: 100%;
+  height: 205px;
+  min-width: 0;
+}
+
+.st .st-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.st .st-donut-center strong {
+  color: #142B50;
+  font-size: 21px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.st .st-donut-center span {
+  margin-top: 2px;
+  color: #64748B;
+  font-size: 10px;
+}
+
+.st .st-chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: 100%;
+  min-width: 0;
+}
+
+.st .st-chart-legend > div {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: #526581;
+  font-size: 10.5px;
+}
+
+.st .st-chart-legend > div span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st .st-chart-legend > div b {
+  color: #263D60;
+  font-size: 10px;
+}
+
+@media (max-width: 1120px) {
+  .st .st-chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .st .st-chart-grid > .st-suspended-chart:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .st .st-chart-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .st .st-chart-grid > .st-suspended-chart,
+  .st .st-chart-grid > .st-suspended-chart:last-child {
+    grid-column: auto;
+    height: 330px;
+    min-height: 330px;
+  }
+
+  .st .st-donut-layout {
+    grid-template-columns: minmax(120px, 1fr) minmax(115px, 1fr);
+  }
+}

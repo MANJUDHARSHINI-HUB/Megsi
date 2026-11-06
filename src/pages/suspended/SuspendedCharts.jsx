@@ -1,67 +1,288 @@
 import { useMemo, useState } from 'react';
-import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { BarChart3, ClipboardList } from 'lucide-react';
-import { Select } from '../../components/Common.jsx';
-import { useI18n } from '../../i18n/I18nContext.jsx';
-import { TREND_HISTORY } from '../../data/suspendedData.js';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {
+  Ban,
+  CalendarDays,
+  CheckCircle2,
+  FileText,
+  ShieldCheck,
+  BarChart3,
+  PieChart as PieIcon,
+} from 'lucide-react';
+import { ChartCard, PeriodControl } from '../../components/Charts.jsx';
+import { CHART_DATA, REASONS, SUMMARY } from '../../data/suspendedData.js';
 
-const ax = { fontSize: 11, fill: '#465477' };
-const WINDOWS = { '6m': 'Last 6 Months', '12m': 'Last 12 Months' };
+const COLORS = ['#1769E8', '#E84A5B', '#8B35C9', '#F59E0B', '#16A36A'];
+const PLAN_COLORS = ['#F59E0B', '#168BD7', '#B044B8', '#E45C85'];
+const CURRENT = new Date();
 
-export function Card({ icon, title, right, children }) {
+const icons = {
+  ban: Ban,
+  calendar: CalendarDays,
+  file: FileText,
+  check: CheckCircle2,
+  shield: ShieldCheck,
+};
+
+// Keep the same period object shape used by the main dashboard PeriodControl.
+const initialPeriod = () => ({
+  mode: 'week',
+  month: CURRENT.getMonth(),
+  year: CURRENT.getFullYear(),
+  weekOffset: 0,
+});
+
+export function SummaryCards() {
   return (
-    <section className="card st-chart">
-      <header className="card-h"><span className="ic-sq">{icon}</span><h3>{title}</h3><div className="grow" />{right}</header>
-      <div className="st-chart-body">{children}</div>
-    </section>
+    <div className="st-summary-grid">
+      {SUMMARY.map((item) => {
+        const Icon = icons[item.icon] || BarChart3;
+        return (
+          <article className="st-summary-card" key={item.label}>
+            <span className={`st-summary-icon ${item.tone}`}>
+              <Icon size={22} />
+            </span>
+            <div className="st-summary-copy">
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+              <small>↑ {item.change}</small>
+            </div>
+          </article>
+        );
+      })}
+    </div>
   );
 }
 
-export function TrendChart({ reactivatedNow }) {
-  const { monthShort } = useI18n();
-  const [w, setW] = useState('6m');
-  const data = useMemo(() => {
-    const all = TREND_HISTORY.map(([k, s, r], i) => ({ key: k, label: monthShort(`${k}-01`), Suspended: s, Reactivated: i === TREND_HISTORY.length - 1 ? r + reactivatedNow : r }));
-    return w === '6m' ? all.slice(-6) : all;
-  }, [w, reactivatedNow, monthShort]);
+function periodKey(period) {
+  if (period.mode === 'today') return 'Today';
+  if (period.mode === 'week') {
+    return period.weekOffset === 0 ? 'This Week' : 'Previous Week';
+  }
+  if (period.mode === 'month') return 'This Month';
+  return 'This Year';
+}
+
+function periodCaption(period) {
+  if (period.mode === 'today') {
+    return CURRENT.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+  if (period.mode === 'week') {
+    if (period.weekOffset === 0) return 'Current Week';
+    if (period.weekOffset === -1) return 'Previous Week';
+    return `${Math.abs(period.weekOffset)} Weeks Ago`;
+  }
+  if (period.mode === 'month') {
+    return new Date(period.year, period.month, 1).toLocaleDateString('en-IN', {
+      month: 'long',
+      year: 'numeric',
+    });
+  }
+  return String(period.year);
+}
+
+function scaleValues(values, period, salt = 0) {
+  const seed = period.mode === 'month'
+    ? period.month + 1
+    : period.mode === 'year'
+      ? Number(period.year) % 13
+      : Math.abs(period.weekOffset || 0) + salt;
+
+  const factor = period.mode === 'today'
+    ? 0.22
+    : period.mode === 'week'
+      ? (period.weekOffset === 0 ? 1 : Math.max(0.72, 1 - Math.abs(period.weekOffset) * 0.08))
+      : period.mode === 'month'
+        ? 0.82 + seed * 0.025
+        : 0.9 + (seed % 7) * 0.035;
+
+  return values.map((value, index) =>
+    Math.max(1, Math.round(value * factor + ((seed + index + salt) % 3)))
+  );
+}
+
+function getTrendData(period) {
+  const source = CHART_DATA.trends[periodKey(period)] || CHART_DATA.trends['This Week'];
+  const factor = period.mode === 'month'
+    ? 0.82 + (period.month + 1) * 0.025
+    : period.mode === 'year'
+      ? 0.9 + (Number(period.year) % 7) * 0.035
+      : period.mode === 'week'
+        ? Math.max(0.72, 1 - Math.abs(period.weekOffset || 0) * 0.08)
+        : 1;
+
+  return source.map((row, index) => ({
+    ...row,
+    s: Math.max(1, Math.round(row.s * factor + (index % 2))),
+    r: Math.max(1, Math.round(row.r * factor)),
+  }));
+}
+
+function SharedPeriodHeader({ title, icon, period, setPeriod, children }) {
   return (
-    <Card icon={<BarChart3 size={16} />} title="Suspension Trends" right={<Select value={w} options={Object.keys(WINDOWS)} onChange={setW} format={(o) => WINDOWS[o]} />}>
-      <ul className="st-legend-inline"><li><i style={{ background: '#0758F9' }} />Suspended</li><li><i style={{ background: '#E8172D' }} />Reactivated</li></ul>
-      <div className="st-plot">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 6, right: 6, left: -22, bottom: 0 }} barGap={2} barCategoryGap="22%">
-            <CartesianGrid stroke="#E4ECF5" vertical={false} />
-            <XAxis dataKey="label" tick={ax} tickLine={false} />
-            <YAxis tick={ax} tickLine={false} axisLine={false} allowDecimals={false} />
-            <Tooltip cursor={{ fill: '#EEF7FC' }} />
-            <Bar dataKey="Suspended" fill="#0758F9" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="Reactivated" fill="#E8172D" radius={[2, 2, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+    <ChartCard
+      className="st-suspended-chart"
+      icon={icon}
+      title={title}
+      right={<PeriodControl value={period} onChange={setPeriod} />}
+    >
+      <div className="st-suspended-chart-inner">
+        <div className="st-chart-period-caption">{periodCaption(period)}</div>
+        {children}
       </div>
-    </Card>
+    </ChartCard>
   );
 }
 
-/** Donut + legend. `selected` highlights a slice; clicking a slice or legend row toggles the table filter. */
-export function BreakdownDonut({ title, items, selected, onSelect }) {
-  const total = items.reduce((n, d) => n + d.value, 0);
-  const pct = (v) => (total ? Math.round((v / total) * 100) : 0);
+function DonutChartPanel({ title, period, setPeriod, labels, values, colors }) {
+  const chartValues = useMemo(
+    () => scaleValues(values, period, title.length),
+    [values, period, title]
+  );
+  const total = chartValues.reduce((sum, value) => sum + value, 0);
+  const data = labels.map((name, index) => ({
+    name,
+    value: chartValues[index] || 0,
+    color: colors[index],
+  }));
+
   return (
-    <Card icon={<ClipboardList size={16} />} title={title}>
-      {!total ? <div className="empty st-empty">No suspended tenants</div> : (
-        <div className="st-donut-wrap">
-          <div className="donut st-donut">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart><Pie data={items.filter((d) => d.value > 0)} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="100%" startAngle={90} endAngle={-270} stroke="#fff" strokeWidth={2} onClick={(d) => onSelect(d.name)} style={{ cursor: 'pointer' }}>
-                {items.filter((d) => d.value > 0).map((d) => <Cell key={d.name} fill={d.color} opacity={!selected || selected === d.name ? 1 : 0.35} />)}</Pie>
-                <Tooltip formatter={(v, n) => [`${v} (${pct(v)}%)`, n]} /></PieChart>
-            </ResponsiveContainer>
-            <div className="donut-c"><b>{total}</b><span>Suspended</span></div>
+    <SharedPeriodHeader
+      title={title}
+      icon={<PieIcon size={16} />}
+      period={period}
+      setPeriod={setPeriod}
+    >
+      <div className="st-donut-layout">
+        <div className="st-donut-graphic">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                innerRadius="58%"
+                outerRadius="82%"
+                paddingAngle={2}
+                stroke="none"
+              >
+                {data.map((item) => (
+                  <Cell key={item.name} fill={item.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [
+                  `${value} · ${total ? Math.round((value / total) * 100) : 0}%`,
+                  name,
+                ]}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="st-donut-center">
+            <strong>{total.toLocaleString('en-IN')}</strong>
+            <span>Total</span>
           </div>
-          <ul className="legend st-legend">{items.map((d) => (
-            <li key={d.name}><button className={selected === d.name ? 'on' : ''} onClick={() => onSelect(d.name)} aria-pressed={selected === d.name} title={`Filter table by ${d.name}`}><i style={{ background: d.color }} />{d.name}<span>{pct(d.value)}%</span></button></li>))}</ul>
-        </div>)}
-    </Card>
+        </div>
+
+        <div className="st-chart-legend">
+          {data.map((item) => (
+            <div key={item.name}>
+              <i style={{ background: item.color }} />
+              <span title={item.name}>{item.name}</span>
+              <b>{total ? Math.round((item.value / total) * 100) : 0}%</b>
+            </div>
+          ))}
+        </div>
+      </div>
+    </SharedPeriodHeader>
+  );
+}
+
+export default function SuspendedCharts() {
+  // Each graph has its own independent period state.
+  const [trendPeriod, setTrendPeriod] = useState(initialPeriod);
+  const [reasonPeriod, setReasonPeriod] = useState(initialPeriod);
+  const [planPeriod, setPlanPeriod] = useState(initialPeriod);
+
+  const trendData = useMemo(() => getTrendData(trendPeriod), [trendPeriod]);
+  const reasonValues = CHART_DATA.reasons[periodKey(reasonPeriod)] || CHART_DATA.reasons['This Week'];
+  const planValues = CHART_DATA.plans[periodKey(planPeriod)] || CHART_DATA.plans['This Week'];
+
+  return (
+    <div className="st-chart-grid">
+      <SharedPeriodHeader
+        title="Suspension Trends"
+        icon={<BarChart3 size={16} />}
+        period={trendPeriod}
+        setPeriod={setTrendPeriod}
+      >
+        <div className="st-trend-legend">
+          <span><i style={{ background: '#1769E8' }} />Suspended</span>
+          <span><i style={{ background: '#E84A5B' }} />Reactivated</span>
+        </div>
+        <div className="st-bar-area">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={trendData}
+              margin={{ top: 8, right: 8, left: -18, bottom: 2 }}
+              barGap={4}
+              barCategoryGap="22%"
+            >
+              <CartesianGrid stroke="#E4ECF5" vertical={false} />
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 10, fill: '#465477' }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: '#465477' }}
+                axisLine={false}
+                tickLine={false}
+                allowDecimals={false}
+                width={32}
+              />
+              <Tooltip cursor={{ fill: '#F3F7FC' }} />
+              <Bar dataKey="s" name="Suspended" fill="#1769E8" radius={[3, 3, 0, 0]} maxBarSize={22} />
+              <Bar dataKey="r" name="Reactivated" fill="#E84A5B" radius={[3, 3, 0, 0]} maxBarSize={22} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </SharedPeriodHeader>
+
+      <DonutChartPanel
+        title="Suspension Reasons"
+        period={reasonPeriod}
+        setPeriod={setReasonPeriod}
+        labels={REASONS}
+        values={reasonValues}
+        colors={COLORS}
+      />
+
+      <DonutChartPanel
+        title="Suspensions by Plan"
+        period={planPeriod}
+        setPeriod={setPlanPeriod}
+        labels={['Starter', 'Professional', 'Business', 'Enterprise']}
+        values={planValues}
+        colors={PLAN_COLORS}
+      />
+    </div>
   );
 }

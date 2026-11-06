@@ -1,4 +1,3 @@
-
 import * as I from 'lucide-react';
 import { NAV } from '../data/mockData.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
@@ -95,7 +94,11 @@ export default function Sidebar({
 
             {group.items.map((item) => {
               const Icon = I[item.icon];
-              const label = t(`nav.${item.id}`);
+
+              const label =
+                item.id === 'billing'
+                  ? 'Billing'
+                  : t(`nav.${item.id}`);
 
               return (
                 <button

@@ -1,4 +1,3 @@
-
 export const NAV = [
   {
     gk: null,
@@ -11,7 +10,7 @@ export const NAV = [
     items: [
       { id: 'companies', label: 'Companies', icon: 'Building2' },
       { id: 'plans', label: 'Subscription Plans', icon: 'Layers' },
-      { id: 'billing', label: 'Tenant Billing', icon: 'FileText' },
+      { id: 'billing', label: 'Billing', icon: 'FileText' },
       { id: 'usage', label: 'Usage & Limits', icon: 'Activity' },
       { id: 'onboarding', label: 'Onboarding', icon: 'UserPlus' },
       { id: 'suspended', label: 'Suspended Tenants', icon: 'Ban' },
@@ -49,7 +48,7 @@ export const NAV = [
   },
 ];
 
-// Companies: joined drives period filtering; tu (optional) = total users used for the Top Companies ranking.
+// Companies
 export const COMPANIES = [
   { id: 1, name: 'SecureGuard UK Ltd', plan: 'Business', users: 120, sites: 18, status: 'Active', joined: '2026-10-20', tu: 210 },
   { id: 2, name: 'Metro Security Group', plan: 'Professional', users: 85, sites: 12, status: 'Active', joined: '2026-10-18', tu: 185 },
@@ -96,15 +95,12 @@ export const USERS = [
   'Olivia Martin',
 ];
 
-// Totals before the first month below (used for interpolation / change calculations).
 export const BASE = {
   companies: 7,
   users: 1100,
   sites: 560,
 };
 
-// companies/users/sites = running totals at END of month;
-// guards/incidents/revenue = values for that month.
 const m = (companies, users, sites, guards, incidents, revenue) => ({
   companies,
   users,
@@ -136,7 +132,6 @@ export const PLAN_MIX = [
   { name: 'Enterprise', w: 4, color: '#F59E0B' },
 ];
 
-// Activity colour/icon mapping by event kind (green / blue / orange / red).
 export const KIND = {
   company: { c: 'green', icon: 'Building2' },
   user: { c: 'green', icon: 'UserPlus' },
@@ -150,102 +145,22 @@ export const KIND = {
 };
 
 export const ACTIVITY = [
-  {
-    ts: '2026-10-20T14:32',
-    kind: 'company',
-    k: 'act.company',
-    p: { name: 'Northern Security' },
-  },
-  {
-    ts: '2026-10-20T12:10',
-    kind: 'upgrade',
-    k: 'act.upgrade',
-    p: { name: 'City Watch Ltd', plan: 'Business' },
-  },
-  {
-    ts: '2026-10-20T11:45',
-    kind: 'user',
-    k: 'act.user',
-    p: { name: 'Sarah Johnson' },
-  },
-  {
-    ts: '2026-10-20T10:20',
-    kind: 'payment',
-    k: 'act.payment',
-    p: { amount: '£2,499', name: 'Metro Security Group' },
-  },
-  {
-    ts: '2026-10-20T09:15',
-    kind: 'ticket',
-    k: 'act.ticket',
-    p: { id: '#TKT-1045' },
-  },
-  {
-    ts: '2026-10-19T18:30',
-    kind: 'suspend',
-    k: 'act.suspend',
-    p: { name: 'OldGuard Security' },
-  },
-  {
-    ts: '2026-10-19T03:00',
-    kind: 'info',
-    k: 'act.backup',
-    p: {},
-  },
-  {
-    ts: '2026-10-18T16:42',
-    kind: 'attention',
-    k: 'act.downgrade',
-    p: { name: 'Beacon Protection', plan: 'Starter' },
-  },
-  {
-    ts: '2026-09-26T15:20',
-    kind: 'failed',
-    k: 'act.backupFailed',
-    p: {},
-  },
-  {
-    ts: '2026-09-24T09:30',
-    kind: 'company',
-    k: 'act.company',
-    p: { name: 'Harbour Security' },
-  },
-  {
-    ts: '2026-09-15T13:00',
-    kind: 'payment',
-    k: 'act.payment',
-    p: { amount: '£1,899', name: 'Citadel Services' },
-  },
-  {
-    ts: '2026-09-02T11:11',
-    kind: 'ticket',
-    k: 'act.ticket',
-    p: { id: '#TKT-1012' },
-  },
-  {
-    ts: '2026-08-26T10:00',
-    kind: 'company',
-    k: 'act.company',
-    p: { name: 'Apex Guarding' },
-  },
-  {
-    ts: '2026-08-14T16:05',
-    kind: 'upgrade',
-    k: 'act.upgrade',
-    p: { name: 'SafeZone Services', plan: 'Business' },
-  },
-  {
-    ts: '2026-07-22T12:40',
-    kind: 'company',
-    k: 'act.company',
-    p: { name: 'Citadel Services' },
-  },
-  {
-    ts: '2026-06-18T09:50',
-    kind: 'user',
-    k: 'act.user',
-    p: { name: 'Noah Evans' },
-  },
+  { ts: '2026-10-20T14:32', kind: 'company', k: 'act.company', p: { name: 'Northern Security' } },
+  { ts: '2026-10-20T12:10', kind: 'upgrade', k: 'act.upgrade', p: { name: 'City Watch Ltd', plan: 'Business' } },
+  { ts: '2026-10-20T11:45', kind: 'user', k: 'act.user', p: { name: 'Sarah Johnson' } },
+  { ts: '2026-10-20T10:20', kind: 'payment', k: 'act.payment', p: { amount: '£2,499', name: 'Metro Security Group' } },
+  { ts: '2026-10-20T09:15', kind: 'ticket', k: 'act.ticket', p: { id: '#TKT-1045' } },
+  { ts: '2026-10-19T18:30', kind: 'suspend', k: 'act.suspend', p: { name: 'OldGuard Security' } },
+  { ts: '2026-10-19T03:00', kind: 'info', k: 'act.backup', p: {} },
+  { ts: '2026-10-18T16:42', kind: 'attention', k: 'act.downgrade', p: { name: 'Beacon Protection', plan: 'Starter' } },
+  { ts: '2026-09-26T15:20', kind: 'failed', k: 'act.backupFailed', p: {} },
+  { ts: '2026-09-24T09:30', kind: 'company', k: 'act.company', p: { name: 'Harbour Security' } },
+  { ts: '2026-09-15T13:00', kind: 'payment', k: 'act.payment', p: { amount: '£1,899', name: 'Citadel Services' } },
+  { ts: '2026-09-02T11:11', kind: 'ticket', k: 'act.ticket', p: { id: '#TKT-1012' } },
+  { ts: '2026-08-26T10:00', kind: 'company', k: 'act.company', p: { name: 'Apex Guarding' } },
+  { ts: '2026-08-14T16:05', kind: 'upgrade', k: 'act.upgrade', p: { name: 'SafeZone Services', plan: 'Business' } },
+  { ts: '2026-07-22T12:40', kind: 'company', k: 'act.company', p: { name: 'Citadel Services' } },
+  { ts: '2026-06-18T09:50', kind: 'user', k: 'act.user', p: { name: 'Noah Evans' } },
 ];
 
 export const HEALTH = {
@@ -263,36 +178,13 @@ export const HEALTH = {
 };
 
 export const NOTIFICATIONS = [
-  {
-    k: 'act.company',
-    p: { name: 'Northern Security' },
-    ago: ['ago.m', 2],
-  },
-  {
-    k: 'act.payment',
-    p: { amount: '£2,499', name: 'Metro Security Group' },
-    ago: ['ago.h', 1],
-  },
-  {
-    k: 'n.ticket',
-    p: { id: '#TKT-1045' },
-    ago: ['ago.h', 2],
-  },
-  {
-    k: 'act.suspend',
-    p: { name: 'OldGuard Security' },
-    ago: ['ago.d', 1],
-  },
-  {
-    k: 'n.backup',
-    p: {},
-    ago: ['ago.d', 1],
-  },
+  { k: 'act.company', p: { name: 'Northern Security' }, ago: ['ago.m', 2] },
+  { k: 'act.payment', p: { amount: '£2,499', name: 'Metro Security Group' }, ago: ['ago.h', 1] },
+  { k: 'n.ticket', p: { id: '#TKT-1045' }, ago: ['ago.h', 2] },
+  { k: 'act.suspend', p: { name: 'OldGuard Security' }, ago: ['ago.d', 1] },
+  { k: 'n.backup', p: {}, ago: ['ago.d', 1] },
 ];
 
-// SAMPLE DATA (demo tracking) - illustrative only, not real business data.
-// status: 'Purchased' | 'Demo Active' | 'Interested' | 'Pending'
-// Company names/contacts reuse COMPANIES / SIGNUPS; the two Purchased amounts match the payment events in ACTIVITY.
 export const DEMO_TRACKING = [
   { id: 1, company: 'Metro Security Group', status: 'Purchased', demoStart: '2026-10-06', date: '2026-10-20', amount: 2499 },
   { id: 2, company: 'Shield Security Group', status: 'Interested', demoStart: '2026-10-18', date: '2026-10-18', amount: 0 },

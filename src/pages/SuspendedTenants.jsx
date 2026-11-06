@@ -1,354 +1,142 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { AlertTriangle, ArrowDown, ArrowUp, Ban, Calendar, ChevronDown, ChevronLeft, ChevronRight, Clock, Download, Eye, FileText, Mail, MoreHorizontal, RotateCcw, Search, SearchCheck, Settings, ShieldAlert, ShieldCheck, Users, X } from 'lucide-react';
-import { Avatar, Menu, PlanBadge } from '../components/Common.jsx';
-import { useI18n } from '../i18n/I18nContext.jsx';
-import { DEMO_TODAY, PLAN_COLORS, PLAN_LIST, REASONS, REASON_COLORS, REVIEW, REVIEW_LIST } from '../data/suspendedData.js';
-import { BreakdownDonut, TrendChart } from './suspended/SuspendedCharts.jsx';
-import { PoliciesModal, ReactivateModal, ReviewBadge, ReviewModal, TenantDrawer } from './suspended/SuspendedModals.jsx';
+import {
+  ArrowLeft, Building2, CreditCard, FileText, Mail, RefreshCw,
+  Search, ShieldAlert, Users, Activity, ClipboardList, X, Download,
+  CalendarDays, MapPin, Phone, UserRound, ReceiptText, CheckCircle2,
+} from 'lucide-react';
+import SuspendedCharts, { SummaryCards } from './suspended/SuspendedCharts.jsx';
+import { TENANTS, REASONS, PLANS, STATUSES } from '../data/suspendedData.js';
 import './suspended-tenants.css';
 
-const PAGE_SIZE = 5;
-const COLS = [['name', 'Company Name'], ['plan', 'Subscription Plan'], ['admin', 'Company Admin'], ['email', 'Email Address'], ['users', 'Users'], ['reason', 'Suspension Reason'], ['suspendedDate', 'Suspended Date'], ['suspendedBy', 'Suspended By'], ['review', 'Review Status']];
-const DATE_MODES = { all: 'All Dates', month: 'This Month', 30: 'Last 30 Days', 90: 'Last 90 Days', custom: 'Custom Range' };
-const addDays = (iso, n) => new Date(Date.parse(iso) + n * 86400000).toISOString().slice(0, 10);
+const PAGE_SIZE = 12;
+const fmtDate = value => value ? new Date(value.replace(' ', 'T')).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+const money = value => `₹${Number(value || 0).toLocaleString('en-IN')}`;
+const pct = (value, max) => max ? Math.min(100, Math.round((value / max) * 100)) : 0;
+const statusClass = value => ({ 'Pending Review': 'pending', 'Under Review': 'review', Critical: 'critical', 'Eligible for Reactivation': 'eligible', Rejected: 'rejected' }[value] || 'pending');
 
-function dateBounds(f) {
-  if (f.mode === 'month') return [`${DEMO_TODAY.slice(0, 7)}-01`, DEMO_TODAY.slice(0, 7) + '-31'];
-  if (f.mode === '30' || f.mode === '90') return [addDays(DEMO_TODAY, -Number(f.mode)), DEMO_TODAY];
-  if (f.mode === 'custom') return [f.from || '0000-01-01', f.to || '9999-12-31'];
-  return ['0000-01-01', '9999-12-31'];
+function Section({ title, icon: Icon, children, extra }) {
+  return <section className="st-panel st-detail-section"><header className="st-panel-heading"><span className="st-panel-icon"><Icon size={16}/></span><h3>{title}</h3><span className="st-grow"/>{extra}</header>{children}</section>;
+}
+function UsageBar({ label, value, max, unit = '', hint }) {
+  const percent = pct(value, max);
+  return <div className="st-usage-row"><div className="st-usage-label"><span>{label}</span><b>{value.toLocaleString('en-IN')} {unit}<em> / {max.toLocaleString('en-IN')} {unit}</em></b></div><div className="st-usage-track"><span className={percent >= 90 ? 'danger' : percent >= 75 ? 'warn' : ''} style={{ width: `${percent}%` }}/></div><small>{hint || `${percent}% of allocated capacity used`}</small></div>;
+}
+function TenantDetails({ tenant, onBack, onReactivate, onContact }) {
+  const [confirm, setConfirm] = useState(false);
+  return <div className="st-detail-page">
+    <div className="st-detail-top"><button className="st-btn st-btn-light" onClick={onBack}><ArrowLeft size={15}/> Back to Suspended Tenants</button><div className="st-detail-breadcrumb">Tenant Management <span>/</span> <b>{tenant.name}</b></div><div className="st-detail-actions"><button className="st-btn st-btn-light" onClick={() => onContact(tenant)}><Mail size={15}/> Contact Tenant</button><button className="st-btn st-btn-primary" onClick={() => setConfirm(true)}><RefreshCw size={15}/> Reactivate Tenant</button></div></div>
+    <div className="st-detail-title"><div className="st-company-icon"><Building2 size={27}/></div><div className="st-detail-title-copy"><span className="st-eyebrow">TENANT ACCOUNT PROFILE</span><h1>{tenant.name}</h1><p>Tenant ID: {tenant.id} <span className={`st-status ${statusClass(tenant.status)}`}>{tenant.status}</span><span className="st-detail-meta"><CalendarDays size={12}/> Suspended {fmtDate(tenant.suspendedDate)}</span></p></div><div className="st-detail-title-side"><small>SUBSCRIPTION PLAN</small><span className={`st-plan ${tenant.plan.toLowerCase()}`}>{tenant.plan}</span></div></div>
+
+
+    <div className="st-detail-grid" id="st-detail-overview">
+      <div className="st-detail-main">
+        <Section title="Suspension Information" icon={ShieldAlert} extra={<span className={`st-status ${statusClass(tenant.status)}`}>{tenant.status}</span>}>
+          <div className="st-info-grid st-info-grid-four"><div><label>Suspension Reason</label><b className="st-reason-pill">{tenant.reason}</b></div><div><label>Suspended On</label><b>{fmtDate(tenant.suspendedDate)}</b></div><div><label>Suspended By</label><b>{tenant.suspendedBy}</b></div><div><label>Review Status</label><b>{tenant.status}</b></div><div className="wide"><label>Administrator Notes</label><b>{tenant.notes}</b></div></div>
+        </Section>
+        <Section title="Company Usage & Capacity" icon={Users} extra={<span className="st-section-hint">Live demo utilisation</span>}>
+          <div className="st-usage-grid"><UsageBar label="Total Users" value={tenant.users} max={tenant.usersMax}/><UsageBar label="Guards" value={tenant.guards} max={tenant.guardsMax}/><UsageBar label="Operational Sites" value={tenant.sites} max={tenant.sitesMax}/><UsageBar label="Storage" value={tenant.storage} max={tenant.storageMax} unit="GB"/></div>
+          <div className="st-usage-summary"><span><b>{tenant.users}</b> Active / allocated users</span><span><b>{tenant.guards}</b> Registered guards</span><span><b>{tenant.sites}</b> Operational sites</span></div>
+        </Section>
+        <Section title="Account Activity Timeline" icon={Activity}>
+          <div className="st-history">{tenant.history.map((item, index) => <div className="st-history-item" key={`${item.date}-${index}`}><span className="st-history-dot"/><div><b>{item.title}</b><p>{item.detail}</p><small>{item.date} · {item.by}</small></div></div>)}<div className="st-history-item"><span className="st-history-dot muted"/><div><b>Account created</b><p>Tenant workspace and initial administrator profile were created.</p><small>{tenant.startDate} · MEGSI System</small></div></div></div>
+        </Section>
+        <Section title="Review & Compliance Notes" icon={ClipboardList}>
+          <div className="st-info-grid"><div><label>Assigned Reviewer</label><b>{tenant.reviewBy}</b></div><div><label>Scheduled Review Date</label><b>{tenant.reviewDate}</b></div><div><label>Current Review Status</label><b><span className={`st-status ${statusClass(tenant.status)}`}>{tenant.status}</span></b></div><div><label>Compliance Category</label><b>{tenant.reason === 'Security Issue' ? 'Security compliance' : tenant.reason === 'Terms Violation' ? 'Terms & policy' : 'Account operations'}</b></div></div>
+          <div className="st-review-note"><b>Internal review note</b><p>{tenant.notes} Review the account evidence and contact the tenant administrator before reinstatement.</p></div>
+        </Section>
+      </div>
+      <aside className="st-detail-side">
+        <Section title="Company Profile" icon={Building2}>
+          <div className="st-info-list"><div><label>Company Administrator</label><b><UserRound size={13}/>{tenant.contact}</b></div><div><label>Email Address</label><b className="break"><Mail size={13}/>{tenant.email}</b></div><div><label>Contact Number</label><b><Phone size={13}/>{tenant.phone}</b></div><div><label>Tenant Reference</label><b>{tenant.id}</b></div><div><label>Operating Region</label><b><MapPin size={13}/>India · South Region</b></div></div>
+        </Section>
+        <Section title="Subscription Details" icon={FileText}>
+          <div className="st-info-list"><div><label>Current Plan</label><b><span className={`st-plan ${tenant.plan.toLowerCase()}`}>{tenant.plan}</span></b></div><div><label>Subscription Start</label><b>{tenant.startDate}</b></div><div><label>Next Renewal Date</label><b>{tenant.renewal}</b></div><div><label>Monthly Plan Price</label><b>{money(tenant.price)}</b></div><div><label>Subscription State</label><b><span className="st-status critical">Suspended</span></b></div></div>
+        </Section>
+        <Section title="Billing & Payments" icon={CreditCard}>
+          <div className="st-billing-highlight"><small>OUTSTANDING BALANCE</small><strong className={tenant.outstanding ? 'st-red' : ''}>{money(tenant.outstanding)}</strong><span>{tenant.outstanding ? 'Payment action required' : 'No pending balance'}</span></div>
+          <div className="st-info-list"><div><label>Last Successful Payment</label><b>{tenant.lastPayment}</b></div><div><label>Payment Status</label><b>{tenant.outstanding ? 'Outstanding' : 'Paid'}</b></div><div><label>Billing Cycle</label><b>Monthly</b></div><div><label>Payment Method</label><b>Registered account method</b></div></div>
+          <div className="st-invoice-list"><div><span><ReceiptText size={14}/> Latest invoice</span><b>{tenant.id}-INV-03</b><small>{money(tenant.price)} · {tenant.lastPayment}</small></div><div><span><ReceiptText size={14}/> Previous invoice</span><b>{tenant.id}-INV-02</b><small>{money(tenant.price)} · 1 month earlier</small></div></div>
+        </Section>
+        <Section title="Account Support" icon={CheckCircle2}>
+          <div className="st-support-box"><b>Tenant support contact</b><p>Contact the company administrator for billing, compliance, or access-related clarification.</p><button className="st-btn st-btn-light" onClick={() => onContact(tenant)}><Mail size={14}/> Email administrator</button></div>
+        </Section>
+      </aside>
+    </div>
+    {confirm && <div className="st-confirm-backdrop" role="presentation"><div className="st-confirm" role="dialog" aria-modal="true"><button className="st-confirm-x" onClick={() => setConfirm(false)} aria-label="Close"><X size={17}/></button><span className="st-confirm-icon"><RefreshCw size={22}/></span><h3>Reactivate this tenant?</h3><p>{tenant.name} will be removed from the suspended list and marked as reactivated in this local demo.</p><div><button className="st-btn st-btn-light" onClick={() => setConfirm(false)}>Cancel</button><button className="st-btn st-btn-primary" onClick={() => { onReactivate(tenant); setConfirm(false); }}>Confirm Reactivation</button></div></div></div>}
+  </div>;
 }
 
-/* ---------- Row action menu (fixed position so the scrolling table never clips it) ---------- */
-function RowMenu({ tenant, onAction }) {
-  const [pos, setPos] = useState(null);
-  const btn = useRef(null);
+export default function SuspendedTenants() {
+  const [tenants, setTenants] = useState(TENANTS);
+  const [query, setQuery] = useState('');
+  const [reason, setReason] = useState('All Reasons');
+  const [plan, setPlan] = useState('All Plans');
+  const [status, setStatus] = useState('All Statuses');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [selected, setSelected] = useState(null);
+  const [reactivated, setReactivated] = useState([]);
+  const sentinel = useRef(null);
+  const scrollBox = useRef(null);
+  const filtered = useMemo(() => tenants.filter(tenant =>
+    (!query || tenant.name.toLowerCase().includes(query.trim().toLowerCase())) &&
+    (reason === 'All Reasons' || tenant.reason === reason) &&
+    (plan === 'All Plans' || tenant.plan === plan) &&
+    (status === 'All Statuses' || tenant.status === status)
+  ), [tenants, query, reason, plan, status]);
+  const filtersActive = Boolean(query || reason !== 'All Reasons' || plan !== 'All Plans' || status !== 'All Statuses');
+  const clearFilters = () => { setQuery(''); setReason('All Reasons'); setPlan('All Plans'); setStatus('All Statuses'); };
+  useEffect(() => { setVisibleCount(PAGE_SIZE); if (scrollBox.current) scrollBox.current.scrollTop = 0; }, [query, reason, plan, status]);
   useEffect(() => {
-    if (!pos) return;
-    const close = () => setPos(null);
-    const down = (e) => { if (!e.target.closest('.st-menu') && !btn.current?.contains(e.target)) close(); };
-    const key = (e) => e.key === 'Escape' && close();
-    document.addEventListener('mousedown', down); document.addEventListener('keydown', key);
-    window.addEventListener('scroll', close, true); window.addEventListener('resize', close);
-    return () => { document.removeEventListener('mousedown', down); document.removeEventListener('keydown', key); window.removeEventListener('scroll', close, true); window.removeEventListener('resize', close); };
-  }, [pos]);
-  const toggle = () => {
-    if (pos) return setPos(null);
-    const r = btn.current.getBoundingClientRect(); const h = 190;
-    setPos({ top: r.bottom + 4 + h > window.innerHeight ? Math.max(8, r.top - h - 4) : r.bottom + 4, left: Math.max(8, r.right - 200) });
+    const node = sentinel.current;
+    const root = scrollBox.current;
+    if (!node || !root || visibleCount >= filtered.length) return undefined;
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0]?.isIntersecting) setVisibleCount(count => Math.min(count + PAGE_SIZE, filtered.length));
+    }, { root, rootMargin: '100px' });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [visibleCount, filtered.length]);
+  const visible = filtered.slice(0, visibleCount);
+  const reactivate = tenant => { setTenants(previous => previous.filter(item => item.id !== tenant.id)); setReactivated(previous => [tenant.name, ...previous]); setSelected(null); };
+  const contact = tenant => { window.location.href = `mailto:${tenant.email}?subject=${encodeURIComponent(`Regarding ${tenant.name} tenant account`)}`; };
+  const exportCsv = () => {
+    const rows = [['Tenant ID', 'Company Name', 'Plan', 'Reason', 'Suspended Date', 'Review Status'], ...filtered.map(tenant => [tenant.id, tenant.name, tenant.plan, tenant.reason, tenant.suspendedDate, tenant.status])];
+    const csv = rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'suspended-tenants.csv'; anchor.click(); URL.revokeObjectURL(url);
   };
-  const run = (a) => { setPos(null); onAction(a, tenant); };
-  const eligible = tenant.review === REVIEW.ELIGIBLE;
-  return (
-    <>
-      <button ref={btn} className="st-dots" aria-label={`Actions for ${tenant.name}`} aria-haspopup="menu" aria-expanded={!!pos} onClick={toggle}><MoreHorizontal size={16} /></button>
-      {pos && createPortal(
-        <div className="st-menu" role="menu" style={{ top: pos.top, left: pos.left }}>
-          <button role="menuitem" onClick={() => run('view')}><Eye size={15} />View Details</button>
-          <button role="menuitem" onClick={() => run('review')}><SearchCheck size={15} />Review Suspension</button>
-          <button role="menuitem" className="ok-i" disabled={!eligible} title={eligible ? '' : 'Approve the review first'} onClick={() => run('reactivate')}><RotateCcw size={15} />Reactivate Tenant</button>
-          <button role="menuitem" onClick={() => run('contact')}><Mail size={15} />Contact Admin</button>
-        </div>, document.body)}
-    </>
-  );
-}
+  if (selected) return <div className="st"><TenantDetails tenant={selected} onBack={() => setSelected(null)} onReactivate={reactivate} onContact={contact}/></div>;
 
-const csvCell = (v) => `"${String(v).replace(/"/g, '""')}"`;
-
-export default function SuspendedTenants({ store, toast }) {
-  const { fmtDate, fmtDateTime } = useI18n();
-  const { tenants, activity, reactivated, policies, setPolicies, reviewTenant, reactivate } = store;
-  const [q, setQ] = useState(''); const [reason, setReason] = useState('All'); const [plan, setPlan] = useState('All'); const [status, setStatus] = useState('All');
-  const [dateF, setDateF] = useState({ mode: 'all', from: '', to: '' });
-  const [sort, setSort] = useState({ k: 'suspendedDate', dir: -1 });
-  const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState(() => new Set());
-  const [drawerId, setDrawerId] = useState(null);
-  const [kpiPanel, setKpiPanel] = useState(null);
-  const [modal, setModal] = useState(null); // { type:'review'|'reactivate'|'policies', tenant|tenants }
-  const tableRef = useRef(null);
-
-  const [from, to] = dateBounds(dateF);
-  const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    const list = tenants.filter((t) =>
-      (reason === 'All' || t.reason === reason) && (plan === 'All' || t.plan === plan) && (status === 'All' || t.review === status)
-      && t.suspendedDate >= from && t.suspendedDate <= to
-      && (!s || [t.name, t.admin, t.email, t.reason, t.plan, t.code, t.suspendedBy].some((v) => String(v).toLowerCase().includes(s))));
-    return [...list].sort((a, b) => {
-      const x = a[sort.k], y = b[sort.k];
-      return (typeof x === 'string' ? x.localeCompare(y) : x - y) * sort.dir || a.id - b.id;
-    });
-  }, [tenants, q, reason, plan, status, from, to, sort]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const cur = Math.min(page, totalPages);
-  const start = (cur - 1) * PAGE_SIZE;
-  const shown = filtered.slice(start, start + PAGE_SIZE);
-  const filtersOn = q || reason !== 'All' || plan !== 'All' || status !== 'All' || dateF.mode !== 'all';
-  const drawer = tenants.find((t) => t.id === drawerId) || null;
-  const selTenants = tenants.filter((t) => selected.has(t.id));
-  const selEligible = selTenants.filter((t) => t.review === REVIEW.ELIGIBLE);
-  const allShownSelected = shown.length > 0 && shown.every((t) => selected.has(t.id));
-
-  useEffect(() => {
-    if (!kpiPanel) return;
-    const onKeyDown = (event) => {
-      if (event.key === 'Escape') setKpiPanel(null);
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [kpiPanel]);
-
-  // keep the page valid when rows disappear (e.g. after a reactivation)
-  useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
-  // drop selections for tenants that no longer exist
-  useEffect(() => { setSelected((s) => { const ids = new Set(tenants.map((t) => t.id)); const n = new Set([...s].filter((i) => ids.has(i))); return n.size === s.size ? s : n; }); }, [tenants]);
-
-  const monthPrefix = DEMO_TODAY.slice(0, 7);
-  const kpis = [
-    { key: 'total', t: 'Total Suspended', v: tenants.length, c: 'red', I: Ban },
-    { key: 'month', t: 'Suspended This Month', v: tenants.filter((x) => x.suspendedDate.startsWith(monthPrefix)).length, c: 'orange', I: AlertTriangle },
-    { key: 'pending', t: 'Pending Review', v: tenants.filter((x) => x.review === REVIEW.PENDING).length, c: 'blue', I: FileText },
-    { key: 'eligible', t: 'Eligible for Reactivation', v: tenants.filter((x) => x.review === REVIEW.ELIGIBLE).length, c: 'purple', I: ShieldCheck },
-    { key: 'critical', t: 'Critical Suspensions', v: tenants.filter((x) => x.review === REVIEW.CRITICAL).length, c: 'green', I: ShieldAlert },
-  ];
-  const kpiPanelTitle = kpis.find((k) => k.key === kpiPanel)?.t || '';
-  const kpiRows = useMemo(() => {
-    if (!kpiPanel) return [];
-    if (kpiPanel === 'month') return tenants.filter((t) => t.suspendedDate.startsWith(monthPrefix));
-    if (kpiPanel === 'pending') return tenants.filter((t) => t.review === REVIEW.PENDING);
-    if (kpiPanel === 'eligible') return tenants.filter((t) => t.review === REVIEW.ELIGIBLE);
-    if (kpiPanel === 'critical') return tenants.filter((t) => t.review === REVIEW.CRITICAL);
-    return tenants;
-  }, [tenants, kpiPanel, monthPrefix]);
-  const byReason = REASONS.map((n) => ({ name: n, value: tenants.filter((t) => t.reason === n).length, color: REASON_COLORS[n] }));
-  const byPlan = PLAN_LIST.map((n) => ({ name: n, value: tenants.filter((t) => t.plan === n).length, color: PLAN_COLORS[n] }));
-  const pending = tenants.filter((t) => t.review === REVIEW.PENDING).sort((a, b) => b.suspendedDate.localeCompare(a.suspendedDate));
-
-  const reset = (fn) => (v) => { fn(v); setPage(1); };
-  function clear() { setQ(''); setReason('All'); setPlan('All'); setStatus('All'); setDateF({ mode: 'all', from: '', to: '' }); setPage(1); }
-  const sortBy = (k) => { setSort((s) => ({ k, dir: s.k === k ? -s.dir : 1 })); setPage(1); };
-  const toggleOne = (id) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const toggleAll = () => setSelected((s) => { const n = new Set(s); shown.forEach((t) => (allShownSelected ? n.delete(t.id) : n.add(t.id))); return n; });
-  const pickReason = (name) => { setReason((r) => (r === name ? 'All' : name)); setPage(1); };
-  const pickPlan = (name) => { setPlan((p) => (p === name ? 'All' : name)); setPage(1); }
-  const viewAllPending = () => {
-  setKpiPanel('pending');
-};
-  const exportCsv = (rows, label) => {
-    if (!rows.length) return toast('Nothing to export — no tenants match the current filters.');
-    const head = ['Tenant ID', 'Company Name', 'Subscription Plan', 'Company Admin', 'Email', 'Users', 'Suspension Reason', 'Suspended Date', 'Suspended By', 'Review Status'];
-    const lines = rows.map((t) => [t.code, t.name, t.plan, t.admin, t.email, t.users, t.reason, t.suspendedDate, t.suspendedBy, t.review].map(csvCell).join(','));
-    const url = URL.createObjectURL(new Blob([[head.map(csvCell).join(','), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' }));
-    const a = document.createElement('a'); a.href = url; a.download = 'megsi-suspended-tenants.csv'; a.click(); URL.revokeObjectURL(url);
-    toast(`Exported ${rows.length} ${label} to megsi-suspended-tenants.csv (demo data).`);
-  };
-
-  const onAction = (a, t) => {
-    if (a === 'view') setDrawerId(t.id);
-    else if (a === 'review') setModal({ type: 'review', tenant: t });
-    else if (a === 'reactivate') t.review === REVIEW.ELIGIBLE ? setModal({ type: 'reactivate', tenants: [t] }) : toast(`${t.name} must be approved in a review before it can be reactivated.`);
-    else if (a === 'contact') window.location.href = `mailto:${t.email}?subject=${encodeURIComponent(`MEGSI account suspension – ${t.name}`)}`;
-  };
-  const saveReview = (t, status, note) => { reviewTenant(t, status, note); setModal(null); toast(`${t.name}: review saved as "${status}" (demo — not sent to a server).`); };
-  const confirmReactivate = (list, note) => {
-    reactivate(list, note); setModal(null); setDrawerId(null);
-    toast(list.length === 1 ? `${list[0].name} reactivated (demo — no backend request was made).` : `${list.length} tenants reactivated (demo — no backend request was made).`);
-  };
-
-  const dateLabel = dateF.mode === 'custom' ? `${dateF.from ? fmtDate(dateF.from) : '…'} – ${dateF.to ? fmtDate(dateF.to) : '…'}` : DATE_MODES[dateF.mode];
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const evIcon = { suspended: 'red', flagged: 'orange', reviewed: 'blue', reactivated: 'green' }; // badge tone; rows use ev-<tone> (global .red/.blue classes paint backgrounds)
-  const evLabel = { suspended: 'Suspended', flagged: 'Critical', reviewed: 'Reviewed', reactivated: 'Active' };
-
-  return (
-    <div className="dash st">
-      <div className="title-row">
-        <div><h1>Suspended Tenants</h1><p>Review suspended companies, investigate suspension reasons, and manage tenant account reinstatement.</p></div>
-        <div className="st-actions">
-          <Menu cls="date-pop" button={<span className={`st-btn ${dateF.mode !== 'all' ? 'active' : ''}`}><Calendar size={16} />{dateF.mode === 'all' ? 'Date Filter' : dateLabel}</span>}>
-            {(close) => (<>
-              {Object.entries(DATE_MODES).filter(([k]) => k !== 'custom').map(([k, l]) => (
-                <div key={k} className={`item ${dateF.mode === k ? 'sel' : ''}`} onClick={() => { setDateF({ mode: k, from: '', to: '' }); setPage(1); close(); }}>{l}</div>))}
-              <CustomRange value={dateF} onApply={(r) => { setDateF({ mode: 'custom', ...r }); setPage(1); close(); }} />
-            </>)}
-          </Menu>
-          <button className="st-btn" onClick={() => exportCsv(filtered, 'tenants')}><Download size={16} />Export Report</button>
-          <button className="st-btn" onClick={() => setModal({ type: 'policies' })}><Settings size={16} />Manage Policies</button>
-        </div>
-      </div>
-
-      <div className="st-kpis">{kpis.map((k) => (
-        <button
-          key={k.t}
-          type="button"
-          className={`card st-kpi ${kpiPanel === k.key ? 'is-open' : ''}`}
-          onClick={() => setKpiPanel((current) => current === k.key ? null : k.key)}
-          aria-label={`Show details for ${k.t}: ${k.v}`}
-          aria-expanded={kpiPanel === k.key}
-        >
-          <span className={`st-kpi-ic ${k.c}`}><k.I size={24} /></span>
-          <span className="st-kpi-t"><small>{k.t}</small><b>{k.v}</b></span>
-        </button>))}
-      </div>
-
-      {kpiPanel && (
-        <div className="st-kpi-panel-backdrop" onMouseDown={(e) => {
-          if (e.target === e.currentTarget) setKpiPanel(null);
-        }}>
-          <aside className="st-kpi-panel" role="dialog" aria-modal="true" aria-label={`${kpiPanelTitle} details`}>
-            <div className="st-kpi-panel-head">
-              <div>
-                <span className="st-kpi-panel-eyebrow">SUSPENDED TENANTS</span>
-                <h2>{kpiPanelTitle}</h2>
-                <p>{kpiRows.length} {kpiRows.length === 1 ? 'tenant' : 'tenants'} found</p>
-              </div>
-              <button type="button" className="st-kpi-panel-close" onClick={() => setKpiPanel(null)} aria-label="Close details panel"><X size={19} /></button>
-            </div>
-
-            <div className="st-kpi-panel-list">
-              {kpiRows.length === 0 ? (
-                <div className="st-kpi-panel-empty">
-                  <Users size={28} />
-                  <b>No tenants to show</b>
-                  <span>There are no tenants in this category.</span>
-                </div>
-              ) : kpiRows.map((t) => (
-                <button
-                  type="button"
-                  className="st-kpi-tenant"
-                  key={t.id}
-                  onClick={() => { setKpiPanel(null); setDrawerId(t.id); }}
-                >
-                  <Avatar name={t.name} />
-                  <span className="st-kpi-tenant-main">
-                    <b>{t.name}</b>
-                    <small>{t.email}</small>
-                    <span>{t.reason} · {fmtDate(t.suspendedDate)}</span>
-                  </span>
-                  <span className="st-kpi-tenant-status">{t.review}</span>
-                  <ChevronRight size={16} className="st-kpi-tenant-chevron" />
-                </button>
-              ))}
-            </div>
-            <div className="st-kpi-panel-foot">
-              <span>Showing details only — the table filters are unchanged.</span>
-              <button type="button" className="st-btn sm" onClick={() => setKpiPanel(null)}>Close</button>
-            </div>
-          </aside>
-        </div>
-      )}
-
-      <div className="st-charts">
-        <TrendChart reactivatedNow={reactivated} />
-        <BreakdownDonut title="Suspension Reasons" items={byReason} selected={reason === 'All' ? null : reason} onSelect={pickReason} />
-        <BreakdownDonut title="Suspensions by Plan" items={byPlan} selected={plan === 'All' ? null : plan} onSelect={pickPlan} />
-      </div>
-
-      <section className="card st-card" ref={tableRef}>
-        <div className="st-toolbar">
-          <span className="st-ttl"><span className="ic-sq"><Users size={16} /></span><h3>Suspended Tenant Accounts</h3></span>
-          <div className="grow" />
-          <div className="tsearch st-search"><Search size={15} /><input placeholder="Company" value={q} onChange={(e) => reset(setQ)(e.target.value)} aria-label="Search suspended tenants" /></div>
-          {[['Reason', reason, REASONS, setReason], ['Plan', plan, PLAN_LIST, setPlan]].map(([label, val, opts, set]) => (
-            <span className={`st-select ${label === "Status" ? "w-lg" : ""}`} key={label}><select value={val} onChange={(e) => reset(set)(e.target.value)} aria-label={`Filter by ${label.toLowerCase()}`}><option value="All">{label}</option>{opts.map((o) => <option key={o}>{o}</option>)}</select><ChevronDown size={13} /></span>))}
-          <span className="st-select"><select value={dateF.mode} onChange={(e) => { setDateF({ mode: e.target.value, from: '', to: '' }); setPage(1); }} aria-label="Filter by date">
-            <option value="all">Date</option>{Object.entries(DATE_MODES).filter(([k]) => k !== 'all' && k !== 'custom').map(([k, l]) => <option key={k} value={k}>{l}</option>)}{dateF.mode === 'custom' && <option value="custom">Custom Range</option>}</select><ChevronDown size={13} /></span>
-          {[['Status', status, REVIEW_LIST, setStatus]].map(([label, val, opts, set]) => (
-            <span className={`st-select ${label === "Status" ? "w-lg" : ""}`} key={label}><select value={val} onChange={(e) => reset(set)(e.target.value)} aria-label={`Filter by ${label.toLowerCase()}`}><option value="All">{label}</option>{opts.map((o) => <option key={o}>{o}</option>)}</select><ChevronDown size={13} /></span>))}
-          <button className="st-btn sm" onClick={clear} disabled={!filtersOn}>Reset Filters</button>
-        </div>
-
-        {selected.size > 0 && (
-          <div className="st-bulk" role="status">
-            <b>{selected.size} selected</b>
-            <button className="st-btn sm" disabled={!selEligible.length} title={selEligible.length ? '' : 'None of the selected tenants are eligible'} onClick={() => setModal({ type: 'reactivate', tenants: selEligible })}><RotateCcw size={14} />Reactivate eligible ({selEligible.length})</button>
-            <button className="st-btn sm" onClick={() => exportCsv(selTenants, 'selected tenants')}><Download size={14} />Export selected</button>
-            <button className="st-btn sm" onClick={() => setSelected(new Set())}><X size={14} />Clear selection</button>
-          </div>)}
-
-        <div className="tscroll st-scroll">
-          <table className="tbl st-tbl">
-            <thead><tr>
-              <th className="chk"><input type="checkbox" checked={allShownSelected} onChange={toggleAll} aria-label="Select all rows on this page" disabled={!shown.length} /></th>
-              <th>#</th>
-              {COLS.map(([k, l]) => <th key={k} className="sortable" onClick={() => sortBy(k)} aria-sort={sort.k === k ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}>{l}{sort.k === k && (sort.dir === 1 ? <ArrowUp size={11} /> : <ArrowDown size={11} />)}</th>)}
-              <th className="r">Actions</th>
-            </tr></thead>
-            <tbody>
-              {shown.map((t, i) => (
-                <tr key={t.id} className={selected.has(t.id) ? 'sel' : ''}>
-                  <td className="chk"><input type="checkbox" checked={selected.has(t.id)} onChange={() => toggleOne(t.id)} aria-label={`Select ${t.name}`} /></td>
-                  <td>{start + i + 1}</td>
-                  <td><div className="name"><Avatar name={t.name} /><button className="st-link" onClick={() => setDrawerId(t.id)}>{t.name}</button></div></td>
-                  <td><PlanBadge v={t.plan} /></td>
-                  <td>{t.admin}</td>
-                  <td className="mail">{t.email}</td>
-                  <td>{t.users}</td>
-                  <td>{t.reason}</td>
-                  <td>{fmtDate(t.suspendedDate)}</td>
-                  <td>{t.suspendedBy}</td>
-                  <td><ReviewBadge v={t.review} /></td>
-                  <td className="r"><RowMenu tenant={t} onAction={onAction} /></td>
-                </tr>))}
-              {shown.length === 0 && <tr><td colSpan={COLS.length + 3} className="empty">{tenants.length === 0 ? 'No suspended tenants — every tenant is active.' : <>No suspended tenants match your filters. <button className="st-link" onClick={clear}>Reset filters</button></>}</td></tr>}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="st-foot">
-          <span className="st-count">{filtered.length === 0 ? 'No tenants found' : `Showing ${start + 1}–${start + shown.length} of ${filtered.length} tenants`}</span>
-          <div className="st-pager">
-            <button className="pg" disabled={cur === 1} onClick={() => setPage(cur - 1)} aria-label="Previous page">«</button>
-            {pages.map((p) => <button key={p} className={`pg ${p === cur ? 'on' : ''}`} onClick={() => setPage(p)} aria-current={p === cur ? 'page' : undefined}>{p}</button>)}
-            <button className="pg" disabled={cur === totalPages} onClick={() => setPage(cur + 1)} aria-label="Next page">»</button>
+  const pending = tenants.filter(tenant => tenant.status === 'Pending Review' || tenant.status === 'Under Review').slice(0, 7);
+  return <div className="st">
+    <div className="st-page-heading"><div><h1>Suspended Tenants</h1><p>Review suspended companies, investigate suspension reasons, and manage tenant account reinstatement.</p></div></div>
+    <SummaryCards/>
+    <SuspendedCharts/>
+    <div className="st-content-grid">
+      <section className="st-panel st-table-panel">
+        <header className="st-table-heading"><div className="st-panel-heading"><span className="st-panel-icon"><Building2 size={16}/></span><h3>Suspended Tenant Accounts</h3><span className="st-result-count">{filtered.length} records</span></div>
+          <div className="st-table-tools">
+            <label className="st-search"><Search size={15}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by company..." aria-label="Search by company"/></label>
+            <select value={reason} onChange={event => setReason(event.target.value)} aria-label="Filter by reason"><option>All Reasons</option>{REASONS.map(value => <option key={value}>{value}</option>)}</select>
+            <select value={plan} onChange={event => setPlan(event.target.value)} aria-label="Filter by plan"><option>All Plans</option>{PLANS.map(value => <option key={value}>{value}</option>)}</select>
+            <select value={status} onChange={event => setStatus(event.target.value)} aria-label="Filter by review status"><option>All Statuses</option>{STATUSES.map(value => <option key={value}>{value}</option>)}</select>
+            <button className="st-btn st-btn-clear" onClick={clearFilters} disabled={!filtersActive}><X size={13}/> Clear Filters</button>
+            <button className="st-btn st-btn-light st-export" onClick={exportCsv}><Download size={14}/> Export</button>
           </div>
-          <span className="st-count-sp" aria-hidden="true" />
-        </div>
+        </header>
+        <div className="st-table-scroll" ref={scrollBox}><table className="st-table"><thead><tr><th>#</th><th>Company Name</th><th>Subscription Plan</th><th>Suspension Reason</th><th>Suspended Date ↓</th><th>Review Status</th><th>Actions</th></tr></thead><tbody>
+          {visible.map((tenant, index) => <tr key={tenant.id}><td>{index + 1}</td><td><b className="st-company-name">{tenant.name}</b><small>{tenant.id}</small></td><td><span className={`st-plan ${tenant.plan.toLowerCase()}`}>{tenant.plan}</span></td><td>{tenant.reason}</td><td>{fmtDate(tenant.suspendedDate)}</td><td><span className={`st-status ${statusClass(tenant.status)}`}>{tenant.status}</span></td><td><button className="st-view-btn" onClick={() => setSelected(tenant)}>View Details</button></td></tr>)}
+          {visible.length === 0 && <tr><td colSpan="7" className="st-empty">No suspended tenants match your search or filters.</td></tr>}
+        </tbody></table>{visibleCount < filtered.length && <div className="st-loading" ref={sentinel}><span className="st-spinner"/> Loading 12 more tenants…</div>}{visibleCount >= filtered.length && filtered.length > 0 && <div className="st-loading st-end">Showing all {filtered.length} matching tenants</div>}</div>
+        <footer className="st-table-footer">Showing {visible.length} of {filtered.length} tenants</footer>
       </section>
-
-      <div className="st-bottom">
-        <section className="card st-panel">
-          <header className="card-h"><span className="ic-sq"><Clock size={16} /></span><h3>Recent Suspension Activity</h3></header>
-          <ul className="st-timeline">
-            {activity.map((a) => (
-              <li key={a.id} className={`ev-${evIcon[a.kind]}`}>
-                <i className="st-dot" />
-                <div className="st-ev"><b>{a.company}</b><small>{a.text}</small></div>
-                <span className="st-time">{fmtDateTime(a.at.replace(' ', 'T')).replace(/ (\d\d:\d\d)$/, ' · $1')}</span>
-                <span className={`st-badge ${evIcon[a.kind]}`}>{evLabel[a.kind]}</span>
-              </li>))}
-          </ul>
-        </section>
-        <section className="card st-panel">
-          <header className="card-h"><span className="ic-sq"><FileText size={16} /></span><h3>Pending Reviews</h3><div className="grow" /><button className="st-viewall" onClick={viewAllPending}>View All</button></header>
-          <ul className="st-pending">
-            {pending.length === 0 && <li className="empty">No reviews pending.</li>}
-            {pending.map((t) => (
-              <li key={t.id}><Avatar name={t.name} /><span className="st-pt"><b>{t.name}</b><small>{t.reason} · {fmtDate(t.suspendedDate)}</small></span>
-                <button className="st-btn sm" onClick={() => setModal({ type: 'review', tenant: t })}>Review</button></li>))}
-          </ul>
-        </section>
-      </div>
-
-      <TenantDrawer tenant={drawer} onClose={() => setDrawerId(null)} onReview={(t) => setModal({ type: 'review', tenant: t })} onReactivate={(list) => setModal({ type: 'reactivate', tenants: list })} />
-      {modal?.type === 'review' && <ReviewModal tenant={modal.tenant} onClose={() => setModal(null)} onSave={saveReview} />}
-      {modal?.type === 'reactivate' && <ReactivateModal tenants={modal.tenants} onClose={() => setModal(null)} onConfirm={confirmReactivate} />}
-      {modal?.type === 'policies' && <PoliciesModal policies={policies} onClose={() => setModal(null)} onSave={(p) => { setPolicies(p); setModal(null); toast('Suspension policies updated (demo — not enforced by a server).'); }} />}
+      <section className="st-panel st-pending-panel"><header className="st-panel-heading"><span className="st-panel-icon"><ClipboardList size={16}/></span><h3>Top Pending Reviews</h3><span className="st-grow"/><span className="st-pending-count">{pending.length}</span></header>
+        <p className="st-pending-intro">Accounts that need administrator attention.</p>
+        <div className="st-review-list">{pending.map(tenant => <div className="st-review-row" key={tenant.id}><span className="st-review-dot"/><div className="st-review-copy"><b>{tenant.name}</b><small>{tenant.reason} · {tenant.suspendedDate.slice(0, 10)}</small></div><button onClick={() => setSelected(tenant)}>Review</button></div>)}</div>
+        {pending.length === 0 && <div className="st-empty st-pending-empty">No pending reviews.</div>}
+        <div className="st-pending-foot">Select Review to open the full tenant profile.</div>
+      </section>
     </div>
-  );
-}
-
-function CustomRange({ value, onApply }) {
-  const [s, setS] = useState(value.from); const [e, setE] = useState(value.to); const [err, setErr] = useState('');
-  return (
-    <div className="custom"><b>Custom range</b>
-      <label>From<input type="date" value={s} onChange={(ev) => setS(ev.target.value)} /></label>
-      <label>To<input type="date" value={e} onChange={(ev) => setE(ev.target.value)} /></label>
-      {err && <span className="err">{err}</span>}
-      <button className="btn-primary sm" onClick={() => { if (!s && !e) return setErr('Choose a start or end date.'); if (s && e && s > e) return setErr('Start date must be before the end date.'); onApply({ from: s, to: e }); }}>Apply</button>
-    </div>
-  );
+    {reactivated.length > 0 && <p className="st-demo-note"><CheckCircle2 size={13}/> Recently reactivated in this demo: {reactivated.join(', ')}</p>}
+  </div>;
 }
