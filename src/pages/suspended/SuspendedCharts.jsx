@@ -37,7 +37,7 @@ const icons = {
 
 // Keep the same period object shape used by the main dashboard PeriodControl.
 const initialPeriod = () => ({
-  mode: 'week',
+  mode: 'today',
   month: CURRENT.getMonth(),
   year: CURRENT.getFullYear(),
   weekOffset: 0,
@@ -68,7 +68,7 @@ export function SummaryCards() {
 function periodKey(period) {
   if (period.mode === 'today') return 'Today';
   if (period.mode === 'week') {
-    return period.weekOffset === 0 ? 'This Week' : 'Previous Week';
+    return period.weekOffset === 0 ? 'This Week' : 'Prev';
   }
   if (period.mode === 'month') return 'This Month';
   return 'This Year';
@@ -84,7 +84,7 @@ function periodCaption(period) {
   }
   if (period.mode === 'week') {
     if (period.weekOffset === 0) return 'Current Week';
-    if (period.weekOffset === -1) return 'Previous Week';
+    if (period.weekOffset === -1) return 'Prev';
     return `${Math.abs(period.weekOffset)} Weeks Ago`;
   }
   if (period.mode === 'month') {
@@ -226,7 +226,7 @@ export default function SuspendedCharts() {
   return (
     <div className="st-chart-grid">
       <SharedPeriodHeader
-        title="Suspension Trends"
+        title="Trends"
         icon={<BarChart3 size={16} />}
         period={trendPeriod}
         setPeriod={setTrendPeriod}
@@ -267,7 +267,7 @@ export default function SuspendedCharts() {
       </SharedPeriodHeader>
 
       <DonutChartPanel
-        title="Suspension Reasons"
+        title="Reasons"
         period={reasonPeriod}
         setPeriod={setReasonPeriod}
         labels={REASONS}
@@ -276,7 +276,7 @@ export default function SuspendedCharts() {
       />
 
       <DonutChartPanel
-        title="Suspensions by Plan"
+        title="Plans"
         period={planPeriod}
         setPeriod={setPlanPeriod}
         labels={['Starter', 'Professional', 'Business', 'Enterprise']}

@@ -174,7 +174,7 @@ export function PeriodControl({
             className="week-nav-btn"
             onClick={() => moveWeek(-1)}
           >
-            ← Previous Week
+            ← Prev
           </button>
 
           <button
@@ -183,7 +183,7 @@ export function PeriodControl({
             onClick={() => moveWeek(1)}
             disabled={weekOffset >= 0}
           >
-            Next Week →
+            Next →
           </button>
         </>
       )}

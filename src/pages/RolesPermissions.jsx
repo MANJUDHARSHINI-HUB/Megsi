@@ -1,52 +1,102 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { PeriodControl } from '../components/Charts.jsx';
 import { createPortal } from 'react-dom';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import {
   BarChart3, Building2, Check, ChevronDown, Copy, CreditCard, Eye, FileText, KeyRound, Lock, MoreHorizontal, Pencil, Plus,
   Power, Settings, Shield, ShieldCheck, Trash2, UserPlus, Users, X,
 } from 'lucide-react';
-import DateRangeMenu from '../components/DateRangeMenu.jsx';
 import { Avatar } from '../components/Common.jsx';
+import RoleDetails from './RoleDetails.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import './roles-permissions.css';
 
+const getLocalISO = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const addUsageDays = (date, days) => {
+  const result = new Date(`${date}T12:00:00`);
+  result.setDate(result.getDate() + days);
+  return getLocalISO(result);
+};
+
+const usagePeriodBounds = (period) => {
+  const today = getLocalISO(new Date());
+
+  if (period.mode === 'today') {
+    return { start: today, end: today };
+  }
+
+  if (period.mode === 'week') {
+    const offset = period.weekOffset ?? 0;
+    return {
+      start: addUsageDays(today, -6 + offset * 7),
+      end: addUsageDays(today, offset * 7),
+    };
+  }
+
+  if (period.mode === 'month') {
+    const start = new Date(period.year, period.month, 1);
+    const end = new Date(period.year, period.month + 1, 0);
+
+    return {
+      start: getLocalISO(start),
+      end: getLocalISO(end),
+    };
+  }
+
+  return {
+    start: `${period.year}-01-01`,
+    end: `${period.year}-12-31`,
+  };
+};
 /* =====================================================================
    Demo data (frontend only - nothing here is enforced by a server)
    ===================================================================== */
 const MODULES = [
-  { id: 'users', name: 'User Management', Icon: Users },
-  { id: 'companies', name: 'Company Management', Icon: Building2 },
-  { id: 'billing', name: 'Billing & Subscription', Icon: CreditCard },
-  { id: 'guards', name: 'Guard Management', Icon: Shield },
-  { id: 'access', name: 'Access Control', Icon: KeyRound },
-  { id: 'reports', name: 'Reports & Analytics', Icon: BarChart3 },
+  { id: 'dashboard', name: 'Dashboard', Icon: BarChart3 },
+  { id: 'companies', name: 'Companies', Icon: Building2 },
+  { id: 'plans', name: 'Subscription Plans', Icon: CreditCard },
+  { id: 'billing', name: 'Billing', Icon: CreditCard },
+  { id: 'usage', name: 'Usage & Limits', Icon: BarChart3 },
+  { id: 'onboarding', name: 'Onboarding', Icon: UserPlus },
+  { id: 'suspended', name: 'Suspended Tenants', Icon: Lock },
+  { id: 'pusers', name: 'Platform Users', Icon: Users },
+  { id: 'cadmins', name: 'Customer Admins', Icon: Users },
+  { id: 'roles', name: 'Roles & Permissions', Icon: ShieldCheck },
+  { id: 'access', name: 'Access Logs', Icon: KeyRound },
+  { id: 'support-access', name: 'Support Access', Icon: Shield },
   { id: 'settings', name: 'System Settings', Icon: Settings },
+  { id: 'integrations', name: 'Integrations', Icon: Lock },
+  { id: 'email', name: 'Email & SMS', Icon: FileText },
+  { id: 'security', name: 'Security & Compliance', Icon: Shield },
   { id: 'audit', name: 'Audit Logs', Icon: FileText },
+  { id: 'backup', name: 'Data Backup', Icon: Copy },
+  { id: 'monitoring', name: 'System Monitoring', Icon: BarChart3 },
+  { id: 'tickets', name: 'Support Tickets', Icon: FileText },
+  { id: 'announcements', name: 'Announcements', Icon: FileText },
+  { id: 'features', name: 'Feature Requests', Icon: FileText },
 ];
 const ACTIONS = [['view', 'View'], ['create', 'Create'], ['edit', 'Edit'], ['delete', 'Delete'], ['approve', 'Approve'], ['manage', 'Manage']];
-const TOTAL_PERMISSIONS = MODULES.length * ACTIONS.length; // 8 modules x 6 actions = 48
+const TOTAL_PERMISSIONS = MODULES.length * ACTIONS.length; // 22 modules x 6 actions = 132
 const PALETTE = ['#0758F9', '#079447', '#F59E0B', '#7909E8', '#E91E8C', '#5B6B8C', '#6A8DFF', '#101B4D', '#E8172D', '#0EA5A4'];
 const ALL = Object.fromEntries(MODULES.map((m) => [m.id, ACTIONS.map(([a]) => a)]));
 const perms = (spec) => Object.fromEntries(Object.entries(spec).map(([k, v]) => [k, v.split(',')]));
 
+const ACCESS_ALL = MODULES.map((module) => module.id);
+const accessFor = (moduleIds) => Object.fromEntries(moduleIds.map((id) => [id, ['view', 'create', 'edit', 'delete', 'approve', 'manage']]));
 const SEED_ROLES = [
-  { id: 'super', name: 'Super Admin', description: 'Full platform access with all permissions', users: 6, status: 'Active', custom: false, color: '#101B4D', permissions: ALL },
-  { id: 'tenant', name: 'Tenant Admin', description: 'Manages tenant settings and users', users: 24, status: 'Active', custom: false, color: '#F59E0B',
-    permissions: perms({ users: 'view,create,edit,delete,approve', companies: 'view,create,edit,approve', billing: 'view,edit,manage', guards: 'view,create,edit,delete,approve', access: 'view,create,edit,manage', reports: 'view,create,manage', settings: 'view,edit', audit: 'view' }) },
-  { id: 'guard', name: 'Security Guard', description: 'Access to guard operations and reports', users: 186, status: 'Active', custom: false, color: '#0758F9',
-    permissions: perms({ users: 'view', companies: 'view', billing: 'view', guards: 'view,create,edit', access: 'view', reports: 'view,create', settings: 'view', audit: 'view' }) },
-  { id: 'cadmin', name: 'Customer Admin', description: 'Manages company data and billing', users: 31, status: 'Active', custom: false, color: '#079447',
-    permissions: perms({ users: 'view,create,edit', companies: 'view,edit', billing: 'view,manage', guards: 'view,create,edit,delete', access: 'view', reports: 'view', settings: 'view,edit', audit: 'view' }) },
-  { id: 'support', name: 'Support Agent', description: 'Handles customer support tickets', users: 28, status: 'Active', custom: false, color: '#E91E8C',
-    permissions: perms({ users: 'view,edit', companies: 'view', guards: 'view', reports: 'view' }) },
-  { id: 'auditor', name: 'Auditor', description: 'Read-only access for audit and compliance', users: 14, status: 'Active', custom: true, color: '#6A8DFF',
-    permissions: perms({ users: 'view', companies: 'view', billing: 'view', guards: 'view', access: 'view', reports: 'view', audit: 'view' }) },
-  { id: 'analyst', name: 'Analyst', description: 'View reports and analytics', users: 20, status: 'Active', custom: true, color: '#5B6B8C',
-    permissions: perms({ users: 'view', companies: 'view', reports: 'view,create,manage' }) },
-  { id: 'manager', name: 'Manager', description: 'Operational management and reporting', users: 15, status: 'Active', custom: true, color: '#7909E8',
-    permissions: perms({ users: 'view,create,edit,approve', companies: 'view', guards: 'view,create,edit,approve', reports: 'view,create' }) },
+  { id: 'super', name: 'SUPER ADMIN', description: 'Full access to every MEGSI platform module and permission.', users: 1, status: 'Active', custom: false, color: '#101B4D', permissions: accessFor(ACCESS_ALL) },
+  { id: 'admin', name: 'ADMIN', description: 'Platform administration and company management.', users: 6, status: 'Active', custom: false, color: '#0758F9', permissions: accessFor(ACCESS_ALL) },
+  { id: 'support', name: 'SUPPORT AGENT', description: 'Access to Support Tickets, Announcements and Feature Requests only.', users: 8, status: 'Active', custom: false, color: '#E91E8C', permissions: accessFor(['tickets', 'announcements', 'features']) },
+  { id: 'auditor', name: 'AUDITOR', description: 'Read-only access to Billing and Audit Logs only.', users: 3, status: 'Active', custom: false, color: '#6A8DFF', permissions: accessFor(['billing', 'audit']) },
+  { id: 'customer-care', name: 'CUSTOMER CARE', description: 'Access to Email & SMS only.', users: 5, status: 'Active', custom: false, color: '#F59E0B', permissions: accessFor(['email']) },
 ];
-const SYSTEM_IDS = ['super', 'tenant', 'guard', 'cadmin', 'support']; // cannot be deleted
+const SYSTEM_IDS = ['super', 'admin', 'support', 'auditor', 'customer-care'];
 
 const SEED_ASSIGNMENTS = [
   { id: 's1', user: 'Rohit Sharma', role: 'Security Guard', company: 'SafeZone Services', at: '2026-10-20 14:32' },
@@ -56,6 +106,10 @@ const SEED_ASSIGNMENTS = [
   { id: 's5', user: 'Arjun Mehta', role: 'Analyst', company: 'SwiftGuard Services', at: '2026-10-16 12:05' },
   { id: 's6', user: 'Priya Shah', role: 'Auditor', company: 'City Watch Ltd', at: '2026-09-28 10:10' },
   { id: 's7', user: 'Tom Hughes', role: 'Tenant Admin', company: 'Shield Security Group', at: '2026-09-21 15:45' },
+    { id: 'usage-nov-1', user: 'Meena Kumar', role: 'Security Guard', company: 'SafeZone Services', at: '2026-11-07 09:30' },
+  { id: 'usage-nov-2', user: 'Rahul Das', role: 'Manager', company: 'Metro Security Group', at: '2026-11-05 11:15' },
+  { id: 'usage-nov-3', user: 'Divya Nair', role: 'Analyst', company: 'Guardian Force Ltd', at: '2026-11-02 14:20' },
+  { id: 'usage-oct-1', user: 'Arun Raj', role: 'Customer Admin', company: 'Elite Security Solutions', at: '2026-10-28 10:45' },
 ];
 const SEED_ACTIVITY = [
   { id: 'l1', action: 'Role assigned', user: 'David Miller', at: '2026-10-20 14:32' },
@@ -75,12 +129,27 @@ const SEED_REQUESTS = [
 ];
 const COMPANY_NAMES = ['SecureGuard UK Ltd', 'Metro Security Group', 'SafeZone Services', 'Guardian Force Ltd', 'Elite Security Solutions', 'SwiftGuard Services', 'City Watch Ltd', 'Shield Security Group'];
 const ACTOR = 'David Miller';
-const STORE_KEY = 'megsi.roles.v1';
+  const STORE_KEY = 'megsi.roles.v1';
 const SEED = { roles: SEED_ROLES, assignments: SEED_ASSIGNMENTS, activity: SEED_ACTIVITY, requests: SEED_REQUESTS };
 
 /* ---------- helpers ---------- */
 function loadState() {
-  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && Array.isArray(s.roles)) return s; } catch { /* storage unavailable or corrupt: use seed */ }
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (saved) {
+      const savedAssignments = Array.isArray(saved.assignments) ? saved.assignments : [];
+      const existingIds = new Set(savedAssignments.map((item) => item.id));
+      const newAssignments = SEED_ASSIGNMENTS.filter((item) => !existingIds.has(item.id));
+      return {
+        ...SEED,
+        ...saved,
+        roles: SEED_ROLES,
+        assignments: [...savedAssignments, ...newAssignments],
+        activity: Array.isArray(saved.activity) ? saved.activity : SEED_ACTIVITY,
+        requests: Array.isArray(saved.requests) ? saved.requests : SEED_REQUESTS,
+      };
+    }
+  } catch { /* storage unavailable or corrupt: use seed */ }
   return SEED;
 }
 const stamp = () => { const d = new Date(); const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
@@ -101,7 +170,12 @@ function Modal({ title, onClose, children, wide }) {
 }
 const Card = ({ icon, title, right, children, cls = '', cardRef }) => (
   <section className={`card rp-card ${cls}`} ref={cardRef}>
-    <header className="card-h"><span className="ic-sq">{icon}</span><h3>{title}</h3><div className="grow" />{right}</header>
+    <header className="card-h">
+      <span className="ic-sq">{icon}</span>
+      <h3>{title}</h3>
+      <div className="grow" />
+      {right}
+    </header>
     {children}
   </section>
 );
@@ -197,30 +271,6 @@ function RoleForm({ role, roles, onSave, onClose }) {
         <div className="rp-modal-f"><button type="button" className="rp-btn big" onClick={onClose}>Cancel</button><button type="submit" className="rp-btn primary big">{role?.id ? 'Save Changes' : 'Create Role'}</button></div>
       </form>
     </Modal>
-  );
-}
-
-/* ---------- Role details drawer ---------- */
-function RoleDrawer({ role, onClose, onEdit }) {
-  useEffect(() => { const k = (e) => e.key === 'Escape' && onClose(); document.addEventListener('keydown', k); return () => document.removeEventListener('keydown', k); }, [onClose]);
-  return (
-    <>
-      <div className="rp-drawer-bd" onClick={onClose} />
-      <aside className="rp-drawer" role="dialog" aria-modal="true" aria-label={`${role.name} details`}>
-        <div className="rp-drawer-h"><div className="rp-drawer-t"><Avatar name={role.name} /><div><h3>{role.name}</h3><StatusBadge v={role.status} /></div></div><button className="icon-btn" onClick={onClose} aria-label="Close details"><X size={18} /></button></div>
-        <div className="rp-drawer-b">
-          <p className="rp-desc">{role.description}</p>
-          <div className="kv"><span>Assigned users</span><b>{role.users}</b></div>
-          <div className="kv"><span>Type</span><b>{SYSTEM_IDS.includes(role.id) ? 'Built-in' : role.custom ? 'Custom' : 'Built-in'}</b></div>
-          <div className="kv"><span>Permissions granted</span><b>{countPerms(role.permissions)} of {TOTAL_PERMISSIONS}</b></div>
-          <h4>Permissions by module</h4>
-          {MODULES.map((m) => { const a = role.permissions[m.id] || []; return (
-            <div className="rp-pm" key={m.id}><span className="rp-mod"><m.Icon size={14} />{m.name}</span>
-              <span className="rp-chips">{a.length ? ACTIONS.filter(([k]) => a.includes(k)).map(([k, l]) => <em key={k}>{l}</em>) : <em className="none">No access</em>}</span></div>); })}
-        </div>
-        <div className="rp-drawer-f"><button className="rp-btn primary" onClick={() => onEdit(role)}><Pencil size={15} />Edit Role &amp; Permissions</button></div>
-      </aside>
-    </>
   );
 }
 
@@ -370,23 +420,33 @@ export default function RolesPermissions({ range, setRange, toast }) {
   const { fmtDate } = useI18n();
   const fmt = (s) => `${fmtDate(s.slice(0, 10))}, ${s.slice(11, 16)}`;
   const [state, setState] = useState(loadState);
+  const [usagePeriod, setUsagePeriod] = useState(() => {
+  const today = new Date();
+
+  return {
+    mode: 'today',
+    month: today.getMonth(),
+    year: today.getFullYear(),
+    weekOffset: 0,
+  };
+});
   const { roles, assignments, activity, requests } = state;
   const [matrixRole, setMatrixRole] = useState('all'); const [matrixModule, setMatrixModule] = useState('all');
   const [modal, setModal] = useState(null); // {type, role?}
-  const [drawerId, setDrawerId] = useState(null);
+  const [detailId, setDetailId] = useState(null); // id of the role whose full Role Details page is open
   const [kpiPanel, setKpiPanel] = useState(null);
   const rolesRef = useRef(null); const matrixRef = useRef(null);
 
   useEffect(() => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch { /* storage unavailable: state still works in memory */ } }, [state]);
   const patch = (fn) => setState((s) => fn(s));
-  const log = (s, action) => ({ ...s, activity: [{ id: `l${Date.now()}${Math.random().toString(16).slice(2, 5)}`, action, user: ACTOR, at: stamp() }, ...s.activity] });
+  const log = (s, action, role) => ({ ...s, activity: [{ id: `l${Date.now()}${Math.random().toString(16).slice(2, 5)}`, action, user: ACTOR, at: stamp(), roleId: role?.id ?? null }, ...s.activity] });
 
   const totalUsers = roles.reduce((n, r) => n + r.users, 0);
   const inRange = (at) => at.slice(0, 10) >= range.start && at.slice(0, 10) <= range.end;
   const recentAssign = useMemo(() => assignments.filter((a) => inRange(a.at)).sort((a, b) => b.at.localeCompare(a.at)), [assignments, range]); // eslint-disable-line react-hooks/exhaustive-deps
   const recentLog = useMemo(() => activity.filter((a) => inRange(a.at)).sort((a, b) => b.at.localeCompare(a.at)), [activity, range]); // eslint-disable-line react-hooks/exhaustive-deps
   const roleColor = (name) => roles.find((r) => r.name === name)?.color ?? '#5B6B8C';
-  const drawerRole = roles.find((r) => r.id === drawerId);
+  const detailRole = roles.find((r) => r.id === detailId);
 
   const scrollTo = (r) => r.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const kpis = [
@@ -399,61 +459,84 @@ export default function RolesPermissions({ range, setRange, toast }) {
 
   /* ----- role actions ----- */
   const onAction = (a, role) => {
-    if (a === 'view') setDrawerId(role.id);
+    if (a === 'view') setDetailId(role.id);
     else if (a === 'edit') setModal({ type: 'form', role });
     else if (a === 'assign') setModal({ type: 'assign', role });
     else if (a === 'duplicate') setModal({ type: 'form', role: { ...role, id: null, name: `${role.name} (Copy)`, users: 0 } });
     else if (a === 'delete') setModal({ type: 'delete', role });
     else if (a === 'status') {
       const next = role.status === 'Active' ? 'Inactive' : 'Active';
-      patch((s) => log({ ...s, roles: s.roles.map((r) => (r.id === role.id ? { ...r, status: next } : r)) }, 'Role status changed'));
+      patch((s) => log({ ...s, roles: s.roles.map((r) => (r.id === role.id ? { ...r, status: next } : r)) }, 'Role status changed', role));
       toast(`${role.name} is now ${next} (demo).`);
     }
   };
   const saveRole = (data) => {
     const existing = modal.role?.id;
     if (existing) {
-      patch((s) => log({ ...s, roles: s.roles.map((r) => (r.id === existing ? { ...r, ...data } : r)) }, 'Permissions updated'));
+      const oldName = modal.role.name;
+      // assignments and requests refer to a role by name, so keep them in step if it is renamed
+      const rename = (list) => (data.name === oldName ? list : list.map((x) => (x.role === oldName ? { ...x, role: data.name } : x)));
+      patch((s) => log({ ...s, roles: s.roles.map((r) => (r.id === existing ? { ...r, ...data } : r)), assignments: rename(s.assignments), requests: rename(s.requests) }, 'Permissions updated', { id: existing }));
       toast(`${data.name} saved (demo — stored in this browser only).`);
     } else {
-      patch((s) => log({ ...s, roles: [...s.roles, { id: `r${Date.now()}`, users: 0, custom: true, color: PALETTE[s.roles.length % PALETTE.length], ...data }] }, 'Role created'));
+      const id = `r${Date.now()}`;
+      patch((s) => log({ ...s, roles: [...s.roles, { id, users: 0, custom: true, color: PALETTE[s.roles.length % PALETTE.length], ...data }] }, 'Role created', { id }));
       toast(`${data.name} created (demo — stored in this browser only).`);
     }
     setModal(null);
   };
   const deleteRole = (role) => {
     patch((s) => log({ ...s, roles: s.roles.filter((r) => r.id !== role.id) }, 'Access revoked'));
-    setModal(null); setDrawerId(null); toast(`${role.name} deleted (demo).`);
+    setModal(null); setDetailId(null); toast(`${role.name} deleted (demo).`);
   };
   const assign = (role, user, company) => {
-    patch((s) => log({ ...s, roles: s.roles.map((r) => (r.id === role.id ? { ...r, users: r.users + 1 } : r)), assignments: [{ id: `s${Date.now()}`, user, role: role.name, company, at: stamp() }, ...s.assignments] }, 'Role assigned'));
+    patch((s) => log({ ...s, roles: s.roles.map((r) => (r.id === role.id ? { ...r, users: r.users + 1 } : r)), assignments: [{ id: `s${Date.now()}`, user, role: role.name, company, at: stamp() }, ...s.assignments] }, 'Role assigned', role));
     setModal(null); toast(`${user} assigned to ${role.name} (demo).`);
   };
   const decide = (req, approve) => {
     patch((s) => {
       const next = { ...s, requests: s.requests.filter((r) => r.id !== req.id) };
       if (!approve) return log(next, 'Access revoked');
-      return log({ ...next, roles: next.roles.map((r) => (r.name === req.role ? { ...r, users: r.users + 1 } : r)), assignments: [{ id: `s${Date.now()}`, user: req.user, role: req.role, company: req.company, at: stamp() }, ...next.assignments] }, 'Role assigned');
+      return log({ ...next, roles: next.roles.map((r) => (r.name === req.role ? { ...r, users: r.users + 1 } : r)), assignments: [{ id: `s${Date.now()}`, user: req.user, role: req.role, company: req.company, at: stamp() }, ...next.assignments] }, 'Role assigned', next.roles.find((r) => r.name === req.role));
     });
     toast(approve ? `${req.user} approved as ${req.role} (demo).` : `Request from ${req.user} rejected (demo).`);
   };
-  const toggleCell = (role, mod) => {
-    if (role.id === 'super') return;
-    const on = (role.permissions[mod.id] || []).length > 0;
-    patch((s) => log({ ...s, roles: s.roles.map((r) => { if (r.id !== role.id) return r; const p = { ...r.permissions }; if (on) delete p[mod.id]; else p[mod.id] = ['view']; return { ...r, permissions: p }; }) }, 'Permissions updated'));
-    toast(on ? `${mod.name} access removed from ${role.name}.` : `${role.name} can now view ${mod.name}. Use Edit Role for finer control.`);
-  };
-
-  const shownRoles = matrixRole === 'all' ? roles : roles.filter((r) => r.id === matrixRole);
+  // Fixed, display-only permission matrix: access is not editable from this table.
+  const shownRoles = matrixRole === 'all' ? SEED_ROLES : SEED_ROLES.filter((role) => role.id === matrixRole);
   const shownMods = matrixModule === 'all' ? MODULES : MODULES.filter((m) => m.id === matrixModule);
-  const usage = roles.filter((r) => r.users > 0).map((r) => ({ name: r.name, value: r.users, color: r.color })).sort((a, b) => b.value - a.value);
+  const usage = useMemo(() => {
+  const { start, end } = usagePeriodBounds(usagePeriod);
+  const counts = {};
+
+  assignments.forEach((a) => {
+    const date = a.at.slice(0, 10);
+
+    if (date >= start && date <= end) {
+      counts[a.role] = (counts[a.role] || 0) + 1;
+    }
+  });
+
+  return roles
+    .map((r) => ({
+      name: r.name,
+      value: counts[r.name] || 0,
+      color: r.color,
+    }))
+    .filter((r) => r.value > 0)
+    .sort((a, b) => b.value - a.value);
+}, [assignments, roles, usagePeriod]);
+
+const usageTotal = usage.reduce((total, item) => total + item.value, 0);
   const viewAll = (b) => <button className="rp-viewall" onClick={b}>View All</button>;
 
   return (
     <div className="dash rp">
+      {detailRole ? (
+        <RoleDetails role={detailRole} modules={MODULES} actions={ACTIONS} systemIds={SYSTEM_IDS} assignments={assignments} activity={activity} fmt={fmt}
+          onBack={() => setDetailId(null)} onEdit={(r) => setModal({ type: 'form', role: r })} onDelete={(r) => setModal({ type: 'delete', role: r })} onAssign={(r) => setModal({ type: 'assign', role: r })} />
+      ) : (<>
       <div className="title-row">
-        <div><h1 className="rp-h1"><ShieldCheck size={30} />Roles &amp; Permissions</h1><p>Manage roles, set permissions and control access across the platform and tenant companies.</p></div>
-        <DateRangeMenu range={range} setRange={setRange} />
+        <div><h1 className="rp-h1"><ShieldCheck size={30} />Roles &amp; Permissions</h1><p>Manage internal MEGSI platform roles and view fixed module access permissions.</p></div>
       </div>
 
       <div className="rp-kpis">{kpis.map((k) => (
@@ -465,34 +548,40 @@ export default function RolesPermissions({ range, setRange, toast }) {
       </div>
 
       <div className="rp-main">
-        <Card cardRef={rolesRef} icon={<Users size={16} />} title="Roles Management" right={<button className="rp-btn primary" onClick={() => setModal({ type: 'form', role: null })}><Plus size={15} />Add Role</button>}>
+        <Card cardRef={rolesRef} icon={<Users size={16} />} title="Roles Management" >
           <div className="rp-scroll roles"><table className="rp-tbl">
             <thead><tr><th>#</th><th>Role Name</th><th>Description</th><th>Users</th><th>Status</th><th className="r">Actions</th></tr></thead>
             <tbody>{roles.map((r, i) => (
               <tr key={r.id}>
                 <td>{i + 1}</td>
-                <td><span className="name"><Avatar name={r.name} /><button className="rp-link" onClick={() => setDrawerId(r.id)}>{r.name}</button></span></td>
+                <td><span className="name"><Avatar name={r.name} /><button className="rp-link" onClick={() => setDetailId(r.id)}>{r.name}</button></span></td>
                 <td className="desc">{r.description}</td>
                 <td>{r.users}</td>
                 <td><StatusBadge v={r.status} /></td>
                 <td className="r"><RowMenu role={r} onAction={onAction} /></td>
               </tr>))}
-              {roles.length === 0 && <tr><td colSpan={6} className="empty">No roles defined. Use Add Role to create one.</td></tr>}</tbody>
+              {roles.length === 0 && <tr><td colSpan={6} className="empty">No platform roles defined.</td></tr>}</tbody>
           </table></div>
         </Card>
 
         <Card cardRef={matrixRef} icon={<ShieldCheck size={16} />} title="Permission Matrix" right={<>
-          <span className="rp-select sm"><select value={matrixRole} onChange={(e) => setMatrixRole(e.target.value)} aria-label="Filter matrix by role"><option value="all">All Roles</option>{roles.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</select><ChevronDown size={13} /></span>
+          <span className="rp-select sm"><select value={matrixRole} onChange={(e) => setMatrixRole(e.target.value)} aria-label="Filter matrix by role"><option value="all">All Roles</option>{SEED_ROLES.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</select><ChevronDown size={13} /></span>
           <span className="rp-select sm"><select value={matrixModule} onChange={(e) => setMatrixModule(e.target.value)} aria-label="Filter matrix by module"><option value="all">All Modules</option>{MODULES.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select><ChevronDown size={13} /></span></>}>
-          <div className="rp-scroll"><table className="rp-tbl matrix">
+          <div className="rp-scroll rp-matrix-scroll"><table className="rp-tbl matrix">
             <thead><tr><th>Module / Permission</th>{shownRoles.map((r) => <th key={r.id} className="c">{r.name}</th>)}</tr></thead>
             <tbody>{shownMods.map((m) => (
               <tr key={m.id}>
                 <td><span className="rp-mod"><m.Icon size={16} />{m.name}</span></td>
-                {shownRoles.map((r) => { const a = r.permissions[m.id] || []; const on = a.length > 0; return (
-                  <td key={r.id} className="c"><button className={`rp-cell ${on ? 'on' : ''}`} disabled={r.id === 'super'} aria-pressed={on}
-                    aria-label={`${r.name}: ${m.name} ${on ? 'allowed' : 'not allowed'}`} title={r.id === 'super' ? 'Super Admin always has full access' : `${r.name} – ${m.name}: ${on ? ACTIONS.filter(([k]) => a.includes(k)).map(([, l]) => l).join(', ') : 'No access'}. Click to ${on ? 'remove access' : 'grant View'}.`}
-                    onClick={() => toggleCell(r, m)}><Check size={13} strokeWidth={3} /></button></td>); })}
+                {shownRoles.map((r) => {
+                  const allowed = Boolean(r.permissions[m.id]?.length);
+                  return <td key={r.id} className="c">
+                    <span className={`rp-cell ${allowed ? 'on' : ''}`} role="img"
+                      aria-label={`${r.name}: ${m.name} ${allowed ? 'allowed' : 'not allowed'}`}
+                      title={`${r.name} – ${m.name}: ${allowed ? 'Allowed' : 'Not allowed'}`}>
+                      {allowed ? <Check size={13} strokeWidth={3} /> : null}
+                    </span>
+                  </td>;
+                })}
               </tr>))}
               {(shownRoles.length === 0 || shownMods.length === 0) && <tr><td className="empty">Nothing to show.</td></tr>}</tbody>
           </table></div>
@@ -509,14 +598,24 @@ export default function RolesPermissions({ range, setRange, toast }) {
               {recentAssign.length === 0 && <tr><td colSpan={5} className="empty">No assignments in the selected period.</td></tr>}</tbody></table></div>
         </Card>
 
-        <Card icon={<Shield size={16} />} title="Role Usage" right={viewAll(() => setModal({ type: 'usage' }))}>
+        <Card
+  icon={<Shield size={16} />}
+  title="Role Usage"
+  right={
+  <PeriodControl
+    compact
+    value={usagePeriod}
+    onChange={setUsagePeriod}
+  />
+}
+>
           <div className="rp-usage">
             <div className="rp-donut">
               <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={usage} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="100%" startAngle={90} endAngle={-270} stroke="#fff" strokeWidth={2}>{usage.map((d) => <Cell key={d.name} fill={d.color} />)}</Pie>
-                <Tooltip formatter={(v, n) => [`${v} (${pct(v, totalUsers)}%)`, n]} /></PieChart></ResponsiveContainer>
-              <div className="donut-c"><b>{totalUsers}</b><span>Total Users</span></div>
+                <Tooltip formatter={(v, n) => [`${v} (${pct(v, usageTotal)}%)`, n]} /></PieChart></ResponsiveContainer>
+              <div className="donut-c"><b>{usageTotal}</b><span>Assignments</span></div>
             </div>
-            <ul className="rp-usage-l">{usage.map((d) => <li key={d.name}><i style={{ background: d.color }} />{d.name}<span>{pct(d.value, totalUsers)}% ({d.value})</span></li>)}</ul>
+            <ul className="rp-usage-l">{usage.map((d) => <li key={d.name}><i style={{ background: d.color }} />{d.name}<span>{pct(d.value, usageTotal)}% ({d.value})</span></li>)}</ul>
           </div>
         </Card>
 
@@ -528,15 +627,16 @@ export default function RolesPermissions({ range, setRange, toast }) {
         </Card>
       </div>
 
-      {kpiPanel && <KpiDetailsDrawer type={kpiPanel} roles={roles} assignments={assignments} requests={requests} fmt={fmt} onClose={() => setKpiPanel(null)} onOpenRole={(role) => { setKpiPanel(null); setDrawerId(role.id); }} onDecide={decide} />}
-      {drawerRole && <RoleDrawer role={drawerRole} onClose={() => setDrawerId(null)} onEdit={(r) => { setDrawerId(null); setModal({ type: 'form', role: r }); }} />}
+      </>)}
+
+      {kpiPanel && <KpiDetailsDrawer type={kpiPanel} roles={roles} assignments={assignments} requests={requests} fmt={fmt} onClose={() => setKpiPanel(null)} onOpenRole={(role) => { setKpiPanel(null); setDetailId(role.id); }} onDecide={decide} />}
       {modal?.type === 'form' && <RoleForm role={modal.role} roles={roles} onSave={saveRole} onClose={() => setModal(null)} />}
       {modal?.type === 'delete' && <DeleteModal role={modal.role} onClose={() => setModal(null)} onConfirm={deleteRole} />}
       {modal?.type === 'assign' && <AssignModal role={modal.role} onClose={() => setModal(null)} onSave={assign} />}
       {modal?.type === 'requests' && <RequestsModal requests={requests} fmt={fmt} onClose={() => setModal(null)} onDecide={decide} />}
       {modal?.type === 'assignments' && <ListModal title="All Role Assignments" cols={['User', 'Role', 'Company', 'Assigned On']} rows={[...assignments].sort((a, b) => b.at.localeCompare(a.at)).map((a) => [a.user, a.role, a.company, fmt(a.at)])} onClose={() => setModal(null)} />}
       {modal?.type === 'log' && <ListModal title="Activity Log" cols={['Action', 'User', 'Date & Time']} rows={[...activity].sort((a, b) => b.at.localeCompare(a.at)).map((a) => [a.action, a.user, fmt(a.at)])} onClose={() => setModal(null)} />}
-      {modal?.type === 'usage' && <ListModal title="Role Usage" cols={['Role', 'Users', 'Share']} rows={usage.map((u) => [u.name, u.value, `${pct(u.value, totalUsers)}%`])} onClose={() => setModal(null)} />}
+      {modal?.type === 'usage' && <ListModal title="Role Usage" cols={['Role', 'Users', 'Share']} rows={usage.map((u) => [u.name, u.value, `${pct(u.value, usageTotal)}%`])} onClose={() => setModal(null)} />}
     </div>
   );
 }

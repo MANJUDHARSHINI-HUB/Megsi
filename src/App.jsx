@@ -74,6 +74,7 @@ export default function App({ onSignOut, userRole = 'Super Admin' }) {
   const { t, lang, fmtDate } = useI18n();
 
   const [page, setPage] = useState('dashboard');
+  const [rolesKey, setRolesKey] = useState(0); // bumping this returns Roles & Permissions to its list view
   const [collapsed, setCollapsed] = useState(false);
 
   const [range, setRange] = useState({
@@ -107,6 +108,7 @@ export default function App({ onSignOut, userRole = 'Super Admin' }) {
 
   // Navigate between pages
   const go = (nextPage) => {
+    if (nextPage === 'roles') setRolesKey((k) => k + 1);
     setPage(nextPage);
     setDetail(null);
   };
@@ -258,6 +260,7 @@ export default function App({ onSignOut, userRole = 'Super Admin' }) {
           {/* Roles and Permissions */}
           {page === 'roles' && (
             <RolesPermissions
+              key={rolesKey}
               range={range}
               setRange={setRange}
               toast={toast}

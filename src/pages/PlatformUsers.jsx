@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import * as XLSX from 'xlsx';
 import {
   AlertTriangle,
+  ArrowLeft,
   ArrowUp,
   Ban,
   CalendarCheck,
   CalendarDays,
   Check,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Download,
+  FileSpreadsheet,
+  FileText,
   Eye,
   Lock,
   Mail,
@@ -24,6 +26,7 @@ import {
   UserCheck,
   UserCog,
   Users,
+  Upload,
   X
 } from 'lucide-react';
 import './platformUsers.css';
@@ -427,25 +430,14 @@ const hashIndex = (value, size) => {
   return hash % size;
 };
 
-function getPageList(current, total) {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  if (current <= 3) return [1, 2, 3, 4, 5, '…', total];
-  if (current >= total - 2) return [1, '…', total - 4, total - 3, total - 2, total - 1, total];
-  return [1, '…', current - 1, current, current + 1, '…', total];
-}
 
 /* ------------------------------------------------------------------ */
 /* Small components                                                    */
 /* ------------------------------------------------------------------ */
 
-function MetricCard({ title, value, change, tone, icon: Icon, accent, onClick, t }) {
+function MetricCard({ title, value, change, tone, icon: Icon, accent, t }) {
   return (
-    <button
-      type="button"
-      className="pu-metric-card"
-      onClick={onClick}
-      aria-label={`${title}: ${value}. ${t ? t("Open details") : "Open details"}`}
-    >
+    <div className="pu-metric-card">
       <span className={`pu-metric-icon ${accent}`}>
         <Icon size={24} strokeWidth={2} />
       </span>
@@ -460,7 +452,7 @@ function MetricCard({ title, value, change, tone, icon: Icon, accent, onClick, t
         </span>
         <span className="pu-metric-caption">{t ? t("This month") : translatePageText(getPageLanguage(), "This month")}</span>
       </span>
-    </button>
+    </div>
   );
 }
 
@@ -494,37 +486,98 @@ function UserAvatar({ user }) {
   );
 }
 
-function DetailPanel({ data, onClose, t = (value) => value }) {
+function DetailPanel({ data, onClose, onEdit, onResetPassword, onSuspend, t = (value) => value }) {
+  const [activeTab, setActiveTab] = useState('activity');
+  const user = data.user;
+  const isSuspended = user.status === 'Suspended';
+  const permissionItems = user.role === 'Platform Super Admin'
+    ? ['Manage all platform settings', 'Manage platform users and roles', 'View all companies and billing', 'Manage subscriptions and access']
+    : user.role === 'Platform Admin'
+      ? ['Manage assigned platform users', 'View assigned companies', 'Manage onboarding and support', 'View platform reports']
+      : user.role === 'Billing Admin'
+        ? ['View subscription plans', 'Manage billing records', 'Export billing reports']
+        : user.role === 'Support Admin'
+          ? ['View and manage support tickets', 'View assigned companies', 'Assist platform users']
+          : user.role === 'Platform Analyst'
+            ? ['View platform analytics', 'Export reports', 'View assigned companies']
+            : ['View assigned platform records', 'Access read-only reports'];
+
   return (
-    <div
-      className="pu-drawer-overlay"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <aside className="pu-drawer" role="dialog" aria-modal="true" aria-label={data.title}>
-        <div className="pu-drawer-heading">
-          <div className="pu-drawer-title-wrap">
-            <ShieldCheck className="pu-drawer-brand-mark" size={23} strokeWidth={2.2} />
-            <div className="pu-drawer-title-copy">
-            <h2>{t(data.title)}</h2>
-            {data.subtitle && <p>{t(data.subtitle)}</p>}
-            </div>
-          </div>
-          <button type="button" className="pu-icon-action" onClick={onClose} aria-label={t("Close")}>
-            <X size={18} />
-          </button>
+    <section className="pu-user-detail-page">
+      <button type="button" className="pu-detail-back" onClick={onClose}>
+        <ArrowLeft size={16} /> {t('Back to Platform Users')}
+      </button>
+
+      <div className="pu-detail-page-heading">
+        <div>
+          <h1>{t('User Details')}</h1>
+          <p>{t('View platform account information, access and activity.')}</p>
         </div>
-        <dl className="pu-drawer-list">
-          {data.rows.map(([label, value], index) => (
-            <div className="pu-drawer-row" key={`${label}-${index}`}>
-              <dt>{t(label)}</dt>
-              <dd>{t(value)}</dd>
+        <StatusBadge status={user.status} t={t} />
+      </div>
+
+      <section className="pu-detail-identity-card">
+        <UserAvatar user={user} />
+        <div className="pu-detail-profile-copy">
+          <strong>{user.name}</strong>
+          <span>{user.email}</span>
+          <RolePill role={user.role} t={t} />
+        </div>
+      </section>
+
+      <section className="pu-detail-info-grid">
+        <div className="pu-detail-info-card"><Mail size={18} /><span><small>{t('Email Address')}</small><strong>{user.email}</strong></span></div>
+        <div className="pu-detail-info-card"><UserCog size={18} /><span><small>{t('Platform role')}</small><strong>{t(user.role)}</strong></span></div>
+        <div className="pu-detail-info-card"><Users size={18} /><span><small>{t('Assigned Companies')}</small><strong>{user.companies === 'All Companies' ? t('All Companies') : user.companies}</strong></span></div>
+        <div className="pu-detail-info-card"><CalendarDays size={18} /><span><small>{t('Account status')}</small><strong>{t(user.status)}</strong></span></div>
+        <div className="pu-detail-info-card"><CalendarCheck size={18} /><span><small>{t('Last Login')}</small><strong>{t(user.lastLogin)}</strong></span></div>
+        <div className="pu-detail-info-card"><ShieldCheck size={18} /><span><small>{t('MFA Status')}</small><strong>{user.mfaEnabled ? t('Enabled') : t('Not enabled')}</strong></span></div>
+      </section>
+
+      <section className="pu-access-summary pu-detail-access-card">
+        <h3>{t('Access Summary')}</h3>
+        <div className="pu-access-summary-row">
+          <Users size={19} />
+          <div><strong>{t('Platform Access')}</strong><span>{user.companies === 'All Companies' ? t('All Companies') : t('Selected companies only')}</span></div>
+        </div>
+      </section>
+
+      <section className="pu-detail-information-card">
+        <div className="pu-detail-tabs" role="tablist" aria-label={t('User information')}>
+          <button type="button" role="tab" aria-selected={activeTab === 'activity'} className={activeTab === 'activity' ? 'active' : ''} onClick={() => setActiveTab('activity')}>{t('Activity Log')}</button>
+          <button type="button" role="tab" aria-selected={activeTab === 'permissions'} className={activeTab === 'permissions' ? 'active' : ''} onClick={() => setActiveTab('permissions')}>{t('Permissions')}</button>
+          <button type="button" role="tab" aria-selected={activeTab === 'companies'} className={activeTab === 'companies' ? 'active' : ''} onClick={() => setActiveTab('companies')}>{t('Companies')}</button>
+        </div>
+
+        <div className="pu-detail-tab-content">
+          {activeTab === 'activity' && (
+            <div className="pu-activity-list">
+              <div className="pu-activity-item"><span className="pu-activity-dot" /><div><strong>{t('Last platform login')}</strong><p>{t(user.lastLogin)}</p></div></div>
+              <div className="pu-activity-item"><span className="pu-activity-dot" /><div><strong>{t('Account status')}</strong><p>{t(user.status)} · {t('Current account status')}</p></div></div>
+              <div className="pu-activity-item"><span className="pu-activity-dot" /><div><strong>{t('MFA security')}</strong><p>{user.mfaEnabled ? t('Multi-factor authentication is enabled.') : t('Multi-factor authentication is not enabled.')}</p></div></div>
             </div>
-          ))}
-        </dl>
-      </aside>
-    </div>
+          )}
+          {activeTab === 'permissions' && (
+            <div className="pu-permission-list">
+              <p className="pu-tab-intro">{t('Permissions assigned through this user role.')}</p>
+              {permissionItems.map((item) => <div className="pu-permission-item" key={item}><ShieldCheck size={16} /><span>{t(item)}</span><Check size={15} /></div>)}
+            </div>
+          )}
+          {activeTab === 'companies' && (
+            <div className="pu-company-detail">
+              <div className="pu-company-detail-icon"><Users size={20} /></div>
+              <div><strong>{user.companies === 'All Companies' ? t('All Companies') : user.companies}</strong><p>{user.companies === 'All Companies' ? t('This user has access to all platform companies.') : t('This user has access to selected companies only.')}</p></div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <div className="pu-detail-page-actions">
+        <button type="button" className="pu-primary-button" onClick={() => onEdit(user)}><Pencil size={16} />{t('Edit User')}</button>
+        <button type="button" className="pu-secondary-button" onClick={() => onResetPassword(user)}><Lock size={16} />{t('Reset Password')}</button>
+        <button type="button" className="pu-danger-button" onClick={() => onSuspend(user)}><ShieldAlert size={16} />{isSuspended ? t('Reactivate Account') : t('Suspend Account')}</button>
+      </div>
+    </section>
   );
 }
 
@@ -590,28 +643,26 @@ export default function PlatformUsers({ language: languageProp } = {}) {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [companyFilter, setCompanyFilter] = useState('all');
-  const [dateRange, setDateRange] = useState(DATE_RANGES[0]);
-  const [dateRangeApplied, setDateRangeApplied] = useState(false);
-  const [showDateMenu, setShowDateMenu] = useState(false);
-  const [showCustomDates, setShowCustomDates] = useState(false);
-  const [customStartDate, setCustomStartDate] = useState('2026-10-01');
-  const [customEndDate, setCustomEndDate] = useState('2026-10-23');
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date(2026, 9, 1));
-  const [calendarYearInput, setCalendarYearInput] = useState('2026');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(7);
-  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [mfaFilter, setMfaFilter] = useState('all');
+  const [lastLoginFilter, setLastLoginFilter] = useState('all');
   const [detail, setDetail] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(10);
+  const loadMoreRef = useRef(null);
   const [rowMenu, setRowMenu] = useState(null);
   const [formMode, setFormMode] = useState(null); // null | 'add' | 'edit'
   const [form, setForm] = useState(EMPTY_FORM);
   const [toast, setToast] = useState('');
-  const [showAllActivity, setShowAllActivity] = useState(false);
-  const [drilldownRole, setDrilldownRole] = useState(null);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const searchRef = useRef(null);
-  const dateRef = useRef(null);
   const menuRef = useRef(null);
+  const importRef = useRef(null);
+  const exportMenuRef = useRef(null);
+
+  // Infinite scrolling: reveal the next batch when the list sentinel enters view.
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [search, roleFilter, statusFilter, companyFilter, mfaFilter, lastLoginFilter, users]);
 
   /* keyboard shortcuts */
   useEffect(() => {
@@ -626,7 +677,6 @@ export default function PlatformUsers({ language: languageProp } = {}) {
         setFormMode(null);
         setDetail(null);
         setRowMenu(null);
-        setShowDateMenu(false);
       }
     };
 
@@ -641,15 +691,14 @@ export default function PlatformUsers({ language: languageProp } = {}) {
     return () => window.clearTimeout(timeout);
   }, [toast]);
 
-  /* close date menu on outside click */
   useEffect(() => {
-    if (!showDateMenu) return undefined;
-    const onDown = (event) => {
-      if (dateRef.current && !dateRef.current.contains(event.target)) setShowDateMenu(false);
+    if (!exportOpen) return undefined;
+    const closeExport = (event) => {
+      if (!exportMenuRef.current?.contains(event.target)) setExportOpen(false);
     };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, [showDateMenu]);
+    document.addEventListener('mousedown', closeExport);
+    return () => document.removeEventListener('mousedown', closeExport);
+  }, [exportOpen]);
 
   /* close row menu on outside click / scroll / resize */
   useEffect(() => {
@@ -675,17 +724,7 @@ export default function PlatformUsers({ language: languageProp } = {}) {
 
   /* ---------------- derived data ---------------- */
 
-  // The selected date range is the dashboard-wide filter: cards, table, and charts
-  // all derive from this same date-filtered dataset. Table-only filters are applied later.
-  const dateFilteredUsers = useMemo(() => {
-    if (!dateRangeApplied) return users;
-    const bounds = getDateBounds(dateRange, customStartDate, customEndDate);
-    if (!bounds.start || !bounds.end) return users;
-    return users.filter((user) => {
-      const loginDate = getLastLoginDate(user.lastLogin);
-      return Boolean(loginDate && loginDate >= bounds.start && loginDate <= bounds.end);
-    });
-  }, [users, dateRange, dateRangeApplied, customStartDate, customEndDate]);
+  const dateFilteredUsers = users;
 
   const counts = useMemo(
     () => ({
@@ -697,21 +736,6 @@ export default function PlatformUsers({ language: languageProp } = {}) {
     }),
     [dateFilteredUsers]
   );
-
-  const roleDistribution = useMemo(() => {
-    const roles = [
-      { name: 'Platform Admin', role: 'Platform Admin', color: '#2563eb' },
-      { name: 'Support Admin', role: 'Support Admin', color: '#059669' },
-      { name: 'Billing Admin', role: 'Billing Admin', color: '#f59e0b' },
-      { name: 'Analyst', role: 'Platform Analyst', color: '#7c3aed' },
-      { name: 'Auditor', role: 'Read-only Auditor', color: '#7b8db8' },
-      { name: 'Platform Super Admin', role: 'Platform Super Admin', color: '#dc2626' }
-    ];
-    return roles.map((role) => ({ ...role, value: dateFilteredUsers.filter((user) => user.role === role.role).length }));
-  }, [dateFilteredUsers]);
-  const roleTotal = roleDistribution.reduce((sum, item) => sum + item.value, 0);
-
-  const mfaPercent = counts.total ? Math.round((counts.mfa / counts.total) * 100) : 0;
 
   const metricItems = [
     {
@@ -771,25 +795,34 @@ export default function PlatformUsers({ language: languageProp } = {}) {
       const matchesCompany =
         companyFilter === 'all' ||
         (companyFilter === 'all-access' ? isAll : !isAll);
-      return matchesSearch && matchesRole && matchesStatus && matchesCompany;
+      const matchesMfa = mfaFilter === 'all' || (mfaFilter === 'enabled' ? user.mfaEnabled : !user.mfaEnabled);
+      const matchesLastLogin = lastLoginFilter === 'all' ||
+        (lastLoginFilter === 'today' ? user.lastLogin.startsWith('Today') :
+        lastLoginFilter === 'yesterday' ? user.lastLogin.startsWith('Yesterday') :
+        lastLoginFilter === 'never' ? user.lastLogin === 'Never' : true);
+      return matchesSearch && matchesRole && matchesStatus && matchesCompany && matchesMfa && matchesLastLogin;
     });
-  }, [dateFilteredUsers, search, roleFilter, statusFilter, companyFilter]);
+  }, [dateFilteredUsers, search, roleFilter, statusFilter, companyFilter, mfaFilter, lastLoginFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const startIndex = (safePage - 1) * pageSize;
-  const visibleUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
-  const rangeStart = filteredUsers.length ? startIndex + 1 : 0;
-  const rangeEnd = Math.min(startIndex + pageSize, filteredUsers.length);
+  const visibleUsers = filteredUsers.slice(0, visibleCount);
 
-  const allOnPageSelected =
-    visibleUsers.length > 0 && visibleUsers.every((user) => selectedIds.has(user.id));
+  useEffect(() => {
+    const sentinel = loadMoreRef.current;
+    if (!sentinel || visibleCount >= filteredUsers.length) return undefined;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        setVisibleCount((count) => Math.min(count + 10, filteredUsers.length));
+      }
+    }, { root: null, rootMargin: '220px', threshold: 0 });
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [filteredUsers.length, visibleCount]);
 
   /* ---------------- actions ---------------- */
 
   const applyFilter = (setter) => (value) => {
     setter(value);
-    setPage(1);
+    setVisibleCount(10);
   };
 
   const clearFilters = () => {
@@ -797,56 +830,16 @@ export default function PlatformUsers({ language: languageProp } = {}) {
     setRoleFilter('all');
     setStatusFilter('all');
     setCompanyFilter('all');
-    // Clear Filters applies only to the table filters. Keep the selected date range unchanged.
-    setPage(1);
+    setMfaFilter('all');
+    setLastLoginFilter('all');
+    // Clear filters without changing any other page state.
+    setVisibleCount(10);
     setToast(t('Filters cleared.'));
-  };
-
-  const toggleRow = (id) => {
-    setSelectedIds((previous) => {
-      const next = new Set(previous);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const togglePage = () => {
-    setSelectedIds((previous) => {
-      const next = new Set(previous);
-      if (allOnPageSelected) visibleUsers.forEach((user) => next.delete(user.id));
-      else visibleUsers.forEach((user) => next.add(user.id));
-      return next;
-    });
-  };
-
-  const showMetricDetails = (metric) => {
-    setDetail({
-      title: metric.title,
-      subtitle: 'Platform user overview',
-      rows: [
-        ['Current count', String(metric.value)],
-        ['Change vs last month', `+${metric.change}`],
-        ['Period', formatDateRangeLabel(dateRange, language, customStartDate, customEndDate)],
-        ['Description', metric.description]
-      ]
-    });
   };
 
   const showUserDetails = (user) => {
     setRowMenu(null);
-    setDetail({
-      title: user.name,
-      subtitle: user.role,
-      rows: [
-        ['Email', user.email],
-        ['Role', user.role],
-        ['Assigned companies', translateCompanyCount(user.companies)],
-        ['Last login', translateLogin(user.lastLogin)],
-        ['Status', user.status],
-        ['MFA', user.mfaEnabled ? 'Enabled' : 'Not enabled']
-      ]
-    });
+    setDetail({ user });
   };
 
   const openAddUser = () => {
@@ -901,7 +894,7 @@ export default function PlatformUsers({ language: languageProp } = {}) {
         },
         ...previous
       ]);
-      setPage(1);
+      setVisibleCount(10);
       setToast(t('Platform user added successfully.'));
     }
 
@@ -933,37 +926,112 @@ export default function PlatformUsers({ language: languageProp } = {}) {
     );
   };
 
-  const exportUsers = () => {
-    const headers = ['Name', 'Email', 'Role', 'Assigned Companies', 'Last Login', 'Status'];
+  const exportUsers = (format) => {
+    const headers = ['Name', 'Email', 'Role', 'Assigned Companies', 'Last Login', 'Status', 'MFA'];
     const rows = filteredUsers.map((user) => [
       user.name,
       user.email,
       user.role,
       user.companies,
       user.lastLogin,
-      user.status
+      user.status,
+      user.mfaEnabled ? 'Enabled' : 'Not enabled'
     ]);
 
-    const csv = [headers, ...rows]
-      .map((row) => row.map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`).join(','))
-      .join('\r\n');
+    if (format === 'excel') {
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      worksheet['!cols'] = headers.map((header, index) => ({ wch: Math.max(header.length + 3, ...rows.map((row) => String(row[index] ?? '').length + 2), 14) }));
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Platform Users');
+      XLSX.writeFile(workbook, 'platform-users.xlsx');
+    } else if (format === 'pdf') {
+      const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+      const tableHead = headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('');
+      const tableRows = rows.map((row) => `<tr>${row.map((value) => `<td>${escapeHtml(value)}</td>`).join('')}</tr>`).join('');
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        setToast(t('Please allow pop-ups to export PDF.'));
+        setExportOpen(false);
+        return;
+      }
+      printWindow.document.write(`<!doctype html><html><head><title>Platform Users</title><style>
+        body{font-family:Arial,sans-serif;padding:24px;color:#172b55}h1{font-size:20px;margin:0 0 6px}p{font-size:11px;color:#64748b;margin:0 0 18px}
+        table{width:100%;border-collapse:collapse;font-size:10px}th{background:#edf3ff;color:#17336f;text-align:left}th,td{border:1px solid #dce5f2;padding:8px;vertical-align:top}
+        tr{page-break-inside:avoid}@media print{body{padding:0}@page{size:landscape;margin:12mm}}
+      </style></head><body><h1>Platform Users</h1><p>${rows.length} users · Exported ${new Date().toLocaleString()}</p><table><thead><tr>${tableHead}</tr></thead><tbody>${tableRows}</tbody></table><script>window.onload=()=>{window.print();};</script></body></html>`);
+      printWindow.document.close();
+    } else {
+      const csv = [headers, ...rows]
+        .map((row) => row.map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`).join(','))
+        .join('\r\n');
+      const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'platform-users.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'platform-users.csv';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-
+    setExportOpen(false);
     setToast(`${t('Exported')} ${filteredUsers.length} ${t('platform users')}.`);
+  };
+
+  const importUsers = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const lines = String(reader.result || '').split(/\r?\n/).filter(Boolean);
+      if (lines.length < 2) { setToast(t('The selected CSV file has no user rows.')); return; }
+      const headers = lines[0].split(',').map((value) => value.trim().toLowerCase().replace(/^"|"$/g, ''));
+      const column = (...names) => headers.findIndex((header) => names.includes(header));
+      const nameIndex = column('name', 'full name', 'user');
+      const emailIndex = column('email', 'email address');
+      const roleIndex = column('role');
+      const statusIndex = column('status');
+      const companyIndex = column('assigned companies', 'companies');
+      if (nameIndex < 0 || emailIndex < 0) { setToast(t('CSV must include Name and Email columns.')); return; }
+      const imported = lines.slice(1).map((line, index) => {
+        const values = line.split(',').map((value) => value.trim().replace(/^"|"$/g, ''));
+        const name = values[nameIndex];
+        const email = values[emailIndex];
+        if (!name || !email || users.some((user) => normalize(user.email) === normalize(email))) return null;
+        const role = roleIndex >= 0 && ROLES.includes(values[roleIndex]) ? values[roleIndex] : 'Platform Analyst';
+        const status = statusIndex >= 0 && STATUSES.includes(values[statusIndex]) ? values[statusIndex] : 'Pending';
+        return { id: Date.now() + index, name, email, role, status, companies: companyIndex >= 0 && values[companyIndex] ? values[companyIndex] : 'All Companies', lastLogin: 'Never', mfaEnabled: false };
+      }).filter(Boolean);
+      if (imported.length) {
+        setUsers((previous) => [...imported, ...previous]);
+        setVisibleCount(10);
+        setToast(`${imported.length} ${t('platform users imported successfully.')}`);
+      } else setToast(t('No new users were imported. Check the CSV rows and email addresses.'));
+      event.target.value = '';
+    };
+    reader.readAsText(file);
   };
 
   const menuUser = rowMenu?.user;
 
   /* ---------------- render ---------------- */
+
+  if (detail) {
+    return (
+      <div className="platform-users-page">
+        <DetailPanel
+          data={detail}
+          onClose={() => setDetail(null)}
+          onEdit={(user) => { setDetail(null); openEditUser(user); }}
+          onResetPassword={(user) => { setDetail(null); setToast(`${t('Password reset link prepared for')} ${user.email}.`); }}
+          onSuspend={(user) => { updateUserStatus(user, user.status === 'Suspended' ? 'Active' : 'Suspended'); setDetail(null); }}
+          t={t}
+        />
+        {toast && <div className="pu-toast" role="status"><Check size={16} /><span>{toast}</span><button type="button" onClick={() => setToast('')} aria-label={t('Dismiss message')}><X size={15} /></button></div>}
+      </div>
+    );
+  }
 
   return (
     <div className="platform-users-page">
@@ -974,64 +1042,37 @@ export default function PlatformUsers({ language: languageProp } = {}) {
           <p>{t('Manage platform accounts, roles, access and account status.')}</p>
         </div>
 
-        <div className="pu-date-wrap" ref={dateRef}>
-          <button
-            type="button"
-            className="pu-date-control"
-            onClick={() => setShowDateMenu((value) => !value)}
-            aria-haspopup="listbox"
-            aria-expanded={showDateMenu}
-          >
-            <CalendarDays size={17} />
-            <span>{dateRange.name === "Custom Date" ? `${t("Custom Date")}: ${dateRange.label}` : `${t(dateRange.name)} · ${formatDateRangeLabel(dateRange, language, customStartDate, customEndDate)}`}</span>
-            <ChevronDown size={16} />
+        <div className="pu-page-actions">
+          <button type="button" className="pu-primary-button" onClick={openAddUser}>
+            <Plus size={17} />
+            {t('Add Platform User')}
           </button>
-
-          {showDateMenu && (
-            <div className="pu-date-menu pu-date-menu-compact" role="dialog" aria-label={t('Date range')}>
-              {DATE_RANGES.filter((range) => !range.custom).map((range) => (
-                <button type="button" key={range.name} className={dateRange.name === range.name ? 'selected' : ''}
-                  onClick={() => {
-                    setDateRange(range); setDateRangeApplied(true); setPage(1); setShowDateMenu(false); setShowCustomDates(false);
-                    setToast(`${t('Date range set to')} ${t(range.name)}.`);
-                  }}>
-                  <strong>{t(range.name)}</strong><span>{formatDateRangeLabel(range, language, customStartDate, customEndDate)}</span>
-                </button>
-              ))}
-              <div className="pu-date-custom">
-                <strong>{t('Custom range')}</strong>
-                <label><span>{t('From')}</span><input type="date" value={customStartDate} max={customEndDate || undefined} onChange={(event) => setCustomStartDate(event.target.value)} /></label>
-                <label><span>{t('To')}</span><input type="date" value={customEndDate} min={customStartDate || undefined} onChange={(event) => setCustomEndDate(event.target.value)} /></label>
-                <button type="button" className="pu-date-apply" disabled={!customStartDate || !customEndDate || customStartDate > customEndDate}
-                  onClick={() => {
-                    const formatDate = (value) => new Date(`${value}T00:00:00`).toLocaleDateString(language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const range = { name: 'Custom Date', label: `${formatDate(customStartDate)} - ${formatDate(customEndDate)}`, start: customStartDate, end: customEndDate };
-                    setDateRange(range); setDateRangeApplied(true); setPage(1); setShowDateMenu(false); setShowCustomDates(false);
-                    setToast(`${t('Date range set to')} ${range.label}.`);
-                  }}>{t('Apply')}</button>
+          <button type="button" className="pu-secondary-button" onClick={() => importRef.current?.click()}>
+            <Upload size={17} />
+            {t('Import')}
+          </button>
+          <div className="pu-export-wrap" ref={exportMenuRef}>
+            <button type="button" className="pu-secondary-button" aria-expanded={exportOpen} onClick={() => setExportOpen((open) => !open)}>
+              <Download size={17} />
+              {t('Export')}
+              <ChevronDown size={15} />
+            </button>
+            {exportOpen && (
+              <div className="pu-export-menu" role="menu">
+                <button type="button" role="menuitem" onClick={() => exportUsers('pdf')}><FileText size={16} /> Export as PDF</button>
+                <button type="button" role="menuitem" onClick={() => exportUsers('excel')}><FileSpreadsheet size={16} /> Export as Excel</button>
+                <button type="button" role="menuitem" onClick={() => exportUsers('csv')}><Download size={16} /> Export as CSV</button>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+          <input ref={importRef} className="pu-hidden-input" type="file" accept=".csv,text/csv" onChange={importUsers} />
         </div>
-      </div>
-
-
-      {/* Primary actions */}
-      <div className="pu-page-actions">
-        <button type="button" className="pu-primary-button" onClick={openAddUser}>
-          <Plus size={17} />
-          {t('Add Platform User')}
-        </button>
-        <button type="button" className="pu-secondary-button" onClick={exportUsers}>
-          <Download size={17} />
-          {t('Export')}
-        </button>
       </div>
 
       {/* KPI cards */}
       <div className="pu-metrics-grid">
         {metricItems.map((metric) => (
-          <MetricCard key={metric.id} {...metric} title={t(metric.title)} description={t(metric.description)} onClick={() => showMetricDetails(metric)} t={t} />
+          <MetricCard key={metric.id} {...metric} title={t(metric.title)} t={t} />
         ))}
       </div>
 
@@ -1094,8 +1135,27 @@ export default function PlatformUsers({ language: languageProp } = {}) {
               </select>
               <ChevronDown size={15} />
             </label>
+            <label className="pu-select-filter pu-advanced-filter">
+              <span>{t('MFA Status')}</span>
+              <select value={mfaFilter} onChange={(event) => applyFilter(setMfaFilter)(event.target.value)} aria-label={t('MFA Status')}>
+                <option value="all">{t('All')}</option>
+                <option value="enabled">{t('Enabled')}</option>
+                <option value="disabled">{t('Not enabled')}</option>
+              </select>
+              <ChevronDown size={15} />
+            </label>
+            <label className="pu-select-filter pu-advanced-filter">
+              <span>{t('Last Login')}</span>
+              <select value={lastLoginFilter} onChange={(event) => applyFilter(setLastLoginFilter)(event.target.value)} aria-label={t('Last Login')}>
+                <option value="all">{t('Any Time')}</option>
+                <option value="today">{t('Today')}</option>
+                <option value="yesterday">{t('Yesterday')}</option>
+                <option value="never">{t('Never')}</option>
+              </select>
+              <ChevronDown size={15} />
+            </label>
             <button type="button" className="pu-secondary-button pu-clear-filters-button" onClick={clearFilters}>
-              {t('Clear Filters')}
+              {t('Reset')}
             </button>
 
           </div>
@@ -1103,69 +1163,24 @@ export default function PlatformUsers({ language: languageProp } = {}) {
 
 
 
-        {selectedIds.size > 0 && (
-          <div className="pu-selection-toolbar" role="region" aria-label={t("Bulk user actions")}>
-            <span><strong>{selectedIds.size}</strong> {t('users selected')}</span>
-            <button type="button" className="pu-text-button" onClick={() => setSelectedIds(new Set())}>{t('Clear selection')}</button>
-            <button type="button" className="pu-secondary-button pu-danger-button" onClick={() => {
-              const selectedUsers = users.filter((user) => selectedIds.has(user.id));
-              if (!selectedUsers.length) return;
-              if (!window.confirm(t('Are you sure you want to delete the selected users?'))) return;
-              setUsers((previous) => previous.filter((user) => !selectedIds.has(user.id)));
-              setSelectedIds(new Set());
-              setToast(`${selectedUsers.length} ${t('selected users.')}`);
-            }}><X size={15} /> {t('Delete selected')}</button>
-            <button type="button" className="pu-secondary-button" onClick={() => {
-              const selectedUsers = users.filter((user) => selectedIds.has(user.id));
-              const csvRows = [['Name', 'Email', 'Role', 'Companies', 'Last Login', 'Status'],
-                ...selectedUsers.map((user) => [user.name, user.email, user.role, user.companies, user.lastLogin, user.status])];
-              const csv = csvRows.map((row) => row.map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
-              const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = 'selected-platform-users.csv';
-              document.body.appendChild(link);
-              link.click();
-              link.remove();
-              URL.revokeObjectURL(url);
-              setToast(`${t('Exported')} ${selectedUsers.length} ${t('selected users')}.`);
-            }}><Download size={15} /> {t('Export selected')}</button>
-          </div>
-        )}
-
         <div className="pu-table-scroll">
           <table className="pu-users-table">
             <thead>
               <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    aria-label={t("Select all users on this page")}
-                    checked={allOnPageSelected}
-                    onChange={togglePage}
-                  />
-                </th>
                 <th>{t("User")}</th>
                 <th>{t("Email Address")}</th>
                 <th>{t("Role")}</th>
                 <th>{t("Assigned Companies")}</th>
+                <th>{t("Access Scope")}</th>
                 <th>{t("Last Login")}</th>
+                <th>{t("MFA Status")}</th>
                 <th>{t("Status")}</th>
                 <th className="pu-actions-head">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody>
               {visibleUsers.map((user) => (
-                <tr key={user.id} className={selectedIds.has(user.id) ? 'selected' : ''}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      aria-label={`${t("Select")} ${user.name}`}
-                      checked={selectedIds.has(user.id)}
-                      onChange={() => toggleRow(user.id)}
-                    />
-                  </td>
+                <tr key={user.id}>
                   <td>
                     <button type="button" className="pu-user-cell" onClick={() => showUserDetails(user)}>
                       <UserAvatar user={user} />
@@ -1177,7 +1192,9 @@ export default function PlatformUsers({ language: languageProp } = {}) {
                     <RolePill role={user.role} t={t} />
                   </td>
                   <td>{translateCompanyCount(user.companies)}</td>
+                  <td>{user.companies === 'All Companies' ? t('All platform companies') : t('Selected companies only')}</td>
                   <td>{translateLogin(user.lastLogin)}</td>
+                  <td><span className={`pu-mfa-badge ${user.mfaEnabled ? 'enabled' : 'disabled'}`}>{user.mfaEnabled ? t('Enabled') : t('Not enabled')}</span></td>
                   <td>
                     <StatusBadge status={user.status} t={t} />
                   </td>
@@ -1202,246 +1219,13 @@ export default function PlatformUsers({ language: languageProp } = {}) {
           {visibleUsers.length === 0 && <EmptyState onClear={clearFilters} t={t} />}
         </div>
 
-        <div className="pu-pagination">
-          <span className="pu-showing">
-            {t("Showing")} {rangeStart}–{rangeEnd} {t("of")} {filteredUsers.length} {t("users")}
-          </span>
-
-          <label className="pu-pagination-size">
-            <span className="sr-only">{t("Rows per page")}</span>
-            <select
-              value={pageSize}
-              onChange={(event) => {
-                setPageSize(Number(event.target.value));
-                setPage(1);
-              }}
-              aria-label={t("Rows per page")}
-            >
-              {[7, 10, 20, 50].map((size) => (
-                <option key={size} value={size}>
-                  {size} / {t("page")}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <div className="pu-pagination-controls">
-            <button
-              type="button"
-              aria-label={t("Previous page")}
-              disabled={safePage <= 1}
-              onClick={() => setPage(Math.max(1, safePage - 1))}
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            {getPageList(safePage, totalPages).map((item, index) =>
-              item === '…' ? (
-                <span className="pu-page-gap" key={`gap-${index}`}>
-                  …
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  key={item}
-                  className={item === safePage ? 'active' : ''}
-                  aria-current={item === safePage ? 'page' : undefined}
-                  onClick={() => setPage(item)}
-                >
-                  {item}
-                </button>
-              )
-            )}
-
-            <button
-              type="button"
-              aria-label={t("Next page")}
-              disabled={safePage >= totalPages}
-              onClick={() => setPage(Math.min(totalPages, safePage + 1))}
-            >
-              <ChevronRight size={16} />
-            </button>
+        {filteredUsers.length > 0 && (
+          <div className="pu-infinite-status" ref={loadMoreRef} aria-live="polite">
+            {visibleUsers.length < filteredUsers.length
+              ? t('Scroll to load more users')
+              : `${t('Showing all')} ${filteredUsers.length} ${t('users')}`}
           </div>
-        </div>
-      </section>
-
-      {/* Analytics */}
-      <section className="pu-analytics-grid">
-        {/* Recent activity */}
-        <div className="pu-analytics-card">
-          <div className="pu-analytics-heading">
-            <h2>{t("Recent User Activity")}</h2>
-            <button
-              type="button"
-              className="pu-view-all-button"
-              onClick={() => setShowAllActivity((value) => !value)}
-              aria-expanded={showAllActivity}
-             >
-              {showAllActivity ? t("Close details") : t("View All")}
-            </button>
-          </div>
-
-          <div className="pu-activity-list">
-            {ACTIVITY.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div className="pu-activity-item" key={item.id}>
-                  <span className={`pu-activity-icon ${item.tone}`}>
-                    <Icon size={16} strokeWidth={2.4} />
-                  </span>
-                  <div className="pu-activity-content">
-                    <p>
-                      <strong>{item.name}</strong> {t(item.text)}
-                    </p>
-                    <span>
-                      {t(item.detail)} &nbsp;·&nbsp; {t(item.time)}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {showAllActivity && (
-            <div className="pu-activity-expanded" role="region" aria-label={t('Latest activity')}>
-              <div className="pu-activity-expanded-heading"><span className="pu-activity-expanded-mark"><CalendarCheck size={16} /></span><strong>{t('Latest activity')}</strong></div>
-              {ACTIVITY.map((item) => (
-                <div className="pu-activity-expanded-row" key={`expanded-${item.id}`}>
-                  <strong>{item.name}</strong><span>{t(item.text)}</span><small>{t(item.detail)} · {t(item.time)}</small>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Role distribution */}
-        <div className="pu-analytics-card">
-          <div className="pu-analytics-heading">
-            <h2>{t("Role Distribution")}</h2>
-          </div>
-
-          <div className="pu-role-chart-layout">
-            <div className="pu-role-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={roleDistribution}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius="58%"
-                    outerRadius="98%"
-                    stroke="#fff"
-                    strokeWidth={2}
-                    label={renderSliceLabel}
-                    labelLine={false}
-                    onClick={(entry) => setDrilldownRole(entry?.role || entry?.payload?.role || null)}
-                    cursor="pointer"
-                  >
-                    {roleDistribution.map((entry) => (
-                      <Cell key={entry.name} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value, name) => [`${value} ${t("users")}`, t(name)]} />
-                </PieChart>
-              </ResponsiveContainer>
-
-              <div className="pu-chart-center">
-                <strong>{roleTotal}</strong>
-                <span>{t("Total Users")}</span>
-              </div>
-            </div>
-
-            <div className="pu-role-legend">
-              {roleDistribution.map((item) => (
-                <button
-                  type="button"
-                  className={`pu-role-legend-item ${drilldownRole === item.role ? 'active' : ''}`}
-                  key={item.name}
-                  onClick={() => setDrilldownRole((current) => current === item.role ? null : item.role)}
-                  aria-label={`${item.name}: ${item.value} users`}
-                >
-                  <span className="pu-role-legend-dot" style={{ background: item.color }} />
-                  <span className="pu-role-legend-name">{t(item.name)}</span>
-                  <strong>{item.value}</strong>
-                </button>
-              ))}
-            </div>
-          </div>
-          {drilldownRole && (
-            <div className="pu-chart-drilldown" role="region" aria-label={t('Drill-down details')}>
-              <div className="pu-chart-drilldown-heading">
-                <div><strong>{t(drilldownRole)}</strong><span>{t('Users in this role')}</span></div>
-                <button type="button" className="pu-icon-action" onClick={() => setDrilldownRole(null)} aria-label={t('Close details')}><X size={16} /></button>
-              </div>
-              <div className="pu-chart-drilldown-stats">
-                <strong>{dateFilteredUsers.filter((user) => user.role === drilldownRole).length}</strong>
-                <span>{t('Total Users')}</span>
-              </div>
-              <div className="pu-chart-drilldown-users">
-                {dateFilteredUsers.filter((user) => user.role === drilldownRole).slice(0, 5).map((user) => (
-                  <button type="button" key={user.id} onClick={() => showUserDetails(user)}><UserAvatar user={user} /><span><strong>{user.name}</strong><small>{user.email}</small></span><ChevronRight size={15} /></button>
-                ))}
-                {dateFilteredUsers.every((user) => user.role !== drilldownRole) && <p>{t('No users match this role.')}</p>}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Access security */}
-        <div className="pu-analytics-card">
-          <div className="pu-analytics-heading">
-            <h2 className="pu-heading-with-icon">
-              <ShieldCheck size={20} />
-              {t("Access Security")}
-            </h2>
-          </div>
-
-          <div className="pu-security-list">
-            <div className="pu-security-row">
-              <span className="pu-security-icon">
-                <Lock size={18} />
-              </span>
-              <div className="pu-security-copy">
-                <div className="pu-security-line">
-                  <span>{t("MFA Enabled")}</span>
-                  <strong>{mfaPercent}%</strong>
-                </div>
-                <div className="pu-progress-track">
-                  <span className="green" style={{ width: `${mfaPercent}%` }} />
-                </div>
-              </div>
-            </div>
-
-            <div className="pu-security-row">
-              <span className="pu-security-icon">
-                <Users size={18} />
-              </span>
-              <div className="pu-security-copy">
-                <div className="pu-security-line">
-                  <span>{t("Users with MFA")}</span>
-                  <strong>
-                    {counts.mfa} / {counts.total}
-                  </strong>
-                </div>
-                <div className="pu-progress-track">
-                  <span className="blue" style={{ width: `${mfaPercent}%` }} />
-                </div>
-              </div>
-            </div>
-
-            <div className="pu-security-row">
-              <span className="pu-security-icon">
-                <CalendarCheck size={18} />
-              </span>
-              <div className="pu-security-copy">
-                <div className="pu-security-line">
-                  <span>{t("Last access review")}</span>
-                  <strong>{new Date(2026, 9, 20).toLocaleDateString(language === 'fr' ? 'fr-FR' : language === 'de' ? 'de-DE' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong>
-                </div>
-                <span className="pu-review-completed">{t("Completed")}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </section>
 
       {/* Row actions menu (fixed so it is never clipped by the table) */}
@@ -1584,8 +1368,6 @@ export default function PlatformUsers({ language: languageProp } = {}) {
           </section>
         </div>
       )}
-
-      {detail && <DetailPanel data={detail} onClose={() => setDetail(null)} t={t} />}
 
       {toast && (
         <div className="pu-toast" role="status">

@@ -134,14 +134,15 @@ function LeadsOverview({ onViewAll }) {
   ];
 
   const statusColors = {
-  New: { color: '#2563eb', background: '#dbeafe' },
-  Contacted: { color: '#7c3aed', background: '#ede9fe' },
-  Qualified: { color: '#ee5913', background: '#fef3c7' },
-  Converted: { color: '#059669', background: '#d1fae5' },
-};
+    New: { color: '#2563eb', background: '#dbeafe' },
+    Contacted: { color: '#7c3aed', background: '#ede9fe' },
+    Qualified: { color: '#ee5913', background: '#fef3c7' },
+    Converted: { color: '#059669', background: '#d1fae5' },
+  };
 
   return (
-    <section className="card table-card revenue-overview-card">
+    // FIX 1: removed "revenue-overview-card" so the heading/table fonts match Recent Activities
+    <section className="card table-card">
       <header className="card-h">
         <span className="ic-sq">
           <I.Users size={16} />
@@ -157,12 +158,13 @@ function LeadsOverview({ onViewAll }) {
         </button>
       </header>
 
+      {/* FIX 2: smaller gap / padding so the metric boxes take less height */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
-          gap: 8,
-          padding: '0 12px 12px',
+          gap: 6,
+          padding: '0 10px 8px',
         }}
       >
         {metrics.map(({ label, value, icon: Icon, color }) => (
@@ -171,7 +173,7 @@ function LeadsOverview({ onViewAll }) {
             style={{
               border: '1px solid #dbeafe',
               borderRadius: 7,
-              padding: '10px 8px',
+              padding: '7px 8px',
               minWidth: 0,
               background: '#fff',
             }}
@@ -182,7 +184,7 @@ function LeadsOverview({ onViewAll }) {
                 alignItems: 'center',
                 gap: 6,
                 color: '#53647c',
-                fontSize: 11,
+                fontSize: 10,
                 whiteSpace: 'nowrap',
               }}
             >
@@ -191,10 +193,10 @@ function LeadsOverview({ onViewAll }) {
             </div>
             <div
               style={{
-                marginTop: 7,
+                marginTop: 4,
                 color: '#10264a',
                 fontWeight: 700,
-                fontSize: 19,
+                fontSize: 16,
               }}
             >
               {value}
@@ -203,8 +205,9 @@ function LeadsOverview({ onViewAll }) {
         ))}
       </div>
 
-      <div className="tscroll ro-scroll">
-        <table className="tbl ro-table">
+      {/* FIX 3: removed "ro-scroll" and "ro-table", added "leads-tbl" */}
+      <div className="tscroll">
+        <table className="tbl leads-tbl">
           <thead>
             <tr>
               <th>Lead Name</th>
@@ -229,7 +232,7 @@ function LeadsOverview({ onViewAll }) {
                       display: 'inline-block',
                       padding: '3px 8px',
                       borderRadius: 5,
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: 600,
                       whiteSpace: 'nowrap',
                     }}
@@ -246,6 +249,7 @@ function LeadsOverview({ onViewAll }) {
     </section>
   );
 }
+
 export default function Dashboard({ range, openDetail, go, toast }) {
   const { t, fmtDate } = useI18n();
   const [revenueViewAll, setRevenueViewAll] = useState(false);
@@ -378,35 +382,35 @@ export default function Dashboard({ range, openDetail, go, toast }) {
       <div className="title-row"><div><h1>{t('title')}</h1><p>{t('welcome')}</p></div></div>
 
       <div className="kpis">
-  {kpis.map((k) => {
-    const Icon = I[META[k.id]?.[0] || 'CircleHelp'];
-    const down = k.change < 0;
-    const detailKey = ['guards', 'incidents', 'revenue'].includes(k.id) && !(month && k.id !== 'revenue') ? 'dp' : 'd';
-    const description = k.id === 'revenue' && month ? t('kpi.revenue.d') : t(`kpi.${k.id}.${detailKey}`);
+        {kpis.map((k) => {
+          const Icon = I[META[k.id]?.[0] || 'CircleHelp'];
+          const down = k.change < 0;
+          const detailKey = ['guards', 'incidents', 'revenue'].includes(k.id) && !(month && k.id !== 'revenue') ? 'dp' : 'd';
+          const description = k.id === 'revenue' && month ? t('kpi.revenue.d') : t(`kpi.${k.id}.${detailKey}`);
 
-    return (
-      <div key={k.id} className="card kpi">
-        <span className={`kpi-ic ${META[k.id]?.[1] || 'blue'}`}>
-          <Icon size={26} />
-        </span>
-        <span className="kpi-t">
-          <small>{t(`kpi.${k.id}.t`)}</small>
-          <span className="kpi-v">
-            <b>{k.value}</b>
-            {k.change == null ? (
-              <em className="neutral">–</em>
-            ) : (
-              <em className={down ? 'down' : 'up'}>
-                {down ? '↓' : '↑'} {Math.abs(k.change)}%
-              </em>
-            )}
-          </span>
-        </span>
-        <span className="kpi-d">{description}</span>
+          return (
+            <div key={k.id} className="card kpi">
+              <span className={`kpi-ic ${META[k.id]?.[1] || 'blue'}`}>
+                <Icon size={26} />
+              </span>
+              <span className="kpi-t">
+                <small>{t(`kpi.${k.id}.t`)}</small>
+                <span className="kpi-v">
+                  <b>{k.value}</b>
+                  {k.change == null ? (
+                    <em className="neutral">–</em>
+                  ) : (
+                    <em className={down ? 'down' : 'up'}>
+                      {down ? '↓' : '↑'} {Math.abs(k.change)}%
+                    </em>
+                  )}
+                </span>
+              </span>
+              <span className="kpi-d">{description}</span>
+            </div>
+          );
+        })}
       </div>
-    );
-  })}
-</div>
 
       <div className="row3"><CompanyGrowthChart /><TenantPlanChart /><RevenueChart /></div>
 
